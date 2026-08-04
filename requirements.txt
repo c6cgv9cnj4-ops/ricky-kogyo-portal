@@ -1,1 +1,6 @@
 requests
+beautifulsoup4
+feedparser
+pdfplumber
+yfinance
+youtube_transcript_api

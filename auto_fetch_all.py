@@ -6,13 +6,10 @@ import requests
 # ============================================================
 # 全成果物集約ポータル 自動生成スクリプト
 #
-# これまでにAI部長（統括エージェント）が作成した各成果物URLへ
-# 定期的にアクセスし、生存確認（404ハレーション排除）を行った上で
-# 一覧ダッシュボード（docs/index.html）を再生成する。
-#
-# 各成果物そのものの中身（元データ）は個別のパイプライン
-# （例: local_portal_fetch.py）が別途更新するため、本スクリプトは
-# 「リンク切れを絶対に放置しない」ことに専念する。
+# 本リポジトリ内で自動生成される8ページ（各fetchスクリプトの出力）は
+# ファイルの存在確認のみを行う（同一パイプライン内で直前に生成される
+# ため、HTTPアクセスは不要）。姉妹リポジトリ（近隣ポータル・15分毎更新）
+# のみ、外部URLとして生存確認（404ハレーション排除）を行う。
 # ============================================================
 
 OUTPUT_DIR = "docs"
@@ -25,62 +22,74 @@ HEADERS = {
                   "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 }
 
-# category: 表示グループ名
+# type: "internal"（本リポジトリ内で自動生成・存在確認） / "external"（HTTP生存確認）
 ARTIFACTS = [
     {
+        "title": "AI部長 朝刊",
+        "path": "morning-news/",
+        "type": "internal",
+        "category": "総合ダッシュボード",
+        "team": "01_情報収集チーム",
+        "note": "他7ページの見出しを集約したダイジェスト（毎日自動更新）",
+    },
+    {
+        "title": "公式一次情報収集・分析ダッシュボード",
+        "path": "official-primary/",
+        "type": "internal",
+        "category": "総合ダッシュボード",
+        "team": "02_分析・提案チーム",
+        "note": "埼玉県警・消防本部・気象庁の公式一次情報のみを収集",
+    },
+    {
+        "title": "近隣3市 地域ポータル（北本・桶川・鴻巣）",
+        "path": "local-portal/",
+        "type": "internal",
+        "category": "地域・防災",
+        "team": "01_情報収集チーム",
+        "note": "local_portal_fetch.py を本リポジトリ内でも毎日自動実行",
+    },
+    {
+        "title": "近隣ポータル（姉妹リポジトリ／15分毎更新）",
+        "url": "https://c6cgv9cnj4-ops.github.io/kitamoto-okegawa-konosu-portal/",
+        "type": "external",
+        "category": "地域・防災",
+        "team": "01_情報収集チーム",
+        "note": "より高頻度（15分毎）に更新される専用パイプライン版",
+    },
+    {
+        "title": "4紙見出し比較ポータル",
+        "path": "newspaper/",
+        "type": "internal",
+        "category": "ニュース比較",
+        "team": "01_情報収集チーム",
+    },
+    {
+        "title": "経済ポータルダッシュボード",
+        "path": "economic/",
+        "type": "internal",
+        "category": "経済",
+        "team": "01_情報収集チーム",
+    },
+    {
         "title": "バドミントン代表・動向インテリジェンス",
-        "url": "https://claude.ai/code/artifact/2bea51e1-2b48-4be1-8052-fce54cd8bee8",
+        "path": "badminton/",
+        "type": "internal",
         "category": "スポーツ",
         "team": "02_分析・提案チーム",
     },
     {
         "title": "都内 美術館・写真展データベース",
-        "url": "https://claude.ai/code/artifact/147e2a38-c8a8-4bb8-813c-737161159ed1",
+        "path": "culture-exhibition/",
+        "type": "internal",
         "category": "カルチャー・撮影",
-        "team": "01_情報収集チーム",
-    },
-    {
-        "title": "経済ポータルダッシュボード",
-        "url": "https://claude.ai/code/artifact/8b48e4d7-532d-4fce-a424-546f47bdfb56",
-        "category": "経済",
-        "team": "01_情報収集チーム",
-    },
-    {
-        "title": "AI部長 朝刊（2026年8月1日）",
-        "url": "https://claude.ai/code/artifact/56b4f217-5dc8-4184-bf8b-63125210cfc9",
-        "category": "総合ダッシュボード",
-        "team": "01_情報収集チーム",
-    },
-    {
-        "title": "近隣3市 地域ポータル（北本・桶川・鴻巣）",
-        "url": "https://claude.ai/code/artifact/de2fe804-00a9-4ec0-8b34-13f0cd27e9d5",
-        "category": "地域・防災",
-        "team": "01_情報収集チーム",
-    },
-    {
-        "title": "4紙見出し比較ポータル",
-        "url": "https://claude.ai/code/artifact/8e525709-0b6d-4fbb-8898-17781ba2b27b",
-        "category": "ニュース比較",
         "team": "01_情報収集チーム",
     },
     {
         "title": "撮影スポット＆気象条件ダッシュボード",
-        "url": "https://claude.ai/code/artifact/d08b5c33-0e3a-4049-89e0-0f23eb8e06a1",
+        "path": "photo-spot/",
+        "type": "internal",
         "category": "カルチャー・撮影",
         "team": "01_情報収集チーム",
-    },
-    {
-        "title": "公式一次情報収集・分析ダッシュボード",
-        "url": "https://claude.ai/code/artifact/d600feee-9de2-4380-9582-5c6abb20fa27",
-        "category": "総合ダッシュボード",
-        "team": "02_分析・提案チーム",
-    },
-    {
-        "title": "近隣ポータル（北本・桶川・鴻巣／GitHub Actions自動更新）",
-        "url": "https://c6cgv9cnj4-ops.github.io/kitamoto-okegawa-konosu-portal/",
-        "category": "地域・防災",
-        "team": "01_情報収集チーム",
-        "note": "local_portal_fetch.py が15分おきに元データを再取得・自動更新中",
     },
 ]
 
@@ -94,12 +103,18 @@ CATEGORY_ORDER = [
 ]
 
 
-def check_url(url):
+def check_external(url):
     try:
         r = requests.get(url, headers=HEADERS, timeout=15, allow_redirects=True)
         return r.status_code, (r.status_code < 400)
     except requests.RequestException as e:
         return f"ERR:{type(e).__name__}", False
+
+
+def check_internal(path):
+    file_path = os.path.join(OUTPUT_DIR, path, "index.html")
+    exists = os.path.isfile(file_path)
+    return ("生成済み" if exists else "未生成"), exists
 
 
 def load_history():
@@ -120,17 +135,27 @@ def main():
 
     results = []
     for item in ARTIFACTS:
-        status_code, ok = check_url(item["url"])
-        prev = history.get(item["url"], {})
+        key = item.get("url") or item.get("path")
+        if item["type"] == "external":
+            status_code, ok = check_external(item["url"])
+            href = item["url"]
+            target_blank = True
+        else:
+            status_code, ok = check_internal(item["path"])
+            href = item["path"]
+            target_blank = False
+
+        prev = history.get(key, {})
         last_ok = now_str if ok else prev.get("last_ok", "未確認")
         results.append({
             **item,
+            "href": href,
+            "target_blank": target_blank,
             "status_code": status_code,
             "ok": ok,
-            "checked_at": now_str,
             "last_ok": last_ok,
         })
-        history[item["url"]] = {"last_ok": last_ok, "last_checked": now_str, "status_code": status_code}
+        history[key] = {"last_ok": last_ok, "last_checked": now_str, "status_code": status_code}
 
     with open(HISTORY_JSON, "w", encoding="utf-8") as f:
         json.dump(history, f, ensure_ascii=False, indent=2)
@@ -155,8 +180,9 @@ def main():
                 else '<span class="badge ng">🔴 要確認（404の可能性）</span>'
             )
             note_html = f'<p class="note">{r["note"]}</p>' if r.get("note") else ""
+            target_attr = ' target="_blank" rel="noopener"' if r["target_blank"] else ""
             cards += f"""
-            <a class="card" href="{r['url']}" target="_blank" rel="noopener">
+            <a class="card" href="{r['href']}"{target_attr}>
               <div class="card-head">
                 <span class="team">{r['team']}</span>
                 {badge}
@@ -165,7 +191,7 @@ def main():
               {note_html}
               <div class="card-foot">
                 <span>最終正常確認: {r['last_ok']}</span>
-                <span>HTTP: {r['status_code']}</span>
+                <span>{r['status_code']}</span>
               </div>
             </a>
             """
@@ -236,8 +262,8 @@ def main():
 {sections_html}
 </main>
 <footer>
-  <p>本ページはGitHub Actionsにより24時間ごとに自動巡回・更新されています（auto_fetch_all.py）。</p>
-  <p>🔴表示のリンクは404等の可能性があります。手動での再確認をおすすめします（404ハレーション絶対排除ルールに基づく自動監視）。</p>
+  <p>本ページ・配下の全ページはGitHub Actionsにより毎日自動巡回・再取得・更新されています。</p>
+  <p>🔴表示のリンクは要確認です（404ハレーション絶対排除ルールに基づく自動監視）。</p>
 </footer>
 </body>
 </html>

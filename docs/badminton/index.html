@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>バドミントン代表・動向インテリジェンス</title>
+<style>
+  :root { --bg:#0f172a; --bg-raised:#1e293b; --ink:#f8fafc; --ink-soft:#94a3b8; --rule:#334155; --accent:#5aa9e6; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif; line-height:1.7; }
+  .page { max-width: 880px; margin:0 auto; padding:28px 20px 64px; }
+  header h1 { font-size:20px; margin:0 0 4px; }
+  header .meta { font-size:12.5px; color:var(--ink-soft); margin-bottom:20px; }
+  section { margin-bottom:32px; }
+  section > h2 { font-size:16px; border-bottom:2px solid var(--rule); padding-bottom:8px; margin-bottom:14px; }
+  .empty { color:var(--ink-soft); font-size:13px; }
+  .ranking-basis { background:#1c2333; border:1px solid #3b4a6b; border-radius:8px; padding:8px 12px; font-size:12px; margin-bottom:12px; }
+  .rr-card { background:var(--bg-raised); border:1px solid var(--rule); border-radius:10px; padding:12px 16px; margin-bottom:10px; }
+  .rr-head { display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:6px; font-size:13.5px; cursor:pointer; list-style:none; }
+  .rr-head::-webkit-details-marker { display:none; }
+  .rr-card[open] .rr-head { margin-bottom:10px; }
+  .rr-card ul { margin:0 0 8px; padding-left:18px; font-size:13px; line-height:1.7; }
+  .rr-source { font-size:11.5px; color:var(--accent); text-decoration:none; }
+  .sa-group { background:#14171c; border:1px solid var(--rule); border-radius:8px; padding:8px 12px; margin-bottom:8px; }
+  .sa-school { font-weight:700; font-size:13px; margin-bottom:4px; color:var(--accent); }
+  .sa-members { font-size:12.5px; line-height:2; display:flex; flex-wrap:wrap; gap:8px; }
+  .cd-member { display:inline-block; max-width:100%; font-size:12px; font-weight:700; background:#14171c; border-radius:6px; padding:4px 8px; }
+  .cd-list { display:flex; flex-direction:column; gap:6px; }
+  .cd-row { display:grid; grid-template-columns: 1fr 1fr 1.3fr; gap:8px; background:#14171c; border:1px solid var(--rule); border-radius:8px; padding:8px 12px; font-size:12px; align-items:center; }
+  .cd-name { font-weight:700; }
+  .cd-role { color:var(--ink-soft); }
+  .cd-team { color:var(--ink-soft); }
+  .cd-career { grid-column: 1 / -1; color:var(--ink-soft); font-size:11px; }
+  .cd-highlight { display:block; color:#ffb347; font-size:11px; font-weight:400; margin-top:2px; white-space:normal; }
+  .rr-player { background:#14171c; border:1px solid var(--rule); border-radius:8px; padding:8px 12px; margin-bottom:8px; }
+  .rr-player-head { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:4px; }
+  .rr-name { font-weight:700; font-size:13px; }
+  .rr-final { font-size:11.5px; color:var(--ink-soft); margin-left:auto; }
+  .rr-player ul { margin:0; padding-left:16px; font-size:12px; color:var(--ink-soft); line-height:1.6; }
+
+  .rk-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:12px; }
+  .rk-col { background:var(--bg-raised); border:1px solid var(--rule); border-radius:10px; padding:12px 14px; }
+  .rk-col h4 { margin:0 0 8px; font-size:13px; color:var(--ink-soft); }
+  .rk-row { display:flex; flex-wrap:wrap; gap:4px 8px; align-items:baseline; font-size:13px; padding:5px 0; border-top:1px solid var(--rule); }
+  .rk-row:first-of-type { border-top:none; }
+  .rk-rank { font-weight:700; color:var(--accent); width:32px; flex-shrink:0; white-space:nowrap; }
+  .rk-name { flex:1 1 auto; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rk-change { color:var(--ink-soft); font-size:11.5px; white-space:nowrap; flex-shrink:0; }
+  .rk-points { color:var(--accent); font-size:11px; font-weight:700; white-space:nowrap; flex-shrink:0; }
+
+  .tn-time { color:var(--ink-soft); font-size:11px; }
+
+  .rt-timeline { display:flex; flex-direction:column; gap:8px; }
+  .rt-post { display:block; background:#14171c; border:1px solid var(--rule); border-radius:8px; padding:10px 12px; text-decoration:none; color:var(--ink); }
+  .rt-post-nolink { cursor:text; opacity:0.85; }
+  .rt-post:hover { border-color:var(--accent); }
+  .rt-post-head { display:flex; gap:8px; align-items:center; flex-wrap:wrap; font-size:11px; color:var(--ink-soft); margin-bottom:4px; }
+  .rt-post-city { background:rgba(90,169,230,0.18); color:var(--accent); border-radius:4px; padding:1px 6px; font-weight:700; }
+  .bd-tag { background:#3b2f1e; color:#ffb347; border-radius:4px; padding:1px 6px; font-weight:700; }
+  .rt-post-author { font-weight:600; }
+  .rt-post-time { margin-left:auto; }
+  .rt-post-body { font-size:13px; line-height:1.6; }
+
+  footer { border-top:1px solid var(--rule); padding-top:14px; font-size:12px; color:var(--ink-soft); }
+  footer ul { margin:6px 0 0; padding-left:18px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>🏸 バドミントン代表・動向インテリジェンス</h1>
+    <div class="meta">最終生成: 2026.08.04 20:17:12 JST｜学閥・相関データベースとは独立した実データ自動集約ページ</div>
+  </header>
+
+  <section>
+    <h2>BWF世界ランキング（日本人選手・カテゴリ別）</h2>
+    <p class="ranking-basis">📅 データ基準日：2026.08.04時点（自動取得元：バドスピ掲載値）</p>
+    <div class='rk-grid'><div class='rk-col'><h4>男子シングルス</h4>
+        <div class="rk-row">
+          <span class="rk-rank">#11</span>
+          <span class="rk-name">奈良岡功大</span>
+          <span class="rk-points">70,030pt（20大会）</span>
+          <span class="rk-change">--</span>
+        </div>
+        <div class="rk-row">
+          <span class="rk-rank">#18</span>
+          <span class="rk-name">渡邉航貴</span>
+          <span class="rk-points">59,570pt（22大会）</span>
+          <span class="rk-change">--</span>
+        </div>
+        <div class="rk-row">
+          <span class="rk-rank">#19</span>
+          <span class="rk-name">田中湧士</span>
+          <span class="rk-points">52,805pt（23大会）</span>
+          <span class="rk-change">--</span>
+        </div></div><div class='rk-col'><h4>女子シングルス</h4>
+        <div class="rk-row">
+          <span class="rk-rank">#2</span>
+          <span class="rk-name">山口茜</span>
+          <span class="rk-points">104,576pt（18大会）</span>
+          <span class="rk-change">--</span>
+        </div>
+        <div class="rk-row">
+          <span class="rk-rank">#8</span>
+          <span class="rk-name">宮崎友花</span>
+          <span class="rk-points">68,106pt（22大会）</span>
+          <span class="rk-change">--</span>
+        </div>
+        <div class="rk-row">
+          <span class="rk-rank">#11</span>
+          <span class="rk-name">奥原希望</span>
+          <span class="rk-points">60,310pt（18大会）</span>
+          <span class="rk-change">--</span>
+        </div></div><div class='rk-col'><h4>男子ダブルス</h4>
+        <div class="rk-row">
+          <span class="rk-rank">#8</span>
+          <span class="rk-name">保木卓朗／小林優吾</span>
+          <span class="rk-points">72,090pt（16大会）</span>
+          <span class="rk-change">--</span>
+        </div>
+        <div class="rk-row">
+          <span class="rk-rank">#21</span>
+          <span class="rk-name">熊谷翔／西大輝</span>
+          <span class="rk-points">50,318pt（18大会）</span>
+          <span class="rk-change">--</span>
+        </div>
+        <div class="rk-row">
+          <span class="rk-rank">#30</span>
+          <span class="rk-name">野村拓海／霜上雄一</span>
+          <span class="rk-points">40,671pt（16大会）</span>
+          <span class="rk-change">--</span>
+        </div></div><div class='rk-col'><h4>女子ダブルス</h4>
+        <div class="rk-row">
+          <span class="rk-rank">#2</span>
+          <span class="rk-name">福島由紀／松本麻佑</span>
+          <span class="rk-points">97,006pt（16大会）</span>
+          <span class="rk-change">--</span>
+        </div>
+        <div class="rk-row">
+          <span class="rk-rank">#7</span>
+          <span class="rk-name">中西貴映／岩永鈴</span>
+          <span class="rk-points">79,564pt（19大会）</span>
+          <span class="rk-change">--</span>
+        </div>
+        <div class="rk-row">
+          <span class="rk-rank">#14</span>
+          <span class="rk-name">保原彩夏／廣上瑠依</span>
+          <span class="rk-points">54,940pt（16大会）</span>
+          <span class="rk-change">--</span>
+        </div></div><div class='rk-col'><h4>混合ダブルス</h4>
+        <div class="rk-row">
+          <span class="rk-rank">#15</span>
+          <span class="rk-name">霜上雄一／保原彩夏</span>
+          <span class="rk-points">52,100pt（15大会）</span>
+          <span class="rk-change">--</span>
+        </div>
+        <div class="rk-row">
+          <span class="rk-rank">#16</span>
+          <span class="rk-name">渡辺勇大／田口真彩</span>
+          <span class="rk-points">51,990pt（14大会）</span>
+          <span class="rk-change">--</span>
+        </div>
+        <div class="rk-row">
+          <span class="rk-rank">#22</span>
+          <span class="rk-name">古賀輝／齋藤夏</span>
+          <span class="rk-points">45,730pt（14大会）</span>
+          <span class="rk-change">--</span>
+        </div></div></div>
+  </section>
+
+  <section>
+    <h2>国際大会全成績アーカイブ</h2>
+    <p class="empty">※ コート別のセット経過はBWF Tournamentsoftware側の埋め込みJSウィジェットが担っており、外部からの定期取得の対象外。本欄は試合ごとの確定スコアを大会終了を待たず実データで随時掲載する。</p>
+    
+      <details class="rr-card">
+        <summary class="rr-head"><strong>YONEX Taipei Open 2026（BWF World Tour Super 300）</strong><span class="tn-time">2026.08.02</span></summary>
+        
+        <div class="rr-player">
+          <div class="rr-player-head"><span class="rr-name">沖本優大（WR #26／21歳）</span><span class="bd-tag">男子S</span><span class="rr-final">優勝</span></div>
+          <ul><li>R32 ○ 21-18,21-15 vs 蘇李陽</li><li>R16 ○ 21-17,21-16 vs ムハマド・ユスフ</li><li>QF ○ 21-12,21-10 vs キラン・ジョージ</li><li>SF ○ 21-19,21-12 vs ユ・テビン</li><li>F ○ 21-15,22-20 vs 周天成</li></ul>
+        </div>
+        <div class="rr-player">
+          <div class="rr-player-head"><span class="rr-name">武井凜生（WR #68／23歳）</span><span class="bd-tag">男子S</span><span class="rr-final">1回戦敗退</span></div>
+          <ul><li>R32 ● 15-21,21-15,23-25 vs リー・チアハオ（フルセット激闘）</li></ul>
+        </div>
+        <div class="rr-player">
+          <div class="rr-player-head"><span class="rr-name">古賀穂（WR #49／29歳）</span><span class="bd-tag">男子S</span><span class="rr-final">1回戦敗退</span></div>
+          <ul><li>R32 ● 21-11,21-14 vs プラノイ・H・S（ストレート2セット、35分で終了。棄権・不戦敗ではない）</li></ul>
+        </div>
+        <div class="rr-player">
+          <div class="rr-player-head"><span class="rr-name">水津愛美（WR #65／22歳）</span><span class="bd-tag">女子S</span><span class="rr-final">ベスト8</span></div>
+          <ul><li>R16 ○ 21-13,21-14 vs 黄晴萍</li><li>QF ● 14-21,13-21 vs グエン・トゥイ・リン</li></ul>
+        </div>
+        <div class="rr-player">
+          <div class="rr-player-head"><span class="rr-name">岡村洋輝（WR #64）／山下恭平（WR #64）</span><span class="bd-tag">男子D</span><span class="rr-final">ベスト4</span></div>
+          <ul><li>SF ● 18-21,10-21 vs レオ・ロリー・カルナンド／ダニエル・マルティン</li></ul>
+        </div>
+        <div class="rr-player">
+          <div class="rr-player-head"><span class="rr-name">松居圭一郎（WR #148）／三橋健也（WR #148）</span><span class="bd-tag">男子D</span><span class="rr-final">2回戦敗退</span></div>
+          <ul><li>R16 ● 13-21,12-21 vs リン・チアイェン／リン・ヨンシェン</li></ul>
+        </div>
+        <div class="rr-player">
+          <div class="rr-player-head"><span class="rr-name">川邊悠陽（WR #69）／松川健大（WR #69）</span><span class="bd-tag">男子D</span><span class="rr-final">ベスト8</span></div>
+          <ul><li>R16 ○ 21-9,20-22,21-14 vs マン・ウェイチョン／ソウ・ウーイーク</li><li>QF ● 21-12,14-21,18-21 vs レオ・ロリー・カルナンド／ダニエル・マルティン</li></ul>
+        </div>
+        <div class="rr-player">
+          <div class="rr-player-head"><span class="rr-name">中出すみれ（WR #71）／髙橋未夢（WR #71）</span><span class="bd-tag">女子D</span><span class="rr-final">優勝</span></div>
+          <ul><li>F ○ vs 決勝スコア詳細は出典元Wikipediaに記載なし（憶測で埋めず結果のみ掲載）</li></ul>
+        </div>
+        <div class="rr-player">
+          <div class="rr-player-head"><span class="rr-name">渡辺勇大（WR #19）／田口真彩（WR #19）</span><span class="bd-tag">混合D</span><span class="rr-final">優勝（ツアー初優勝）</span></div>
+          <ul><li>F ○ 2-0 vs チャイニーズタイペイ・ペア（詳細スコアは出典元に完全記載なし）</li></ul>
+        </div>
+        <a class="rr-source" href="https://en.wikipedia.org/wiki/2026_Taipei_Open" target="_blank" rel="noopener">出典を見る →</a>
+      </details>
+  </section>
+
+  <details class="rr-card">
+    <summary class="rr-head"><strong>バドミントン界 学閥・出身校別有力選手リスト</strong></summary>
+    
+      <p class="empty">※ 2026.08.03個別Web検索で確認済みの実データ。男子現役＝青、女子現役＝ピンク、スタッフ＝グレーで色分け。各校内は年齢の高い順（年上→年下）でソート。年齢は生まれ年から算出（月日不明分は年単位の概算）。判明している項目のみ表示。大学閥は出身高校が判明済みの分のみカッコ内に併記。指導者陣は高校/大学が判明した分のみここに統合、それ以外は下の一覧に別掲。</p>
+      <h4>高校閥・大学閥（現役選手＋出身校判明済みスタッフ）</h4>
+      
+      <div class="sa-group"><div class="sa-school">埼玉栄高校</div><div class="sa-members"><span class="cd-member" style="color:#4A90E2">緑川大輝（26歳／埼玉県／NTT東日本／[D/XD]／現役）</span><span class="cd-member" style="color:#FF69B4">齋藤夏（26歳／埼玉県／PLENTY GLOBAL LINX／[XD]／現役）</span><span class="cd-member" style="color:#4A90E2">渡邉航貴（27歳／埼玉県／BIPROGY／[S]／現役）</span><span class="cd-member" style="color:#4A90E2">岡村洋輝（28歳／北海道／BIPROGY／[D]／現役）</span><span class="cd-member" style="color:#4A90E2">古賀輝（32歳／福岡県／JTEKT Stingers／[XD]／現役）</span><span class="cd-member" style="color:#4A90E2">西本拳太（32歳／三重県／JTEKT Stingers／[S]／現役）</span><span class="cd-member" style="color:#9ca3af">竹内義憲（34歳／日立情報通信エンジニアリング／スタッフ）</span><span class="cd-member" style="color:#9ca3af">星野翔平（NTT東日本／スタッフ）</span><span class="cd-member" style="color:#9ca3af">中田政秀（広島県／金沢学院クラブ（コーチ）／スタッフ）</span></div></div>
+      <div class="sa-group"><div class="sa-school">聖ウルスラ学院英智高校</div><div class="sa-members"><span class="cd-member" style="color:#4A90E2">熊谷翔（24歳／宮城県／BIPROGY／[D]／現役）</span><span class="cd-member" style="color:#FF69B4">保原彩夏（28歳／宮城県／ヨネックス／[D/XD]／現役）</span><span class="cd-member" style="color:#4A90E2">野村拓海（29歳／宮城県／日立情報通信エンジニアリング／[D]／現役）</span></div></div>
+      <div class="sa-group"><div class="sa-school">富岡高校</div><div class="sa-members"><span class="cd-member" style="color:#4A90E2">小林優吾（31歳／宮城県／トナミ運輸／[D]／現役）<span class="cd-highlight">🏆2021年世界選手権 男子D 優勝（日本勢初）／2022年9月 世界ランク1位</span></span><span class="cd-member" style="color:#4A90E2">保木卓朗（31歳／山口県／トナミ運輸／[D]／現役）<span class="cd-highlight">🏆2021年世界選手権 男子D 優勝（日本勢初）／2022年9月 世界ランク1位</span></span><span class="cd-member" style="color:#9ca3af">齋藤太一（NTT東日本／スタッフ）</span></div></div>
+      <div class="sa-group"><div class="sa-school">水島工業高校</div><div class="sa-members"><span class="cd-member" style="color:#9ca3af">佐伯浩一（43歳／岡山県／NTT東日本／スタッフ）</span></div></div>
+      <div class="sa-group"><div class="sa-school">八代東高校</div><div class="sa-members"><span class="cd-member" style="color:#4A90E2">田中湧士（27歳／熊本県／NTT東日本／[S]／現役）</span><span class="cd-member" style="color:#4A90E2">霜上雄一（28歳／熊本県／日立情報通信エンジニアリング／[D/XD]／現役）</span></div></div>
+      <div class="sa-group"><div class="sa-school">柳井商工高校</div><div class="sa-members"><span class="cd-member" style="color:#FF69B4">宮崎友花（20歳／大阪府（柳井市育ち）／[S]／現役）</span><span class="cd-member" style="color:#FF69B4">水津愛美（23歳／山口県／ACT SAIKYO／[S]／現役）</span><span class="cd-member" style="color:#FF69B4">岩永鈴（27歳／山口県／BIPROGY／[D]／現役）</span></div></div>
+      <div class="sa-group"><div class="sa-school">関東第一高校</div><div class="sa-members"><span class="cd-member" style="color:#9ca3af">佐々木翔（44歳／北海道／日本代表／スタッフ）</span><span class="cd-member" style="color:#9ca3af">佐藤翔治（44歳／東京都／日本代表／NTT東日本／スタッフ）</span></div></div>
+      <div class="sa-group"><div class="sa-school">金沢市立工業高校</div><div class="sa-members"><span class="cd-member" style="color:#9ca3af">坂井一将（36歳／石川県／日本代表／スタッフ）</span></div></div>
+      <div class="sa-group"><div class="sa-school">小松原高校</div><div class="sa-members"><span class="cd-member" style="color:#9ca3af">遠藤大由（40歳／埼玉県／日本代表／BIPROGY／スタッフ）<span class="cd-highlight">🏆2015年世界選手権 男子D 銅（早川賢一と）／2016年リオ五輪出場／2020年全英オープン優勝（渡辺勇大と・日本勢初）／2021年世界選手権 準優勝</span></span></div></div>
+      <div class="sa-group"><div class="sa-school">青森山田高校</div><div class="sa-members"><span class="cd-member" style="color:#FF69B4">志田千陽（29歳／秋田県／元 再春館製薬所／[D]／現役）<span class="cd-highlight">🏆2024年パリ五輪 女子D 銅メダル</span></span><span class="cd-member" style="color:#FF69B4">福島由紀（33歳／熊本県／岐阜Bluvic／[D]／現役）</span><span class="cd-member" style="color:#9ca3af">藤井瑞希（38歳／熊本県／日本代表／スタッフ）</span><span class="cd-member" style="color:#9ca3af">篠谷菜留（日立情報通信エンジニアリング／スタッフ）</span></div></div>
+      <div class="sa-group"><div class="sa-school">高岡工芸高校</div><div class="sa-members"><span class="cd-member" style="color:#9ca3af">平田典靖（43歳／富山県／日本代表／ジェイテクトStingers監督／スタッフ）</span></div></div>
+      <div class="sa-group"><div class="sa-school">旭川実業高校</div><div class="sa-members"><span class="cd-member" style="color:#9ca3af">近藤智（北海道／コンサドーレ／スタッフ）</span></div></div>
+      <div class="sa-group"><div class="sa-school">東大阪大学柏原高校</div><div class="sa-members"><span class="cd-member" style="color:#4A90E2">下農走（29歳／大阪府／金沢学院クラブ（コーチ兼選手／元トナミ運輸）／現役）</span></div></div>
+      <div class="sa-group"><div class="sa-school">勝山高校</div><div class="sa-members"><span class="cd-member" style="color:#FF69B4">山口茜（29歳／福井県／再春館製薬所／[S]／現役）<span class="cd-highlight">🏆世界選手権 女子S 2連覇（2021・2022）／2022年全英オープン優勝／2025年3度目の世界選手権優勝</span></span></div></div>
+      <div class="sa-group"><div class="sa-school">九州国際大学付属高校</div><div class="sa-members"><span class="cd-member" style="color:#FF69B4">松山奈未（28歳／福岡県／再春館製薬所／[D]／現役）<span class="cd-highlight">🏆2024年パリ五輪 女子D 銅メダル</span></span></div></div>
+      <div class="sa-group"><div class="sa-school">比叡山高校</div><div class="sa-members"><span class="cd-member" style="color:#9ca3af">早川賢一（40歳／BIPROGY監督（元日本ユニシス）／スタッフ）<span class="cd-highlight">🏆2014年トマス杯 団体優勝貢献／2015年世界選手権 男子D 銅（遠藤大由と）／2016年リオ五輪 男子D 5位入賞</span></span></div></div>
+      <div class="sa-group"><div class="sa-school">札幌第一高等学校</div><div class="sa-members"><span class="cd-member" style="color:#9ca3af">吉原康司（34歳／北海道／コンサドーレ（元選手）／スタッフ）</span><span class="cd-member" style="color:#9ca3af">吉田仁（46歳／北海道／コンサドーレ監督／スタッフ）</span></div></div>
+      <div class="sa-group"><div class="sa-school">日本大学</div><div class="sa-members"><span class="cd-member" style="color:#4A90E2">熊谷翔（24歳／聖ウルスラ学院英智高校出身／宮城県／BIPROGY／[D]／現役）</span><span class="cd-member" style="color:#4A90E2">奈良岡功大（25歳／青森県／NTT東日本／[S]／現役）<span class="cd-highlight">🏆2023年世界選手権（コペンハーゲン）男子S 準優勝（銀）</span></span><span class="cd-member" style="color:#4A90E2">田中湧士（27歳／八代東高校出身／熊本県／NTT東日本／[S]／現役）</span><span class="cd-member" style="color:#9ca3af">早川賢一（40歳／比叡山高校出身／BIPROGY監督（元日本ユニシス）／スタッフ）<span class="cd-highlight">🏆2014年トマス杯 団体優勝貢献／2015年世界選手権 男子D 銅（遠藤大由と）／2016年リオ五輪 男子D 5位入賞</span></span><span class="cd-member" style="color:#9ca3af">佐伯浩一（43歳／水島工業高校出身／岡山県／NTT東日本／スタッフ）</span><span class="cd-member" style="color:#9ca3af">大嶋一彰（日立情報通信エンジニアリング／スタッフ）</span></div></div>
+      <div class="sa-group"><div class="sa-school">早稲田大学</div><div class="sa-members"><span class="cd-member" style="color:#4A90E2">緑川大輝（26歳／埼玉栄高校出身／埼玉県／NTT東日本／[D/XD]／現役）</span><span class="cd-member" style="color:#FF69B4">齋藤夏（26歳／埼玉栄高校出身／埼玉県／PLENTY GLOBAL LINX／[XD]／現役）</span><span class="cd-member" style="color:#FF69B4">岩永鈴（27歳／柳井商工高校出身／山口県／BIPROGY／[D]／現役）</span><span class="cd-member" style="color:#FF69B4">中西貴映（31歳／神奈川県／BIPROGY／[D]／現役）</span><span class="cd-member" style="color:#4A90E2">古賀輝（32歳／埼玉栄高校出身／福岡県／JTEKT Stingers／[XD]／現役）</span><span class="cd-member" style="color:#9ca3af">齋藤太一（富岡高校出身／NTT東日本／スタッフ）</span></div></div>
+      <div class="sa-group"><div class="sa-school">日本体育大学</div><div class="sa-members"><span class="cd-member" style="color:#4A90E2">霜上雄一（28歳／八代東高校出身／熊本県／日立情報通信エンジニアリング／[D/XD]／現役）</span><span class="cd-member" style="color:#4A90E2">山下恭平（28歳／岡山県／NTT東日本／[D]／現役）</span><span class="cd-member" style="color:#9ca3af">竹内義憲（34歳／埼玉栄高校出身／日立情報通信エンジニアリング／スタッフ）</span><span class="cd-member" style="color:#9ca3af">遠藤大由（40歳／小松原高校出身／埼玉県／日本代表／BIPROGY／スタッフ）<span class="cd-highlight">🏆2015年世界選手権 男子D 銅（早川賢一と）／2016年リオ五輪出場／2020年全英オープン優勝（渡辺勇大と・日本勢初）／2021年世界選手権 準優勝</span></span><span class="cd-member" style="color:#9ca3af">平田典靖（43歳／高岡工芸高校出身／富山県／日本代表／ジェイテクトStingers監督／スタッフ）</span><span class="cd-member" style="color:#9ca3af">星野翔平（埼玉栄高校出身／NTT東日本／スタッフ）</span></div></div>
+      <div class="sa-group"><div class="sa-school">専修大学</div><div class="sa-members"><span class="cd-member" style="color:#9ca3af">石井裕二（ジェイテクトStingers（副部長兼総監督）／スタッフ）</span></div></div>
+      <div class="sa-group"><div class="sa-school">中央大学</div><div class="sa-members"><span class="cd-member" style="color:#9ca3af">中田政秀（埼玉栄高校出身／広島県／金沢学院クラブ（コーチ）／スタッフ）</span></div></div>
+      <div class="sa-group"><div class="sa-school">札幌大学</div><div class="sa-members"><span class="cd-member" style="color:#9ca3af">吉田仁（46歳／札幌第一高等学校出身／北海道／コンサドーレ監督／スタッフ）</span></div></div>
+      <div class="sa-group"><div class="sa-school">北翔大学</div><div class="sa-members"><span class="cd-member" style="color:#9ca3af">吉原康司（34歳／札幌第一高等学校出身／北海道／コンサドーレ（元選手）／スタッフ）</span></div></div>
+  </details>
+
+  <details class="rr-card">
+    <summary class="rr-head"><strong>指導者陣（監督・コーチ）出身校・所属チーム一覧</strong></summary>
+    
+      <p class="empty">※ 学校閥に統合できた指導者陣は上の「学閥」欄に掲載。ここでは残りの指導者陣を掲載（全員グレー表記でスタッフと明示）。年齢は生まれ年が判明した分のみ算出。日本代表コーチ陣＋S/Jリーグ男子8チームの監督・コーチを網羅（女子12チーム・S/JリーグIIは今後拡張予定）。</p>
+      <div class="cd-list">
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">大堀均</span>
+        <span class="cd-role">ヘッドコーチ</span>
+        <span class="cd-team">日本代表</span>
+        <span class="cd-career">福島県立富岡高校でバドミントン部を創設・強化し桃田賢斗／渡辺勇大／東野有紗らを育成／2025年に日本代表ヘッドコーチ就任</span>
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">井田貴子</span>
+        <span class="cd-role">コーチ</span>
+        <span class="cd-team">日本代表</span>
+        <span class="cd-career">現役時代：2000年シドニー五輪 日本代表</span>
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">リー・ワンワー</span>
+        <span class="cd-role">コーチ</span>
+        <span class="cd-team">日本代表</span>
+        <span class="cd-career">現役時代：2000/2004/2008年五輪マレーシア代表（シドニー4位）／世界選手権銅メダル2回・アジア選手権優勝</span>
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">中島慶</span>
+        <span class="cd-role">コーチ</span>
+        <span class="cd-team">日本代表</span>
+        <span class="cd-career">中国出身（旧名：丁其慶）／髙橋礼華・松友美佐紀組（リオ五輪金）を指導</span>
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">今井紀夫</span>
+        <span class="cd-role">JOC専任コーチ</span>
+        <span class="cd-team">日本代表</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">ハルモノ・ユウォノ</span>
+        <span class="cd-role">コーチ</span>
+        <span class="cd-team">日立情報通信エンジニアリング</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">和田周</span>
+        <span class="cd-role">コーチ</span>
+        <span class="cd-team">ジェイテクトStingers</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">市川和洋</span>
+        <span class="cd-role">コーチ</span>
+        <span class="cd-team">ジェイテクトStingers</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">小林晃</span>
+        <span class="cd-role">コーチ</span>
+        <span class="cd-team">ジェイテクトStingers</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">杉山勝美</span>
+        <span class="cd-role">部長（元部長兼監督）</span>
+        <span class="cd-team">日立情報通信エンジニアリング</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">長谷川進</span>
+        <span class="cd-role">監督</span>
+        <span class="cd-team">金沢学院クラブ</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">高木孝一郎</span>
+        <span class="cd-role">監督</span>
+        <span class="cd-team">三菱自動車京都</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">数野健太（41歳）</span>
+        <span class="cd-role">ヘッドコーチ</span>
+        <span class="cd-team">三菱自動車京都</span>
+        <span class="cd-career">元日本ユニシス実業団選手／早川賢一と大学インカレ男子D優勝</span>
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">西薗弘典</span>
+        <span class="cd-role">コーチ</span>
+        <span class="cd-team">三菱自動車京都</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">常山明良</span>
+        <span class="cd-role">コーチ</span>
+        <span class="cd-team">三菱自動車京都</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">西谷春樹</span>
+        <span class="cd-role">コーチ</span>
+        <span class="cd-team">三菱自動車京都</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">五十嵐優</span>
+        <span class="cd-role">コーチ</span>
+        <span class="cd-team">BIPROGY</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">澤田奈緒美</span>
+        <span class="cd-role">マネジャー</span>
+        <span class="cd-team">BIPROGY</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">星千智</span>
+        <span class="cd-role">スタッフ</span>
+        <span class="cd-team">BIPROGY</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">齊藤昇</span>
+        <span class="cd-role">オーナー</span>
+        <span class="cd-team">BIPROGY</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">柴田昌宏</span>
+        <span class="cd-role">バドミントン部長</span>
+        <span class="cd-team">BIPROGY</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">荒木純</span>
+        <span class="cd-role">監督</span>
+        <span class="cd-team">トナミ運輸</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">安村康介</span>
+        <span class="cd-role">マネジャー</span>
+        <span class="cd-team">トナミ運輸</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">ヘンキー・イラワン</span>
+        <span class="cd-role">ヘッドコーチ</span>
+        <span class="cd-team">トナミ運輸</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">トニー・グナワン</span>
+        <span class="cd-role">コーチ</span>
+        <span class="cd-team">トナミ運輸</span>
+        <span class="cd-career">2000年シドニー五輪 男子D 金メダル（チャンドラ・ウィジャヤと）／2001年世界選手権優勝（ハリム・ハリアントと）／2005年世界選手権優勝（米国代表として）</span>
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">細智映</span>
+        <span class="cd-role">監督</span>
+        <span class="cd-team">豊田通商</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">吉村徳仁</span>
+        <span class="cd-role">コーチ兼選手</span>
+        <span class="cd-team">豊田通商</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">前田知鶴代</span>
+        <span class="cd-role">副監督</span>
+        <span class="cd-team">豊田通商</span>
+        
+      </div>
+      <div class="cd-row">
+        <span class="cd-name" style="color:#9ca3af">佐藤冴香</span>
+        <span class="cd-role">ヘッドコーチ（女子）</span>
+        <span class="cd-team">豊田通商</span>
+        
+      </div></div>
+  </details>
+
+  <footer>
+    データ取得状況（スキップログ）:
+    <ul><li>なし</li></ul>
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>撮影スポット＆気象条件ダッシュボード</title>
+<style>
+  :root {
+    --paper: #EFF2ED;
+    --paper-raised: #FFFFFF;
+    --ink: #1F2620;
+    --ink-soft: #57604F;
+    --ink-faint: #838C7C;
+    --accent: #3F6B4A;
+    --accent-warm: #96690E;
+    --rule: #D6DCD1;
+    --sky: #3E6FA6;
+    --night: #2C3454;
+    --warn-bg: #F3ECD9;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "Noto Sans JP", system-ui, sans-serif;
+    line-height: 1.7;
+  }
+  .mono { font-family: ui-monospace, "SF Mono", "Roboto Mono", monospace; font-variant-numeric: tabular-nums; }
+  .page { max-width: 960px; margin: 0 auto; padding: 32px 20px 64px; }
+
+  header.top { border-bottom: 3px solid var(--accent); padding-bottom: 16px; margin-bottom: 20px; }
+  header.top h1 { font-size: 26px; margin: 0 0 6px; color: var(--accent); }
+  header.top .meta { color: var(--ink-soft); font-size: 13px; }
+
+  .moon-strip {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: var(--night);
+    color: #E8ECF7;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .moon-strip .moon-title { font-weight: 700; font-size: 14px; opacity: 0.85; }
+  .moon-strip .moon-main { font-size: 20px; font-weight: 700; }
+  .moon-strip .moon-sub { font-size: 13px; opacity: 0.85; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 2px rgba(31,38,32,0.06), 0 8px 20px -14px rgba(31,38,32,0.3);
+  }
+  .card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .card-head h3 { font-size: 16.5px; margin: 0; text-wrap: balance; }
+  .city-badge { font-size: 11px; color: var(--ink-faint); white-space: nowrap; }
+
+  .tag-row { margin: 8px 0 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: 11px; font-weight: 600;
+    background: rgba(63,107,74,0.1); color: var(--accent);
+    padding: 2px 8px; border-radius: 999px;
+  }
+
+  .weather-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px 6px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 10px 0;
+    margin-bottom: 12px;
+  }
+  .wstat { display: flex; flex-direction: column; }
+  .wlabel { font-size: 10.5px; color: var(--ink-faint); }
+  .wvalue { font-size: 13.5px; font-weight: 700; color: var(--sky); }
+
+  .cloudsea-box {
+    background: var(--warn-bg);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+  }
+  .cloudsea-label { font-size: 13px; font-weight: 700; color: var(--accent-warm); margin-bottom: 4px; }
+  .cloudsea-reasons { margin: 0; padding-left: 18px; font-size: 12px; color: var(--ink-soft); }
+  .disclaimer { font-size: 10.5px; color: var(--ink-faint); margin-top: 4px; }
+
+  .lens-box { border-top: 1px dashed var(--rule); padding-top: 10px; }
+  .lens-title { font-size: 11px; color: var(--ink-faint); }
+  .lens-name { font-size: 14.5px; font-weight: 700; margin: 2px 0; }
+  .lens-meta { font-size: 12px; color: var(--ink-soft); }
+  .lens-reason { font-size: 11.5px; color: var(--ink-faint); margin-top: 2px; }
+
+  .empty { font-size: 12.5px; color: var(--ink-faint); }
+
+  footer { margin-top: 32px; border-top: 1px solid var(--rule); padding-top: 14px; font-size: 12px; color: var(--ink-faint); }
+  footer ul { margin: 6px 0 0; padding-left: 18px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="top">
+    <h1>撮影スポット＆気象条件ダッシュボード</h1>
+    <div class="meta">機材レコメンド付き｜最終更新: 2026-08-04 20:17</div>
+  </header>
+
+  <div class="moon-strip">
+    <div class="moon-title">今夜の月</div>
+    <div class="moon-main">満月〜下弦</div>
+    <div class="moon-sub mono">月齢 20.7 ／ 照度目安 65.4%（低いほど星空向き）</div>
+  </div>
+
+  <div class="grid">
+    
+    <div class="card">
+      <div class="card-head">
+        <h3>北本自然観察公園</h3>
+        <span class="city-badge">北本市</span>
+      </div>
+      <div class="tag-row"><span class='tag'>風景</span><span class='tag'>スナップ</span><span class='tag'>花</span><span class='tag'>植物</span></div>
+      
+        <div class="weather-grid">
+          <div class="wstat"><span class="wlabel">天気</span><span class="wvalue">晴れ</span></div>
+          <div class="wstat"><span class="wlabel">気温</span><span class="wvalue mono">24.2℃</span></div>
+          <div class="wstat"><span class="wlabel">湿度</span><span class="wvalue mono">73%</span></div>
+          <div class="wstat"><span class="wlabel">風速</span><span class="wvalue mono">6.1m/s</span></div>
+          <div class="wstat"><span class="wlabel">雲量</span><span class="wvalue mono">39%</span></div>
+          <div class="wstat"><span class="wlabel">日出/日没</span><span class="wvalue mono">04:51 / 18:44</span></div>
+        </div>
+      
+      <div class="lens-box">
+        <div class="lens-title">推奨レンズ</div>
+        <div class="lens-name">SIGMA MACRO 50mm F2.8 EX DG</div>
+        <div class="lens-meta mono">レンズ単体 320g ／ 総重量（ボディ込み） 1110g</div>
+        <div class="lens-reason">選定根拠: 花・植物</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <h3>荒川河川敷（桶川市）</h3>
+        <span class="city-badge">桶川市</span>
+      </div>
+      <div class="tag-row"><span class='tag'>風景</span><span class='tag'>夜景</span><span class='tag'>スナップ</span><span class='tag'>鳥</span><span class='tag'>遠景</span></div>
+      
+        <div class="weather-grid">
+          <div class="wstat"><span class="wlabel">天気</span><span class="wvalue">晴れ</span></div>
+          <div class="wstat"><span class="wlabel">気温</span><span class="wvalue mono">24.4℃</span></div>
+          <div class="wstat"><span class="wlabel">湿度</span><span class="wvalue mono">75%</span></div>
+          <div class="wstat"><span class="wlabel">風速</span><span class="wvalue mono">8.0m/s</span></div>
+          <div class="wstat"><span class="wlabel">雲量</span><span class="wvalue mono">39%</span></div>
+          <div class="wstat"><span class="wlabel">日出/日没</span><span class="wvalue mono">04:51 / 18:44</span></div>
+        </div>
+      
+      <div class="lens-box">
+        <div class="lens-title">推奨レンズ</div>
+        <div class="lens-name">EF24-105mm F4 L IS USM</div>
+        <div class="lens-meta mono">レンズ単体 670g ／ 総重量（ボディ込み） 1460g</div>
+        <div class="lens-reason">選定根拠: 風景・スナップ</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <h3>鴻巣ポピー・コスモスフェア会場</h3>
+        <span class="city-badge">鴻巣市</span>
+      </div>
+      <div class="tag-row"><span class='tag'>花</span><span class='tag'>マクロ</span><span class='tag'>イベント</span><span class='tag'>植物</span></div>
+      
+        <div class="weather-grid">
+          <div class="wstat"><span class="wlabel">天気</span><span class="wvalue">快晴</span></div>
+          <div class="wstat"><span class="wlabel">気温</span><span class="wvalue mono">24.3℃</span></div>
+          <div class="wstat"><span class="wlabel">湿度</span><span class="wvalue mono">75%</span></div>
+          <div class="wstat"><span class="wlabel">風速</span><span class="wvalue mono">7.6m/s</span></div>
+          <div class="wstat"><span class="wlabel">雲量</span><span class="wvalue mono">14%</span></div>
+          <div class="wstat"><span class="wlabel">日出/日没</span><span class="wvalue mono">04:51 / 18:44</span></div>
+        </div>
+      
+      <div class="lens-box">
+        <div class="lens-title">推奨レンズ</div>
+        <div class="lens-name">SIGMA MACRO 50mm F2.8 EX DG</div>
+        <div class="lens-meta mono">レンズ単体 320g ／ 総重量（ボディ込み） 1110g</div>
+        <div class="lens-reason">選定根拠: 花・マクロ・植物</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <h3>美の山公園（雲海展望）</h3>
+        <span class="city-badge">秩父市・皆野町</span>
+      </div>
+      <div class="tag-row"><span class='tag'>雲海</span><span class='tag'>風景</span><span class='tag'>星空</span><span class='tag'>夜景</span></div>
+      
+        <div class="weather-grid">
+          <div class="wstat"><span class="wlabel">天気</span><span class="wvalue">快晴</span></div>
+          <div class="wstat"><span class="wlabel">気温</span><span class="wvalue mono">22.2℃</span></div>
+          <div class="wstat"><span class="wlabel">湿度</span><span class="wvalue mono">80%</span></div>
+          <div class="wstat"><span class="wlabel">風速</span><span class="wvalue mono">3.4m/s</span></div>
+          <div class="wstat"><span class="wlabel">雲量</span><span class="wvalue mono">15%</span></div>
+          <div class="wstat"><span class="wlabel">日出/日没</span><span class="wvalue mono">04:53 / 18:46</span></div>
+        </div>
+      
+        <div class="cloudsea-box">
+          <div class="cloudsea-label">【推測】雲海 発生可能性：中程度（スコア60/100）</div>
+          <ul class="cloudsea-reasons"><li>寒暖差5.9℃（やや弱いが可能性あり）</li><li>風速3.4m/s（やや風あり）</li><li>湿度80%（高湿度）</li><li>雲量15%（晴れて放射冷却が進みやすい）</li></ul>
+          <div class="disclaimer">※気象条件からのAI推定であり、公式予報ではありません。</div>
+        </div>
+      <div class="lens-box">
+        <div class="lens-title">推奨レンズ</div>
+        <div class="lens-name">SIGMA 35mm F1.4 DG HSM | Art</div>
+        <div class="lens-meta mono">レンズ単体 665g ／ 総重量（ボディ込み） 1455g</div>
+        <div class="lens-reason">選定根拠: 星空・夜景</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <h3>北本駅東口 商店街スナップ</h3>
+        <span class="city-badge">北本市</span>
+      </div>
+      <div class="tag-row"><span class='tag'>スナップ</span><span class='tag'>イベント</span><span class='tag'>万能</span></div>
+      
+        <div class="weather-grid">
+          <div class="wstat"><span class="wlabel">天気</span><span class="wvalue">晴れ</span></div>
+          <div class="wstat"><span class="wlabel">気温</span><span class="wvalue mono">24.3℃</span></div>
+          <div class="wstat"><span class="wlabel">湿度</span><span class="wvalue mono">75%</span></div>
+          <div class="wstat"><span class="wlabel">風速</span><span class="wvalue mono">7.6m/s</span></div>
+          <div class="wstat"><span class="wlabel">雲量</span><span class="wvalue mono">27%</span></div>
+          <div class="wstat"><span class="wlabel">日出/日没</span><span class="wvalue mono">04:51 / 18:44</span></div>
+        </div>
+      
+      <div class="lens-box">
+        <div class="lens-title">推奨レンズ</div>
+        <div class="lens-name">EF24-105mm F4 L IS USM</div>
+        <div class="lens-meta mono">レンズ単体 670g ／ 総重量（ボディ込み） 1460g</div>
+        <div class="lens-reason">選定根拠: スナップ・イベント・万能</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    データ取得状況（スキップログ）:
+    <ul><li>なし（すべての情報源から正常に取得できました）</li></ul>
+    <p>気象データ: Open-Meteo（無償API）／ 月齢: 天文計算式（常時計算可能）／ 雲海スコアはAIによる推定値です。</p>
+  </footer>
+</div>
+</body>
+</html>

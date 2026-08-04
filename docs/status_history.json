@@ -1,47 +1,47 @@
 {
-  "https://claude.ai/code/artifact/2bea51e1-2b48-4be1-8052-fce54cd8bee8": {
-    "last_ok": "2026-08-04 17:35 JST",
-    "last_checked": "2026-08-04 17:35 JST",
-    "status_code": 200
+  "morning-news/": {
+    "last_ok": "2026-08-04 20:28 JST",
+    "last_checked": "2026-08-04 20:28 JST",
+    "status_code": "生成済み"
   },
-  "https://claude.ai/code/artifact/147e2a38-c8a8-4bb8-813c-737161159ed1": {
-    "last_ok": "2026-08-04 17:35 JST",
-    "last_checked": "2026-08-04 17:35 JST",
-    "status_code": 200
+  "official-primary/": {
+    "last_ok": "2026-08-04 20:28 JST",
+    "last_checked": "2026-08-04 20:28 JST",
+    "status_code": "生成済み"
   },
-  "https://claude.ai/code/artifact/8b48e4d7-532d-4fce-a424-546f47bdfb56": {
-    "last_ok": "2026-08-04 17:35 JST",
-    "last_checked": "2026-08-04 17:35 JST",
-    "status_code": 200
-  },
-  "https://claude.ai/code/artifact/56b4f217-5dc8-4184-bf8b-63125210cfc9": {
-    "last_ok": "2026-08-04 17:35 JST",
-    "last_checked": "2026-08-04 17:35 JST",
-    "status_code": 200
-  },
-  "https://claude.ai/code/artifact/de2fe804-00a9-4ec0-8b34-13f0cd27e9d5": {
-    "last_ok": "2026-08-04 17:35 JST",
-    "last_checked": "2026-08-04 17:35 JST",
-    "status_code": 200
-  },
-  "https://claude.ai/code/artifact/8e525709-0b6d-4fbb-8898-17781ba2b27b": {
-    "last_ok": "2026-08-04 17:35 JST",
-    "last_checked": "2026-08-04 17:35 JST",
-    "status_code": 200
-  },
-  "https://claude.ai/code/artifact/d08b5c33-0e3a-4049-89e0-0f23eb8e06a1": {
-    "last_ok": "2026-08-04 17:35 JST",
-    "last_checked": "2026-08-04 17:35 JST",
-    "status_code": 200
-  },
-  "https://claude.ai/code/artifact/d600feee-9de2-4380-9582-5c6abb20fa27": {
-    "last_ok": "2026-08-04 17:35 JST",
-    "last_checked": "2026-08-04 17:35 JST",
-    "status_code": 200
+  "local-portal/": {
+    "last_ok": "2026-08-04 20:28 JST",
+    "last_checked": "2026-08-04 20:28 JST",
+    "status_code": "生成済み"
   },
   "https://c6cgv9cnj4-ops.github.io/kitamoto-okegawa-konosu-portal/": {
-    "last_ok": "2026-08-04 17:35 JST",
-    "last_checked": "2026-08-04 17:35 JST",
+    "last_ok": "2026-08-04 20:28 JST",
+    "last_checked": "2026-08-04 20:28 JST",
     "status_code": 200
+  },
+  "newspaper/": {
+    "last_ok": "2026-08-04 20:28 JST",
+    "last_checked": "2026-08-04 20:28 JST",
+    "status_code": "生成済み"
+  },
+  "economic/": {
+    "last_ok": "2026-08-04 20:28 JST",
+    "last_checked": "2026-08-04 20:28 JST",
+    "status_code": "生成済み"
+  },
+  "badminton/": {
+    "last_ok": "2026-08-04 20:28 JST",
+    "last_checked": "2026-08-04 20:28 JST",
+    "status_code": "生成済み"
+  },
+  "culture-exhibition/": {
+    "last_ok": "2026-08-04 20:28 JST",
+    "last_checked": "2026-08-04 20:28 JST",
+    "status_code": "生成済み"
+  },
+  "photo-spot/": {
+    "last_ok": "2026-08-04 20:28 JST",
+    "last_checked": "2026-08-04 20:28 JST",
+    "status_code": "生成済み"
   }
 }

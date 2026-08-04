@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>公式一次情報収集・分析ダッシュボード｜AI部長</title>
+<style>
+  :root {
+    --bg:#f4f6f8; --card-bg:#ffffff; --text:#1a1f24; --sub:#5b6570;
+    --accent:#2a5bd7; --border:#e2e6ea;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#12161b; --card-bg:#1b2027; --text:#eef1f4; --sub:#9aa4af; --border:#2a313a; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,"Hiragino Sans","Yu Gothic",sans-serif; padding:32px 20px 60px;
+  }
+  header, main { max-width:920px; margin:0 auto; }
+  header h1 { font-size:1.5rem; margin:0 0 6px; }
+  header p { color:var(--sub); font-size:0.9rem; margin:4px 0; }
+  .back { display:inline-block; margin-bottom:14px; color:var(--accent); text-decoration:none; font-size:0.85rem; }
+  .stats { display:flex; flex-wrap:wrap; gap:12px; margin:18px 0 30px; }
+  .stat { background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:12px 16px; min-width:140px; }
+  .stat-num { font-size:1.4rem; font-weight:700; }
+  .stat-label { font-size:0.78rem; color:var(--sub); margin-top:2px; }
+  section { margin-bottom:26px; background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:18px 20px; }
+  section h2 { font-size:1.02rem; margin:0 0 6px; border-left:4px solid var(--accent); padding-left:10px; }
+  .origin { font-size:0.76rem; color:var(--sub); margin:0 0 12px; word-break:break-all; }
+  .origin a { color:var(--sub); }
+  ul.list { list-style:none; margin:0; padding:0; }
+  ul.list li { padding:8px 0; border-top:1px dashed var(--border); display:flex; justify-content:space-between; gap:12px; font-size:0.9rem; }
+  ul.list li:first-child { border-top:none; }
+  ul.list a { color:var(--text); text-decoration:none; }
+  ul.list a:hover { text-decoration:underline; }
+  .date { color:var(--sub); font-size:0.76rem; white-space:nowrap; }
+  .empty { color:var(--sub); font-size:0.86rem; }
+  footer { max-width:920px; margin:24px auto 0; color:var(--sub); font-size:0.76rem; }
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="../">← 全成果物ポータルに戻る</a>
+  <h1>🏛️ 公式一次情報収集・分析ダッシュボード</h1>
+  <p>埼玉県警・埼玉県央広域消防本部・気象庁の公式一次情報のみを収集対象とし、二次情報や憶測は含めません。</p>
+  <div class="stats">
+    <div class="stat"><div class="stat-num">32</div><div class="stat-label">直近件数（全ソース合計）</div></div>
+    <div class="stat"><div class="stat-num">3/4</div><div class="stat-label">新着ありのソース数</div></div>
+  </div>
+</header>
+<main>
+
+        <section>
+          <h2>埼玉県警 鴻巣警察署 新着情報</h2>
+          <p class="origin">一次情報源: <a href="https://www.police.pref.saitama.lg.jp/kenke/kesatsusho/konosu/shinchaku/index.html" target="_blank" rel="noopener">https://www.police.pref.saitama.lg.jp/kenke/kesatsusho/konosu/shinchaku/index.html</a></p>
+          <ul class="list">
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0140/yotyou080728.html" target="_blank" rel="noopener">特殊詐欺予兆電話情報（7月28日分）オレオレ詐欺に注意！</a>
+                  <span class="date">8月3日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0140/2026jidouonseikaisi.html" target="_blank" rel="noopener">警察署代表電話への音声応答転送装置の導入について</a>
+                  <span class="date">7月31日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0140/yotyou080723.html" target="_blank" rel="noopener">特殊詐欺予兆電話情報（7月23日分）家電量販店騙りの詐欺電話が急増！</a>
+                  <span class="date">7月30日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0140/yotyou080724.html" target="_blank" rel="noopener">特殊詐欺予兆電話情報（7月24日から7月27日分）郵便局騙りの詐欺電話が急増！</a>
+                  <span class="date">7月30日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0140/yotyou080721.html" target="_blank" rel="noopener">特殊詐欺予兆電話情報（7月21日分）オレオレ詐欺に注意！</a>
+                  <span class="date">7月28日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0140/keikai080629.html" target="_blank" rel="noopener">警戒情報（令和8年6月29日～7月5日認知）</a>
+                  <span class="date">7月28日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0140/yotyou080717-.html" target="_blank" rel="noopener">特殊詐欺予兆電話情報（7月17日から7月20日分）オレオレ詐欺に注意！</a>
+                  <span class="date">7月23日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0140/kenke/2026koutsuujiko2.html" target="_blank" rel="noopener">北本市内で交通死亡事故が発生</a>
+                  <span class="date">7月22日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0140/hanzaitoukei4.html" target="_blank" rel="noopener">鴻巣警察署犯罪統計</a>
+                  <span class="date">7月15日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0140/keikai080622.html" target="_blank" rel="noopener">警戒情報（令和8年6月22日～6月28日認知）</a>
+                  <span class="date">7月15日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0140/keikai080608.html" target="_blank" rel="noopener">警戒情報（令和8年6月8日～6月14日認知）</a>
+                  <span class="date">7月9日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0140/kansyajyou080626alsok.html" target="_blank" rel="noopener">感謝状の贈呈（令和8年6月26日特殊詐欺水際防止功労）</a>
+                  <span class="date">7月8日</span>
+                </li></ul>
+        </section>
+        <section>
+          <h2>埼玉県警 上尾警察署 新着情報</h2>
+          <p class="origin">一次情報源: <a href="https://www.police.pref.saitama.lg.jp/kenke/kesatsusho/ageo/shinchaku/index.html" target="_blank" rel="noopener">https://www.police.pref.saitama.lg.jp/kenke/kesatsusho/ageo/shinchaku/index.html</a></p>
+          <ul class="list">
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0130/kenke/kyougikai-ageo-6-11/kyougikai-ageo-8-6-5.html" target="_blank" rel="noopener">令和8年第2回上尾警察署協議会開催概要</a>
+                  <span class="date">7月16日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0130/kenke/kotsu/bougaiunten.html" target="_blank" rel="noopener">妨害運転は悪質で危険です！</a>
+                  <span class="date">6月25日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0130/kenke/kotsu/r8_obon_menkyo.html" target="_blank" rel="noopener">お盆期間中の運転免許手続</a>
+                  <span class="date">6月11日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0130/2026rokuonki.html" target="_blank" rel="noopener">防犯対策電話録音機を無償配付します！</a>
+                  <span class="date">4月14日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0130/kenke/kyougikai-ageo-6-11/kyougikai-ageo-3-2.html" target="_blank" rel="noopener">令和8年第1回上尾警察署協議会開催概要</a>
+                  <span class="date">4月10日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0130/jitensya0403.html" target="_blank" rel="noopener">自転車盗難に注意</a>
+                  <span class="date">4月6日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0130/taiya0305.html" target="_blank" rel="noopener">タイヤ・ホイールの盗難が増えています</a>
+                  <span class="date">3月6日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0130/0201saposagi.html" target="_blank" rel="noopener">サポート詐欺に注意！</a>
+                  <span class="date">2月2日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0130/kenke/kyougikai-ageo-10-28.html" target="_blank" rel="noopener">令和7年第3回上尾警察署協議会開催概要</a>
+                  <span class="date">12月3日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0130/kenke/kyougikai-ageo-6-19.html" target="_blank" rel="noopener">令和7年第2回上尾警察署協議会開催概要</a>
+                  <span class="date">8月14日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0130/kenke/hurikome180904.html" target="_blank" rel="noopener">防犯講話申請書様式</a>
+                  <span class="date">8月4日</span>
+                </li>
+                <li>
+                  <a href="https://www.police.pref.saitama.lg.jp/p0130/kenke/akiyataisaku.html" target="_blank" rel="noopener">空き家が狙われています！</a>
+                  <span class="date">6月10日</span>
+                </li></ul>
+        </section>
+        <section>
+          <h2>埼玉県央広域消防本部 公式お知らせ</h2>
+          <p class="origin">一次情報源: <a href="https://www.ken-o.or.jp/firehead/" target="_blank" rel="noopener">https://www.ken-o.or.jp/firehead/</a></p>
+          <ul class="list">
+                <li>
+                  <a href="https://www.ken-o.or.jp/news/firehead-cat/post-10724/" target="_blank" rel="noopener">熱中症に注意しましょう（救急搬送人員速報値）</a>
+                  <span class="date">2026年08月04日</span>
+                </li>
+                <li>
+                  <a href="https://www.ken-o.or.jp/news/firehead-cat/post-13333/" target="_blank" rel="noopener">解体予定の建物を使用して訓練を実施しました。</a>
+                  <span class="date">2026年07月23日</span>
+                </li>
+                <li>
+                  <a href="https://www.ken-o.or.jp/guide/staff-recruit/" target="_blank" rel="noopener">令和8年度消防職員採用試験受験案内を掲載しました。［第1次試験日：9月20日（日）］</a>
+                  <span class="date">2026年07月01日</span>
+                </li>
+                <li>
+                  <a href="https://www.ken-o.or.jp/news/firehead-cat/post-13221/" target="_blank" rel="noopener">水難救助合同訓練を実施しました。</a>
+                  <span class="date">2026年06月30日</span>
+                </li>
+                <li>
+                  <a href="https://www.ken-o.or.jp/news/firehead-cat/post-6779-2/" target="_blank" rel="noopener">救急現場での協力者に対する表彰式を行いました。［令和8年6月14日（日）］</a>
+                  <span class="date">2026年06月19日</span>
+                </li>
+                <li>
+                  <a href="https://www.ken-o.or.jp/news/firehead-cat/post-13116/" target="_blank" rel="noopener">県央だよりvol.43　掲載内容の訂正とお詫び</a>
+                  <span class="date">2026年06月19日</span>
+                </li>
+                <li>
+                  <a href="https://www.ken-o.or.jp/guide/staff-recruit/briefing-session/" target="_blank" rel="noopener">消防本部主催の採用説明会を７月12日（日）に開催します。</a>
+                  <span class="date">2026年06月15日</span>
+                </li>
+                <li>
+                  <a href="https://www.ken-o.or.jp/news/firehead-cat/post-8900/" target="_blank" rel="noopener">消防・救急フェアを開催します</a>
+                  <span class="date">2026年06月11日</span>
+                </li></ul>
+        </section>
+        <section>
+          <h2>気象庁 地震情報（埼玉県該当分）</h2>
+          <p class="origin">一次情報源: <a href="https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml" target="_blank" rel="noopener">https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml</a></p>
+          <p class="empty">現在、対象となる新着情報はありません（正常にアクセスできています）。</p>
+        </section>
+</main>
+<footer>
+  <p>最終更新: 2026-08-04 20:22 JST｜GitHub Actionsにより毎日自動更新（official_primary_fetch.py）</p>
+  <p>本ページは各公式機関の一次情報のみを対象とし、要約・見出しの改変は行いません（原文タイトルをそのまま掲載）。</p>
+</footer>
+</body>
+</html>

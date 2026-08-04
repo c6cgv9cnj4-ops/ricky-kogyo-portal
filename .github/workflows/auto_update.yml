@@ -23,12 +23,39 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Check all deliverable links and rebuild portal
+      # 近隣3市地域ポータル（badminton/official-primaryが関数を再利用するため最初に実行）
+      - name: Fetch: 近隣3市 地域ポータル
+        run: python local_portal_fetch.py
+
+      - name: Fetch: バドミントン代表・動向インテリジェンス
+        run: python badminton_intelligence.py
+
+      - name: Fetch: 都内 美術館・写真展データベース
+        run: python culture_exhibition_dashboard.py
+
+      - name: Fetch: 経済ポータルダッシュボード
+        run: python economic_portal_dashboard.py
+
+      - name: Fetch: 4紙見出し比較ポータル
+        run: python newspaper_portal.py
+
+      - name: Fetch: 撮影スポット＆気象条件ダッシュボード
+        run: python photo_spot_dashboard.py
+
+      - name: Fetch: 公式一次情報収集・分析ダッシュボード
+        run: python official_primary_fetch.py
+
+      # 朝刊は他ページの生成結果を読むため最後から2番目に実行
+      - name: Build: AI部長 朝刊（他ページ見出しダイジェスト）
+        run: python morning_news_fetch.py
+
+      # ルートポータル（各ページの存在確認＋トップindex.html再生成）を最後に実行
+      - name: Build: 全成果物ポータル（トップページ）
         run: python auto_fetch_all.py
 
       - name: Commit and push if changed
         run: |
           git config user.name "ricky-kogyo-portal-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add docs/index.html docs/status_history.json
+          git add docs/
           git diff --cached --quiet && echo "No changes" || (git commit -m "auto: update all-deliverables portal $(date -u +'%Y-%m-%d %H:%M UTC')" && git push)

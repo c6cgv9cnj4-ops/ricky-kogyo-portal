@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>都内 美術館・写真展データベース</title>
+<style>
+  :root { --bg:#121212; --bg-raised:#1e1e1e; --ink:#f2f2f2; --ink-soft:#a3a3a3; --rule:#333; --accent:#c9a24b; --free:#4fb08a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif; line-height:1.7; }
+  .page { max-width: 1000px; margin:0 auto; padding:28px 20px 64px; }
+  header h1 { font-size:22px; margin:0 0 4px; }
+  header .meta { font-size:12.5px; color:var(--ink-soft); margin-bottom:16px; }
+
+  .tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+  .tab-btn { background:var(--bg-raised); color:var(--ink); border:1px solid var(--rule); border-radius:999px; padding:7px 14px; font-size:13px; cursor:pointer; }
+  .tab-btn.active { background:var(--accent); color:#1a1400; border-color:var(--accent); font-weight:700; }
+
+  .filters { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+  .filter-btn { background:var(--bg-raised); color:var(--ink-soft); border:1px solid var(--rule); border-radius:6px; padding:6px 12px; font-size:12px; cursor:pointer; font-weight:600; }
+  .filter-btn.active { color:var(--free); border-color:var(--free); }
+  .filter-btn-hot { border-color:#e2665a; color:#e2665a; }
+  .filter-btn-hot.active { background:linear-gradient(135deg, #e2665a, #c9a24b); color:#1a0d0a; border-color:#e2665a; box-shadow:0 0 10px rgba(226,102,90,0.5); }
+
+  .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:14px; }
+  .card { display:block; background:var(--bg-raised); border:1px solid var(--rule); border-radius:10px; padding:16px 18px; text-decoration:none; color:var(--ink); }
+  .card:hover { border-color:var(--accent); }
+  .card-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .venue-tag { font-size:11px; color:var(--accent); font-weight:700; }
+  .cat-badge { font-size:10px; font-weight:700; padding:2px 8px; border-radius:999px; }
+  .cat-badge.cat-photo { background:rgba(6,182,212,0.18); color:#22d3ee; }
+  .cat-badge.cat-art { background:rgba(168,85,247,0.18); color:#c084fc; }
+  .cat-badge.cat-other { background:rgba(163,163,163,0.18); color:var(--ink-soft); }
+  .title { font-size:14.5px; margin:0 0 6px; }
+  .status-badge { font-size:10.5px; background:rgba(79,176,138,0.2); color:var(--free); padding:2px 6px; border-radius:4px; }
+  .period { font-size:12px; color:var(--ink-soft); margin-bottom:10px; }
+  .period.muted { font-style:italic; }
+  .access-badge { font-size:11px; color:var(--accent); background:rgba(201,162,75,0.1); padding:4px 8px; border-radius:6px; margin-bottom:8px; display:inline-block; }
+  .price-badge { font-size:12px; font-weight:700; color:var(--free); background:rgba(79,176,138,0.1); padding:4px 8px; border-radius:6px; margin-bottom:8px; display:inline-block; }
+  .info-row { display:flex; justify-content:space-between; font-size:11.5px; border-top:1px solid var(--rule); padding-top:6px; margin-top:6px; }
+  .info-label { color:var(--ink-soft); }
+  .info-value { text-align:right; max-width:65%; }
+  .empty { color:var(--ink-soft); }
+
+  footer { margin-top:32px; border-top:1px solid var(--rule); padding-top:14px; font-size:12px; color:var(--ink-soft); }
+  footer ul { margin:6px 0 14px; padding-left:18px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>都内 美術館・写真展データベース</h1>
+    <div class="meta">最終生成: 2026-08-04 20:19｜取得件数: 138件</div>
+  </header>
+
+  <div class="filters">
+    <button class="filter-btn" data-filter="disc-free">♿ 障害者手帳：無料</button>
+    <button class="filter-btn" data-filter="disc-discount">♿ 障害者手帳：割引</button>
+    <button class="filter-btn" data-filter="cat-art">🎨 美術展</button>
+    <button class="filter-btn" data-filter="cat-photo">📷 写真展</button>
+    <button class="filter-btn filter-btn-hot" data-filter="open">🔥 現在開催中</button>
+  </div>
+
+  <div class="grid" id="grid">
+    <a class="card" href="https://www.nact.jp/exhibition_special/2026/picasso_paulsmith/" target="_blank" rel="noopener"
+       data-venue="国立新美術館" data-free="1" data-open="1"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">国立新美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">ピカソ meets ポール・スミス　遊び心の冒険へ <span class='status-badge'>開催中</span></h3>
+      <div class='period'>2026年6月10日（水） ～ 2026年9月21日（月・祝）</div>
+      <div class='access-badge'>🚶 東京メトロ千代田線「乃木坂駅」6出口 徒歩1分（直結）</div>
+      <div class='price-badge'>🎟️ 1,200円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">中学生以下、障害者手帳等をお持ちの方とその付添者 1 名は無料です。</span></div>
+    </a>
+    <a class="card" href="https://www.artizon.museum/exhibition/detail/602" target="_blank" rel="noopener"
+       data-venue="アーティゾン美術館" data-free="1" data-open="1"
+       data-free-price="0" data-category="art"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">アーティゾン美術館</div><span class='cat-badge cat-art'>🎨 美術展</span></div>
+      <h3 class="title">エットレ・ソットサス —魔法がはじまるとき、デザインは生まれる <span class='status-badge'>予約受付中</span></h3>
+      <div class='period'>2026年6月23日[火] - 10月4日[日]</div>
+      <div class='access-badge'>🚶 東京メトロ「京橋駅」6・7出口 徒歩5分／JR「東京駅」八重洲中央口 徒歩5分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">障がい者手帳をお持ちの方と 付き添いの方1名 無料 予約不要 入館時に障がい者手帳をご提示ください。</span></div>
+    </a>
+    <a class="card" href="https://www.artizon.museum/exhibition/detail/604" target="_blank" rel="noopener"
+       data-venue="アーティゾン美術館" data-free="1" data-open="1"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">アーティゾン美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">瀧口修造　書くことと描くこと <span class='status-badge'>予約受付中</span></h3>
+      <div class='period'>2026年6月23日[火] - 10月4日[日]</div>
+      <div class='access-badge'>🚶 東京メトロ「京橋駅」6・7出口 徒歩5分／JR「東京駅」八重洲中央口 徒歩5分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">障がい者手帳をお持ちの方と 付き添いの方1名 無料 予約不要 入館時に障がい者手帳をご提示ください。</span></div>
+    </a>
+    <a class="card" href="https://www.tnm.jp/modules/r_free_page/index.php?id=2760" target="_blank" rel="noopener"
+       data-venue="東京国立博物館" data-free="0" data-open="1"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立博物館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">弘法大師生誕1250年記念 特別展「空海と真言の名宝」 <span class='status-badge'>開催中</span></h3>
+      <div class='period'>2026年7月14日（火）～2026年9月6日（日）</div>
+      <div class='access-badge'>🚶 JR「上野駅」公園口 徒歩10分</div>
+      <div class='price-badge'>🎟️ 2,300円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">入館の際に生徒手帳、障がい者手帳などをご提示ください。</span></div>
+    </a>
+    <a class="card" href="https://www.tnm.jp/modules/r_free_page/index.php?id=2766" target="_blank" rel="noopener"
+       data-venue="東京国立博物館" data-free="0" data-open="1"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立博物館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">特別企画「ビフォー縄文　旧石器時代発見80周年」 <span class='status-badge'>開催中</span></h3>
+      <div class='period'>2026年6月16日（火）～2026年8月23日（日）</div>
+      <div class='access-badge'>🚶 JR「上野駅」公園口 徒歩10分</div>
+      <div class='price-badge'>🎟️ 1,000円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">入館の際に障害者手帳等をご提示ください。</span></div>
+    </a>
+    <a class="card" href="https://www.tnm.jp/modules/r_exhibition/index.php?controller=item&amp;id=8565" target="_blank" rel="noopener"
+       data-venue="東京国立博物館" data-free="1" data-open="1"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立博物館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">特集 仏教の花―蓮と宝相華― <span class='status-badge'>開催中</span></h3>
+      <div class='period'>2026年6月23日（火）～2026年8月30日（日）</div>
+      <div class='access-badge'>🚶 JR「上野駅」公園口 徒歩10分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">総合文化展は本人・介護者各1名無料（公式ページ確認）。特別展は個別に取得困難（要アクセス）</span></div>
+    </a>
+    <a class="card" href="https://shoto-museum.jp/exhibitions/212takashima/" target="_blank" rel="noopener"
+       data-venue="渋谷区立松濤美術館" data-free="1" data-open="1"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">渋谷区立松濤美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">没後50年 髙島野十郎展 <span class='status-badge'>開催中</span></h3>
+      <div class='period'>2026年7月4日(土)～9月6日(日)　July 4, 2026－September 6, 2026前期：7月4日（土） ～8月2日（日） 後期：8月4日（火）～9月6日（日） ※会期中、一部展示替えあり</div>
+      <div class='access-badge'>🚶 京王井の頭線「神泉駅」徒歩5分／JR「渋谷駅」徒歩15分</div>
+      <div class='price-badge'>🎟️ 1000円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者各1名 無料（公式FAQ確認）</span></div>
+    </a>
+    <a class="card" href="https://mot-art-museum.jp/exhibitions/mot-collection-260428/" target="_blank" rel="noopener"
+       data-venue="東京都現代美術館" data-free="1" data-open="1"
+       data-free-price="1" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都現代美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">MOTコレクション はじめて、びじゅつ <span class='status-badge'>開催中</span></h3>
+      <div class='period'>2026年4月28日 〜 8月16日｜🔍手動確認 2026-08-02（JS描画サイトのため自動更新非対応）</div>
+      
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">※ 身体障害者手帳・愛の手帳・療育手帳・精神障害者保健福祉手帳・被爆者健康手帳をお持ちの方と、その付添いの方（2名まで）は無料です。</span></div>
+    </a>
+    <a class="card" href="https://yayoikusamamuseum.jp/exhibition/" target="_blank" rel="noopener"
+       data-venue="草間彌生美術館" data-free="0" data-open="1"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">草間彌生美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">クサマズ・ポップ <span class='status-badge'>開催中</span></h3>
+      <div class='period'>2026年4月16日 〜 8月30日｜🔍手動確認 2026-08-02（JS描画サイトのため自動更新非対応）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">取得困難（要アクセス・JS描画サイトのため個別ページ自動確認不可）</span></div>
+    </a>
+    <a class="card" href="https://www.suntory.co.jp/sma/exhibition/" target="_blank" rel="noopener"
+       data-venue="サントリー美術館" data-free="1" data-open="1"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">サントリー美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">眼のごちそう　食器 <span class='status-badge'>開催中</span></h3>
+      <div class='period'>2026年7月8日 〜 8月30日｜🔍手動確認 2026-08-02（JS描画サイトのため自動更新非対応）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・介助者1名 無料（公式ページ実地確認、2026-08-02）</span></div>
+    </a>
+    <a class="card" href="https://www.2121designsight.jp/program/soup/" target="_blank" rel="noopener"
+       data-venue="21_21 DESIGN SIGHT" data-free="0" data-open="1"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">21_21 DESIGN SIGHT</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">企画展「スープはいのち」 <span class='status-badge'>開催中</span></h3>
+      <div class='period'>2026年3月27日 〜 8月9日｜🔍手動確認 2026-08-02（JS描画サイトのため自動更新非対応）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">取得困難（要アクセス・JS描画サイトのため個別ページ自動確認不可）</span></div>
+    </a>
+    <a class="card" href="https://personal.canon.jp/event/photographyexhibition/gallery/sato-strata" target="_blank" rel="noopener"
+       data-venue="キヤノンギャラリー" data-free="0" data-open="1"
+       data-free-price="0" data-category="photo"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">キヤノンギャラリー</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">佐藤 時啓 写真展「Strata of Time 積層する時間 八戸／東京」（品川） <span class='status-badge'>開催中</span></h3>
+      <div class='period'>2026年6月25日～2026年8月6日</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://personal.canon.jp/event/photographyexhibition/gallery/tateno-awai" target="_blank" rel="noopener"
+       data-venue="キヤノンギャラリー" data-free="0" data-open="1"
+       data-free-price="0" data-category="photo"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">キヤノンギャラリー</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">館野 二朗 写真展「AWAI 奄美2016-2025」（銀座） <span class='status-badge'>開催中</span></h3>
+      <div class='period'>2026年7月28日～2026年8月8日</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://personal.canon.jp/event/photographyexhibition/gallery/sichiku-sprite" target="_blank" rel="noopener"
+       data-venue="キヤノンギャラリー" data-free="0" data-open="1"
+       data-free-price="0" data-category="photo"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">キヤノンギャラリー</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">紫竹 理枝子 写真展「SPRITE　あいだを遊ぶ妖精たち」（大阪） <span class='status-badge'>開催中</span></h3>
+      <div class='period'>2026年7月28日～2026年8月8日</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://personal.canon.jp/event/photographyexhibition/gallery/gima-identification" target="_blank" rel="noopener"
+       data-venue="キヤノンギャラリー" data-free="0" data-open="1"
+       data-free-price="0" data-category="photo"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">キヤノンギャラリー</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">沖縄写真タイフーン＜北から南から＞連動　儀間 梨々香 写真展「見果てぬ夢の、線をなぞる」（品川） <span class='status-badge'>開催中</span></h3>
+      <div class='period'>2026年7月24日～2026年9月3日</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://personal.canon.jp/event/photographyexhibition/gallery/dextnagoya-2026" target="_blank" rel="noopener"
+       data-venue="キヤノンギャラリー" data-free="0" data-open="1"
+       data-free-price="0" data-category="photo"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">キヤノンギャラリー</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">キヤノンフォトクラブdext名古屋写真展「The stylish macro season is here」（品川） <span class='status-badge'>開催中</span></h3>
+      <div class='period'>2026年7月24日～2026年9月3日</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://shoto-museum.jp/exhibitions/213rojo/" target="_blank" rel="noopener"
+       data-venue="渋谷区立松濤美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">渋谷区立松濤美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">路上、お邪魔ですか？ <span class='status-badge'>開催予定</span></h3>
+      <div class='period'>2026年9月19日(土)～11月23日(月・祝)　September 19, 2026－November 23, 2026</div>
+      <div class='access-badge'>🚶 京王井の頭線「神泉駅」徒歩5分／JR「渋谷駅」徒歩15分</div>
+      <div class='price-badge'>🎟️ 1000円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者各1名 無料（公式FAQ確認）</span></div>
+    </a>
+    <a class="card" href="https://shoto-museum.jp/exhibitions/214naoki/" target="_blank" rel="noopener"
+       data-venue="渋谷区立松濤美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">渋谷区立松濤美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">舟越直木　見えないものに形をあたえる　―舟越家から生まれたもうひとりの異才― <span class='status-badge'>開催予定</span></h3>
+      <div class='period'>2026年12月5日(土)～2027年2月7日(日)　December 5, 2026－February 7, 2027</div>
+      <div class='access-badge'>🚶 京王井の頭線「神泉駅」徒歩5分／JR「渋谷駅」徒歩15分</div>
+      <div class='price-badge'>🎟️ 1000円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者各1名 無料（公式FAQ確認）</span></div>
+    </a>
+    <a class="card" href="https://www.yamatane-museum.jp/exhibitions/2026/togyu.html" target="_blank" rel="noopener"
+       data-venue="山種美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">山種美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">奥村土牛 ―名作でたどる100年のあゆみ― <span class='status-badge'>まもなく開催</span></h3>
+      <div class='period'>2026.8.8 [土] —2026.10.4 [日]</div>
+      
+      <div class='price-badge'>🎟️ 1500円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">株式会社 開館時間 午前10時～午後5時 (入館は午後4時30分まで) 休館日 月曜日[9/21(月･祝)、9/22(火･祝)、9/23(水・祝)は開館、9/24(木)は休館] 入館料 一般1500円(前売り1300円)、中学生以下無料(付添者の同伴が必要です) 夏の学割　大学生・高校生500円 ※障がい者手帳､被爆者健康手帳をご提示の方､およびその介助者(1名)一般1300円 ※きもの特典：きもの・ゆかたでご来館のお客様は､一般200円引きの料金となります。</span></div>
+    </a>
+    <a class="card" href="https://www.nact.jp/exhibition_special/2026/louvre2026/" target="_blank" rel="noopener"
+       data-venue="国立新美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="art"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">国立新美術館</div><span class='cat-badge cat-art'>🎨 美術展</span></div>
+      <h3 class="title">ルーヴル美術館展　ルネサンス </h3>
+      <div class='period'>2026年9月 9日（水）～2026年12月13日（日）</div>
+      <div class='access-badge'>🚶 東京メトロ千代田線「乃木坂駅」6出口 徒歩1分（直結）</div>
+      <div class='price-badge'>🎟️ 1,300円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">中学生以下、障害者手帳等をお持ちの方とその付添者 1 名は無料です。</span></div>
+    </a>
+    <a class="card" href="https://www.nact.jp/exhibition_special/2026/shojomanga/" target="_blank" rel="noopener"
+       data-venue="国立新美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">国立新美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">少女漫画・インフィニティ　萩尾望都×山岸凉子×大和和紀 三人展 </h3>
+      <div class='period'>2026年10月28日（水）～2027年2月 8日（月）</div>
+      <div class='access-badge'>🚶 東京メトロ千代田線「乃木坂駅」6出口 徒歩1分（直結）</div>
+      <div class='price-badge'>🎟️ 800円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">中学生以下、障害者手帳等をお持ちの方とその付添者 1 名は無料です。</span></div>
+    </a>
+    <a class="card" href="https://www.tobikan.jp/exhibition/2026_viewsofthisplace.html" target="_blank" rel="noopener"
+       data-venue="東京都美術館" data-free="1" data-open="0"
+       data-free-price="1" data-category="art"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都美術館</div><span class='cat-badge cat-art'>🎨 美術展</span></div>
+      <h3 class="title">東京都美術館開館100周年記念 この場所の風景―上野・大牟田・ブエノスアイレス </h3>
+      <div class='period'>2026年7月23日(木)～10月7日(水)</div>
+      <div class='access-badge'>🚶 JR「上野駅」公園改札 徒歩7分</div>
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">※身体障害者手帳・愛の手帳・療育手帳・精神障害者保健福祉手帳・被爆者健康手帳をお持ちの方とその介護者（1名まで）は無料 ※18歳以下の方、大学生、高校生、専門学校生、65歳以上の方、各種お手帳をお持ちの方は、いずれも証明できるものをご提示ください ※都内の小学・中学・高校生ならびにこれらに準ずる者とその引</span></div>
+    </a>
+    <a class="card" href="https://www.tobikan.jp/exhibition/2026_britishmuseum.html" target="_blank" rel="noopener"
+       data-venue="東京都美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="art"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都美術館</div><span class='cat-badge cat-art'>🎨 美術展</span></div>
+      <h3 class="title">東京都美術館開館100周年記念 大英博物館日本美術コレクション　百花繚乱～海を越えた江戸絵画 </h3>
+      <div class='period'>2026年7月25日(土)～10月18日(日)</div>
+      <div class='access-badge'>🚶 JR「上野駅」公園改札 徒歩7分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">・身体障害者手帳・愛の手帳・療育手帳・精神障害者保健福祉手帳・被爆者健康手帳をお持ちの方とその介護者（1名まで）は無料。</span></div>
+    </a>
+    <a class="card" href="https://www.tobikan.jp/exhibition/2026_acten.html" target="_blank" rel="noopener"
+       data-venue="東京都美術館" data-free="1" data-open="0"
+       data-free-price="1" data-category="art"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都美術館</div><span class='cat-badge cat-art'>🎨 美術展</span></div>
+      <h3 class="title">東京都美術館開館100周年記念 アート・コミュニケーション事業を体験する 2026 </h3>
+      <div class='period'>2026年7月31日(金)～8月10日(月)</div>
+      <div class='access-badge'>🚶 JR「上野駅」公園改札 徒歩7分</div>
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・介護者1名 無料とみられる（複数情報源で一致、公式ページでの料金記載は未確認）</span></div>
+    </a>
+    <a class="card" href="https://www.tobikan.jp/exhibition/2026_orsay.html" target="_blank" rel="noopener"
+       data-venue="東京都美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="art"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都美術館</div><span class='cat-badge cat-art'>🎨 美術展</span></div>
+      <h3 class="title">東京都美術館開館100周年記念 オルセー美術館所蔵　いまを生きる歓び </h3>
+      <div class='period'>2026年11月14日(土)～2027年3月28日(日)</div>
+      <div class='access-badge'>🚶 JR「上野駅」公園改札 徒歩7分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">・身体障害者手帳・愛の手帳・療育手帳・精神障害者保健福祉手帳・被爆者健康手帳をお持ちの方とその介護者（1名まで）は無料。</span></div>
+    </a>
+    <a class="card" href="https://www.tobikan.jp/exhibition/2026_waysofreading.html" target="_blank" rel="noopener"
+       data-venue="東京都美術館" data-free="1" data-open="0"
+       data-free-price="1" data-category="art"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都美術館</div><span class='cat-badge cat-art'>🎨 美術展</span></div>
+      <h3 class="title">東京都美術館開館100周年記念 あなたが世界を読むために </h3>
+      <div class='period'>2026年11月19日(木)～2027年1月11日(月・祝)</div>
+      <div class='access-badge'>🚶 JR「上野駅」公園改札 徒歩7分</div>
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・介護者1名 無料とみられる（複数情報源で一致、公式ページでの料金記載は未確認）</span></div>
+    </a>
+    <a class="card" href="https://www.tobikan.jp/exhibition/2026_archives.html" target="_blank" rel="noopener"
+       data-venue="東京都美術館" data-free="1" data-open="0"
+       data-free-price="1" data-category="art"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都美術館</div><span class='cat-badge cat-art'>🎨 美術展</span></div>
+      <h3 class="title">東京都美術館開館100周年記念 はじまりをひらく　東京都美術館の100年 </h3>
+      <div class='period'>2026年11月19日(木)～2027年1月11日(月・祝)</div>
+      <div class='access-badge'>🚶 JR「上野駅」公園改札 徒歩7分</div>
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・介護者1名 無料とみられる（複数情報源で一致、公式ページでの料金記載は未確認）</span></div>
+    </a>
+    <a class="card" href="https://www.tobikan.jp/exhibition/2027_dufy.html" target="_blank" rel="noopener"
+       data-venue="東京都美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">デュフィ展 </h3>
+      <div class='period'>2027年4月24日(土)～8月22日(日)</div>
+      <div class='access-badge'>🚶 JR「上野駅」公園改札 徒歩7分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・介護者1名 無料とみられる（複数情報源で一致、公式ページでの料金記載は未確認）</span></div>
+    </a>
+    <a class="card" href="https://www.mori.art.museum/jp/exhibitions/ronmueck/index.html" target="_blank" rel="noopener"
+       data-venue="森美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">森美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">ロン・ミュエク </h3>
+      <div class='period'>2026.4.29（水）～ 9.23（水）</div>
+      <div class='access-badge'>🚶 東京メトロ日比谷線「六本木駅」1C出口 徒歩3分（直結）</div>
+      <div class='price-badge'>🎟️ 2,300円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・介助者1名 無料とみられる（公式ニュースページ複数で確認）</span></div>
+    </a>
+    <a class="card" href="https://www.mori.art.museum/jp/exhibitions/marikomori/index.html" target="_blank" rel="noopener"
+       data-venue="森美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">森美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">森万里子：燦燦 </h3>
+      <div class='period'>2026.10.31（土）～ 2027.3.28（日）</div>
+      <div class='access-badge'>🚶 東京メトロ日比谷線「六本木駅」1C出口 徒歩3分（直結）</div>
+      <div class='price-badge'>🎟️ 2,800円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・介助者1名 無料とみられる（公式ニュースページ複数で確認）</span></div>
+    </a>
+    <a class="card" href="https://www.artizon.museum/exhibition/detail/608" target="_blank" rel="noopener"
+       data-venue="アーティゾン美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">アーティゾン美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">ジャム・セッション　石橋財団コレクション×藤井光　WHOSE LIGHT? —だれのひかりか </h3>
+      <div class='period'>2026年10月24日[土] - 2027年1月31日[日]</div>
+      <div class='access-badge'>🚶 東京メトロ「京橋駅」6・7出口 徒歩5分／JR「東京駅」八重洲中央口 徒歩5分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">障がい者手帳をお持ちの方と 付き添いの方1名 無料 予約不要 入館時に障がい者手帳をご提示ください。</span></div>
+    </a>
+    <a class="card" href="https://www.artizon.museum/exhibition/detail/610" target="_blank" rel="noopener"
+       data-venue="アーティゾン美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">アーティゾン美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">エトランゼたち —洋画家たちのヨーロッパ体験 </h3>
+      <div class='period'>2026年10月24日[土] - 2027年1月31日[日]</div>
+      <div class='access-badge'>🚶 東京メトロ「京橋駅」6・7出口 徒歩5分／JR「東京駅」八重洲中央口 徒歩5分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">障がい者手帳をお持ちの方と 付き添いの方1名 無料 予約不要 入館時に障がい者手帳をご提示ください。</span></div>
+    </a>
+    <a class="card" href="https://fujifilmsquare.jp/exhibition/260724_01.html" target="_blank" rel="noopener"
+       data-venue="フジフイルムスクエア" data-free="1" data-open="0"
+       data-free-price="1" data-category="photo"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">フジフイルムスクエア</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">星野道夫写真展 ～ NANOOK ホッキョクグマ 氷原の静かなる物語～ </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 都営大江戸線「六本木駅」8番出口 直結</div>
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">入場無料（フジフイルムスクエア共通）</span></div>
+    </a>
+    <a class="card" href="https://fujifilmsquare.jp/exhibition/260701_05.html" target="_blank" rel="noopener"
+       data-venue="フジフイルムスクエア" data-free="1" data-open="0"
+       data-free-price="1" data-category="photo"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">フジフイルムスクエア</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">「写真伝来｜写真大国ニッポンの はじまり」 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 都営大江戸線「六本木駅」8番出口 直結</div>
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">入場無料（フジフイルムスクエア共通）</span></div>
+    </a>
+    <a class="card" href="https://fujifilmsquare.jp/exhibition/260814_01.html" target="_blank" rel="noopener"
+       data-venue="フジフイルムスクエア" data-free="1" data-open="0"
+       data-free-price="1" data-category="photo"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">フジフイルムスクエア</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">北島良夫写真展 「黒き砂浜を出て…そして再び」 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 都営大江戸線「六本木駅」8番出口 直結</div>
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">入場無料（フジフイルムスクエア共通）</span></div>
+    </a>
+    <a class="card" href="https://fujifilmsquare.jp/exhibition/260814_02.html" target="_blank" rel="noopener"
+       data-venue="フジフイルムスクエア" data-free="1" data-open="0"
+       data-free-price="1" data-category="photo"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">フジフイルムスクエア</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">篠田岬輝写真展 「with　ペンギンたちの生きる島」 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 都営大江戸線「六本木駅」8番出口 直結</div>
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">入場無料（フジフイルムスクエア共通）</span></div>
+    </a>
+    <a class="card" href="https://fujifilmsquare.jp/exhibition/260814_03.html" target="_blank" rel="noopener"
+       data-venue="フジフイルムスクエア" data-free="1" data-open="0"
+       data-free-price="1" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">フジフイルムスクエア</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">ミツバチはこんなに楽しい！ ―小さな生き物の大きなチカラ― </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 都営大江戸線「六本木駅」8番出口 直結</div>
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">入場無料（フジフイルムスクエア共通）</span></div>
+    </a>
+    <a class="card" href="https://fujifilmsquare.jp/exhibition/260814_04.html" target="_blank" rel="noopener"
+       data-venue="フジフイルムスクエア" data-free="1" data-open="0"
+       data-free-price="1" data-category="photo"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">フジフイルムスクエア</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">「第18回 六本木フォトコンテスト 写真展 」 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 都営大江戸線「六本木駅」8番出口 直結</div>
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">入場無料（フジフイルムスクエア共通）</span></div>
+    </a>
+    <a class="card" href="https://fujifilmsquare.jp/exhibition/260821_01.html" target="_blank" rel="noopener"
+       data-venue="フジフイルムスクエア" data-free="1" data-open="0"
+       data-free-price="1" data-category="photo"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">フジフイルムスクエア</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">第45回　ハッセルブラッドフォトクラブ 写真展 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 都営大江戸線「六本木駅」8番出口 直結</div>
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">入場無料（フジフイルムスクエア共通）</span></div>
+    </a>
+    <a class="card" href="https://fujifilmsquare.jp/exhibition/260821_02.html" target="_blank" rel="noopener"
+       data-venue="フジフイルムスクエア" data-free="1" data-open="0"
+       data-free-price="1" data-category="photo"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">フジフイルムスクエア</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">町田奈穂写真展 「ここにいる」 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 都営大江戸線「六本木駅」8番出口 直結</div>
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">入場無料（フジフイルムスクエア共通）</span></div>
+    </a>
+    <a class="card" href="https://fujifilmsquare.jp/exhibition/260828_01.html" target="_blank" rel="noopener"
+       data-venue="フジフイルムスクエア" data-free="1" data-open="0"
+       data-free-price="1" data-category="photo"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">フジフイルムスクエア</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">2026 全日本読売写真 クラブ展 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 都営大江戸線「六本木駅」8番出口 直結</div>
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">入場無料（フジフイルムスクエア共通）</span></div>
+    </a>
+    <a class="card" href="https://fujifilmsquare.jp/exhibition/260904_01.html" target="_blank" rel="noopener"
+       data-venue="フジフイルムスクエア" data-free="1" data-open="0"
+       data-free-price="1" data-category="photo"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">フジフイルムスクエア</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">「東京写真倶楽部展」 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 都営大江戸線「六本木駅」8番出口 直結</div>
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">入場無料（フジフイルムスクエア共通）</span></div>
+    </a>
+    <a class="card" href="https://fujifilmsquare.jp/exhibition/260911_01.html" target="_blank" rel="noopener"
+       data-venue="フジフイルムスクエア" data-free="1" data-open="0"
+       data-free-price="1" data-category="photo"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">フジフイルムスクエア</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">全日写連フォトフェスティバル2026 「カラーとモノクロ　表現の競演」 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 都営大江戸線「六本木駅」8番出口 直結</div>
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">入場無料（フジフイルムスクエア共通）</span></div>
+    </a>
+    <a class="card" href="https://fujifilmsquare.jp/exhibition/260911_03.html" target="_blank" rel="noopener"
+       data-venue="フジフイルムスクエア" data-free="1" data-open="0"
+       data-free-price="1" data-category="photo"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">フジフイルムスクエア</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">「富士フイルムフォトコンテスト」 歴代グランプリ展 （第61回～第64回） </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 都営大江戸線「六本木駅」8番出口 直結</div>
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">入場無料（フジフイルムスクエア共通）</span></div>
+    </a>
+    <a class="card" href="https://topmuseum.jp/exhibition/5419/" target="_blank" rel="noopener"
+       data-venue="東京都写真美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都写真美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">TOPコレクション　明日の食卓 </h3>
+      <div class='period'>3F 展示室 2026.7.2 （木） ～ 2026.9.21 （月）</div>
+      <div class='access-badge'>🚶 JR「恵比寿駅」東口 徒歩7分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">中学生以下および障害者手帳をお持ちの方とその介護者（２名まで）、TOPMUSEUM PASSPORT 2026提示者は無料。</span></div>
+    </a>
+    <a class="card" href="https://topmuseum.jp/exhibition/5417/" target="_blank" rel="noopener"
+       data-venue="東京都写真美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都写真美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">出光真子　おんなのさくひん </h3>
+      <div class='period'>2F 展示室 2026.6.18 （木） ～ 2026.9.21 （月）</div>
+      <div class='access-badge'>🚶 JR「恵比寿駅」東口 徒歩7分</div>
+      <div class='price-badge'>🎟️ 500円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">中学生以下および障害者手帳をお持ちの方とその介護者（２名まで）、TOPMUSEUM PASSPORT 2026提示者は無料。</span></div>
+    </a>
+    <a class="card" href="https://topmuseum.jp/exhibition/5476/" target="_blank" rel="noopener"
+       data-venue="東京都写真美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都写真美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">Nikon Small World / NIKON JOICO AWARD展 </h3>
+      <div class='period'>B1F 展示室 2026.7.25 （土） ～ 2026.8.23 （日）</div>
+      <div class='access-badge'>🚶 JR「恵比寿駅」東口 徒歩7分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">※障害者手帳をお持ちの方とその介護者（2名まで）は無料。</span></div>
+    </a>
+    <a class="card" href="https://topmuseum.jp/movie/12180/" target="_blank" rel="noopener"
+       data-venue="東京都写真美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都写真美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">出光真子 おんなのさくひん――ある映像作家の自伝　上映会 </h3>
+      <div class='period'>1F ホール 6月18日(木) ～6月20日(土)  ／ 7月9日(木) ～7月12日(日) ／ 8月27日(木) ～8月30日(日) ／ 9月17日(木)～9月20日(日)</div>
+      <div class='access-badge'>🚶 JR「恵比寿駅」東口 徒歩7分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">展覧会ページは こちら ■料金（1プログラム） ● 当日券（座席指定券） ○ 一般およびシニア（60歳以上） 500円 ○ 学生および高校生以下、障害者手帳をお持ちの方（介護者2名まで１名につき）　無料 ※学生、高校生・中学生、各種お手帳をお持ちの方は、いずれも証明できるものをご提示ください。</span></div>
+    </a>
+    <a class="card" href="https://topmuseum.jp/exhibition/5423/" target="_blank" rel="noopener"
+       data-venue="東京都写真美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都写真美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">ふたたびくみたてる　日本の新進作家 vol.23 </h3>
+      <div class='period'>3F 展示室 2026.9.30 （水） ～ 2027.1.17 （日）</div>
+      <div class='access-badge'>🚶 JR「恵比寿駅」東口 徒歩7分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・介護者2名まで無料とみられる（展覧会により異なる場合ありと公式に明記）</span></div>
+    </a>
+    <a class="card" href="https://topmuseum.jp/exhibition/5421/" target="_blank" rel="noopener"
+       data-venue="東京都写真美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都写真美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">アジアン・コンテンポラリー（仮） </h3>
+      <div class='period'>2F 展示室 2026.9.30 （水） ～ 2027.1.17 （日）</div>
+      <div class='access-badge'>🚶 JR「恵比寿駅」東口 徒歩7分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・介護者2名まで無料とみられる（展覧会により異なる場合ありと公式に明記）</span></div>
+    </a>
+    <a class="card" href="https://topmuseum.jp/exhibition/12474/" target="_blank" rel="noopener"
+       data-venue="東京都写真美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都写真美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">TOKYOスマート・カルチャー・プロジェクト　奈良女子大学 長谷研究室「複製される感性－森山大道」 </h3>
+      <div class='period'>B1F 展示室 2026.9.5 （土） ～ 2026.10.18 （日）</div>
+      <div class='access-badge'>🚶 JR「恵比寿駅」東口 徒歩7分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・介護者2名まで無料とみられる（展覧会により異なる場合ありと公式に明記）</span></div>
+    </a>
+    <a class="card" href="https://topmuseum.jp/movie/12393/" target="_blank" rel="noopener"
+       data-venue="東京都写真美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都写真美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">かもめ食堂  ／ めがね ／ 土を喰らう十二ヵ月 </h3>
+      <div class='period'>1F ホール 8月7日(金)～8月16日(日) ／ 9月4日(金)～9月6日(日)</div>
+      <div class='access-badge'>🚶 JR「恵比寿駅」東口 徒歩7分</div>
+      <div class='price-badge'>🎟️ 1,800円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">■上映スケジュール（日本語字幕） ※詳細は こちら [PDF286kb] ■料金 ● 当日券（座席指定券） ○ 一般 1,800円 ○ シニア（60歳以上）1,500円 ○ 学生（大学・専門学校生） 1,500円 ○ 高校生・中学生以下（3歳以上）、障害者手帳をお持ちの方（介護者2名まで1名につき）1,000円 ※3歳未満のお子様に座席が必要な場合は料金（中学生以下）をいただきます。</span></div>
+    </a>
+    <a class="card" href="https://topmuseum.jp/movie/12613/" target="_blank" rel="noopener"
+       data-venue="東京都写真美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都写真美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">104歳、哲代さんのひとり暮らし／あなたのおみとり </h3>
+      <div class='period'>1F ホール 9月8日(火)～9月11日(金) ／ 9月15日(火)～9月16日(水) ／ 9月21日(月・祝) ～9月23日(水・祝)</div>
+      <div class='access-badge'>🚶 JR「恵比寿駅」東口 徒歩7分</div>
+      <div class='price-badge'>🎟️ 1,800円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">／ 9月21日(月・祝) ～9月23日(水・祝) ■上映スケジュール（日本語字幕） ※詳細は こちら [PDF300kb] ■料金 ● 当日券（座席指定券） ○ 一般 1,800円 ○ シニア（60歳以上）1,400円 ○ 学生（大学・専門学校生） 1,500円 ○ 高校生・中学生以下（3歳以上）、障害者手帳をお持ちの方（介護者2名まで1名につき）1,000円 ※3歳未満のお子様に座席が必要な場合は料金（中学生以下）をいただきます。</span></div>
+    </a>
+    <a class="card" href="https://news.google.com/rss/articles/CBMiggFBVV95cUxOaS1RVXdGTldqcW9RSDV6R0ZQdlJIZ1ItSnpVaXg5X29uODBldFZnSTNFU2JGR3BJNVo5UmZ2S3I0UDRETFJ4Y3ljdEItOGlvYXpiLVo1aTlNck5JZHZQNHpUVXJ3alByTDRLejNYZHpXM25yVWg1bnF4OHlGLU1GaFFB0gGCAUFVX3lxTE5pLVFVd0ZOV2pxb1FINXpHRlB2UkhnUi1KelVpeDlfb244MGV0VmdJM0VTYkZHcEk1WjlSZnZLcjRQNERMUnhjeWN0Qi04aW9hemItWjVpOU1yTklkdlA0elRVcndqUHJMNEt6M1hkelczbnJVaDVucXg4eUYtTUZoUUE?oc=5" target="_blank" rel="noopener"
+       data-venue="国立西洋美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">国立西洋美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">版画家レンブラント　挑戦、継承、インパクト </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 JR「上野駅」公園口 徒歩1分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名 無料、常設展・企画展とも（公式ページ直接確認）</span></div>
+    </a>
+    <a class="card" href="https://news.google.com/rss/articles/CBMibkFVX3lxTE5ORktVNGQyNHFXNTVyMFYzVExlckpYdUUydVZsRExCbUc0Z0lGWDZpeUt3alFqdFlNTkdxYnNFcjIydllXWlFPZXRJWFNtRmh4Z2tEUXhyYzdsb2U0Wm9xRkZ6UXpUcXhwRVk2SDdR?oc=5" target="_blank" rel="noopener"
+       data-venue="国立西洋美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">国立西洋美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">にぎやかサタデー </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 JR「上野駅」公園口 徒歩1分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名 無料、常設展・企画展とも（公式ページ直接確認）</span></div>
+    </a>
+    <a class="card" href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE5hQ19KUS1TRmFjRnBJeUZyOG0tNVJBOGtsLWg2TnRmSVZBMm9EZjBTdTlDeV9LSnBuakYxM3FXTFlRYXpPYTV0RW9oc2trMk9FSExyTmRhMXZOTWZHOVgxMg?oc=5" target="_blank" rel="noopener"
+       data-venue="国立西洋美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">国立西洋美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">版画家レンブラント 挑戦、継承、インパクト </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 JR「上野駅」公園口 徒歩1分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名 無料、常設展・企画展とも（公式ページ直接確認）</span></div>
+    </a>
+    <a class="card" href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE0wRmhnZnhYQlZTclV0NjVsNDY5MzdWNTZCNThiRzl1aHlEMmREOEZYSnd4NnlZOTVuVFpmSktPa3lRLUNtdmlOemtBZ29RckROZngwZnF5eWJXVkt0V2FUYlFXMV9RMGph?oc=5" target="_blank" rel="noopener"
+       data-venue="国立西洋美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">国立西洋美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">チュルリョーニス展 内なる星図 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 JR「上野駅」公園口 徒歩1分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名 無料、常設展・企画展とも（公式ページ直接確認）</span></div>
+    </a>
+    <a class="card" href="https://news.google.com/rss/articles/CBMibkFVX3lxTFBuWDkxXzJueFFldnRzWGhyN1RoSUhncWpQNmtLWWl3OWNyMGNlamJ5em5pXzB5Sl85RmItVXd1eThOellOMFZjS2dFMXpFZHo1eWQ0TmFNWl9kY01QMkFaNWVxeGx4RkZjS0xJQjVB?oc=5" target="_blank" rel="noopener"
+       data-venue="国立西洋美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="art"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">国立西洋美術館</div><span class='cat-badge cat-art'>🎨 美術展</span></div>
+      <h3 class="title">オルセー美術館所蔵 印象派―室内をめぐる物語 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 JR「上野駅」公園口 徒歩1分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名 無料、常設展・企画展とも（公式ページ直接確認）</span></div>
+    </a>
+    <a class="card" href="https://news.google.com/rss/articles/CBMiZkFVX3lxTE5zZ25icXQ0c0s0dmljY0lnYlE2VjliellQWlY0dGZScmpCQlFNQ0JWWDJqUEVGbmNiV2VwVFZ4cjVjTUw2LWlfdkZEanMzWUFhM2R2aWpwdFptMTcydVhFS1h6NWNHdw?oc=5" target="_blank" rel="noopener"
+       data-venue="国立西洋美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">国立西洋美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">ピカソ meets ポール・スミス </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      <div class='access-badge'>🚶 JR「上野駅」公園口 徒歩1分</div>
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名 無料、常設展・企画展とも（公式ページ直接確認）</span></div>
+    </a>
+    <a class="card" href="https://www.nezu-muse.or.jp/jp/exhibitions/upcoming/" target="_blank" rel="noopener"
+       data-venue="根津美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">根津美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">企画展 やきもの名品紀行 中国・日本・朝鮮半島 </h3>
+      <div class='period'>2026年8月15日（土）～10月12日（月・祝）</div>
+      <div class='access-badge'>🚶 東京メトロ「表参道駅」A5出口 徒歩8分</div>
+      <div class='price-badge'>🎟️ 1400円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">要 会期 2026年8月15日（土）～10月12日（月・祝） 休館日 毎週月曜日　ただし9月21日（月・祝）、10月12日（月・祝）は開館、9月24日（木）休館 開館時間 午前10時～午後5時（入館は閉館30分前まで） 入館料 オンライン日時指定予約 一般　1400円 学生（大学生以上）600円 ＊障害者手帳提示者および同伴者は200円引き、高校生以下は無料 ＊当日券は上記料金に一律200円プラスとなります。</span></div>
+    </a>
+    <a class="card" href="http://artgallery-m84.com/?p=16668" target="_blank" rel="noopener"
+       data-venue="Art Gallery M84" data-free="0" data-open="0"
+       data-free-price="0" data-category="photo"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">Art Gallery M84</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">ギド・アルゼンチーニ写真展 『女性的宇宙』 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="http://artgallery-m84.com/?p=16587" target="_blank" rel="noopener"
+       data-venue="Art Gallery M84" data-free="0" data-open="0"
+       data-free-price="0" data-category="photo"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">Art Gallery M84</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">写真家 北尾辰也氏によるギャラリートークを実施 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="http://artgallery-m84.com/?p=16518" target="_blank" rel="noopener"
+       data-venue="Art Gallery M84" data-free="0" data-open="0"
+       data-free-price="0" data-category="photo"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">Art Gallery M84</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">北尾辰也写真展『COSMIC STRUCTURES』 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="http://artgallery-m84.com/?p=16571" target="_blank" rel="noopener"
+       data-venue="Art Gallery M84" data-free="0" data-open="0"
+       data-free-price="0" data-category="photo"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">Art Gallery M84</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">北尾辰也写真展『COSMIC STRUCTURES』SOLD作品 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="http://artgallery-m84.com/?p=16438" target="_blank" rel="noopener"
+       data-venue="Art Gallery M84" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">Art Gallery M84</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">ArtCollectors`7月号の特集「ヌード エロスの視線」に本間理恵子と七菜乃掲載 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.momat.go.jp/exhibitions/569" target="_blank" rel="noopener"
+       data-venue="東京国立近代美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="photo"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立近代美術館</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">杉本博司　絶滅写真 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 2,300円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">中学生以下、障害者手帳をお持ちの方とその付添者（1名）は無料。</span></div>
+    </a>
+    <a class="card" href="https://www.momat.go.jp/exhibitions/r8-1" target="_blank" rel="noopener"
+       data-venue="東京国立近代美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立近代美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">所蔵作品展 MOMATコレクション（2026.5.26–2026.9.13） </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 500円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">5時から割引（金・土曜） ：一般　300円　大学生　150円 高校生以下および18歳未満、65歳以上、「 MOMATパスポート 」をお持ちの方、障害者手帳をお持ちの方とその付添者（1名）は無料。</span></div>
+    </a>
+    <a class="card" href="https://www.momat.go.jp/exhibitions/r8-1-g4" target="_blank" rel="noopener"
+       data-venue="東京国立近代美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="art"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立近代美術館</div><span class='cat-badge cat-art'>🎨 美術展</span></div>
+      <h3 class="title">生誕120周年 長谷川三郎と国立近代美術館 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 500円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">5時から割引（金・土曜） ：一般　300円　大学生　150円 高校生以下および18歳未満、65歳以上、「 MOMATパスポート 」をお持ちの方、障害者手帳をお持ちの方とその付添者(1名)は無料。</span></div>
+    </a>
+    <a class="card" href="https://www.momat.go.jp/exhibitions/570" target="_blank" rel="noopener"
+       data-venue="東京国立近代美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立近代美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">竹久夢二　時代を創る表現者 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 2,100円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">中学生以下、障害者手帳をお持ちの方とその付添者（1名）は無料。</span></div>
+    </a>
+    <a class="card" href="https://www.momat.go.jp/exhibitions/572" target="_blank" rel="noopener"
+       data-venue="東京国立近代美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立近代美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">速水御舟展（仮称） </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.momat.go.jp/exhibitions/567" target="_blank" rel="noopener"
+       data-venue="東京国立近代美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立近代美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">下村観山展 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 2,000円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">中学生以下、障害者手帳をお持ちの方とその付添者（1名）は無料。</span></div>
+    </a>
+    <a class="card" href="https://www.momat.go.jp/exhibitions/r7-3" target="_blank" rel="noopener"
+       data-venue="東京国立近代美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立近代美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">所蔵作品展 MOMATコレクション（2026.3.3–5.10）  </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 500円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">5時から割引（金・土曜） ：一般　300円　大学生　150円 高校生以下および18歳未満、65歳以上、「 MOMATパスポート 」をお持ちの方、障害者手帳をお持ちの方とその付添者（1名）は無料。</span></div>
+    </a>
+    <a class="card" href="https://www.momat.go.jp/exhibitions/r7-3-g4" target="_blank" rel="noopener"
+       data-venue="東京国立近代美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立近代美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">新収蔵＆特別公開｜メダルド・ロッソ《Ecce Puer（この少年を見よ）》 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 500円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">5時から割引（金・土曜） ：一般　300円　大学生　150円 高校生以下および18歳未満、65歳以上、「 MOMATパスポート 」をお持ちの方、障害者手帳をお持ちの方とその付添者(1名)は無料。</span></div>
+    </a>
+    <a class="card" href="https://www.momat.go.jp/exhibitions/566" target="_blank" rel="noopener"
+       data-venue="東京国立近代美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立近代美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">アンチ・アクション　彼女たち、それぞれの応答と挑戦 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 2,000円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">＊高校生以下および18歳未満、障害者手帳をご提示の方とその付添者(1名）は無料。</span></div>
+    </a>
+    <a class="card" href="https://www.momat.go.jp/exhibitions/r7-2" target="_blank" rel="noopener"
+       data-venue="東京国立近代美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立近代美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">所蔵作品展 MOMATコレクション（2025.11.5–2026.2.8）  </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 500円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">5時から割引（金・土曜） ：一般　300円　大学生　150円 高校生以下および18歳未満、65歳以上、「 MOMATパスポート 」をお持ちの方、障害者手帳をお持ちの方とその付添者（1名）は無料。</span></div>
+    </a>
+    <a class="card" href="https://www.momat.go.jp/exhibitions/r7-2-g4" target="_blank" rel="noopener"
+       data-venue="東京国立近代美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立近代美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">没後30年 榎倉康二 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 500円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">5時から割引（金・土曜） ：一般　300円　大学生　150円 高校生以下および18歳未満、65歳以上、「 MOMATパスポート 」をお持ちの方、障害者手帳をお持ちの方とその付添者(1名)は無料。</span></div>
+    </a>
+    <a class="card" href="https://www.momat.go.jp/exhibitions/r7-1" target="_blank" rel="noopener"
+       data-venue="東京国立近代美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立近代美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">所蔵作品展 MOMATコレクション（2025.7.15–10.26） </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 500円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">5時から割引（金・土曜） ：一般　300円　大学生　150円 高校生以下および18歳未満、65歳以上、「 MOMATパスポート 」をお持ちの方、障害者手帳をお持ちの方とその付添者(1名)は無料。</span></div>
+    </a>
+    <a class="card" href="https://www.momat.go.jp/exhibitions/r7-1-g4" target="_blank" rel="noopener"
+       data-venue="東京国立近代美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立近代美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">新収蔵＆特別公開｜コレクションにみる日韓 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 500円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">5時から割引（金・土曜） ：一般　300円　大学生　150円 高校生以下および18歳未満、65歳以上、「 MOMATパスポート 」をお持ちの方、障害者手帳をお持ちの方とその付添者(1名)は無料。</span></div>
+    </a>
+    <a class="card" href="https://www.momat.go.jp/exhibitions/563" target="_blank" rel="noopener"
+       data-venue="東京国立近代美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立近代美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">コレクションを中心とした特集　記録をひらく 記憶をつむぐ </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 1,500円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">高校生以下および18歳未満、障害者手帳をお持ちの方とその付添者（1名）は無料。</span></div>
+    </a>
+    <a class="card" href="https://www.momat.go.jp/exhibitions/561" target="_blank" rel="noopener"
+       data-venue="東京国立近代美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京国立近代美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">ヒルマ・アフ・クリント展 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 2,300円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">中学生以下、障害者手帳をお持ちの方とその付添者（1名）は無料。</span></div>
+    </a>
+    <a class="card" href="https://mot-art-museum.jp/exhibitions/" target="_blank" rel="noopener"
+       data-venue="東京都現代美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都現代美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">多田美波―光、凛と ゆれる </h3>
+      <div class='period'>2026年8月29日 〜 12月6日｜🔍手動確認 2026-08-02（JS描画サイトのため自動更新非対応）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">取得困難（要アクセス・JS描画サイトのため個別ページ自動確認不可）</span></div>
+    </a>
+    <a class="card" href="https://mot-art-museum.jp/exhibitions/" target="_blank" rel="noopener"
+       data-venue="東京都現代美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都現代美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">共時的星叢──時を共にした星たち　越境する芸術のまなざし </h3>
+      <div class='period'>2026年9月5日 〜 12月13日｜🔍手動確認 2026-08-02（JS描画サイトのため自動更新非対応）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">取得困難（要アクセス・JS描画サイトのため個別ページ自動確認不可）</span></div>
+    </a>
+    <a class="card" href="https://www.setagayaartmuseum.or.jp/exhibition/collection/" target="_blank" rel="noopener"
+       data-venue="世田谷美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">世田谷美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">コレクション展 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.setagayaartmuseum.or.jp/exhibition/past/" target="_blank" rel="noopener"
+       data-venue="世田谷美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">世田谷美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">これまでの展覧会 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.setagayaartmuseum.or.jp/exhibition/special/past.php" target="_blank" rel="noopener"
+       data-venue="世田谷美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">世田谷美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">これまでの企画展 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.setagayaartmuseum.or.jp/exhibition/collection/past.php" target="_blank" rel="noopener"
+       data-venue="世田谷美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">世田谷美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">これまでのコレクション展 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.mitsui-museum.jp/exhibition/index.html" target="_blank" rel="noopener"
+       data-venue="三井記念美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="art"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">三井記念美術館</div><span class='cat-badge cat-art'>🎨 美術展</span></div>
+      <h3 class="title">三井記念美術館 </h3>
+      <div class='period'>2026年7月4日 〜 8月30日</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">※障害者手帳をご呈示いただいた方、およびその介護者1名は無料です(ミライロIDも可)。</span></div>
+    </a>
+    <a class="card" href="https://mimt.jp/exhibition/#montmartre" target="_blank" rel="noopener"
+       data-venue="三菱一号館美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">三菱一号館美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">次々回の展覧会 2027.2.19(金) - 5.23(日) モンマルトル：ロートレック、シュザンヌ・ヴァラドンとパリの知られざる画家たち（仮称） </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://mimt.jp/exhibition/#montmartre" target="_blank" rel="noopener"
+       data-venue="三菱一号館美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">三菱一号館美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">次々回の展覧会 2027.2.19(金) - 5.23(日) モンマルトル：ロートレック、シュザンヌ・ヴァラドンとパリの知られざる画家たち（仮称） </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.ukiyoe-ota-muse.jp/exhibition/" target="_blank" rel="noopener"
+       data-venue="太田記念美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">太田記念美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">生誕290年記念　勝川春章　－北斎誕生の系譜 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 1000円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.matsuoka-museum.jp/contents/10604/" target="_blank" rel="noopener"
+       data-venue="松岡美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">松岡美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">風そよぐ情景　ヴ … 2026.06.16 ～ 2026.10.12 展示室5・6 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.matsuoka-museum.jp/contents/10624/" target="_blank" rel="noopener"
+       data-venue="松岡美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">松岡美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">五窯響宴　宋から … 2026.06.16 ～ 2026.10.12 展示室4 </h3>
+      <div class='period'>2026年6月16日 〜 10月12日</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.matsuoka-museum.jp/contents/10416/" target="_blank" rel="noopener"
+       data-venue="松岡美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">松岡美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">いにしえのエトル … 2026.02.25 ～ 2027.02.07 展示室１ </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.city.itabashi.tokyo.jp/artmuseum/4000016/4002027/4002032.html" target="_blank" rel="noopener"
+       data-venue="板橋区立美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">板橋区立美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">2026イタリア・ボローニャ国際絵本原画展 </h3>
+      <div class='period'>2026年7月8日（水曜日）～8月16日（日曜日）</div>
+      
+      <div class='price-badge'>🎟️ 900円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.city.itabashi.tokyo.jp/artmuseum/4000016/4002027/4002035.html" target="_blank" rel="noopener"
+       data-venue="板橋区立美術館" data-free="1" data-open="0"
+       data-free-price="1" data-category="art"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">板橋区立美術館</div><span class='cat-badge cat-art'>🎨 美術展</span></div>
+      <h3 class="title">館蔵品展　さっぱり　こってり　江戸絵画 </h3>
+      <div class='period'>2026年8月29日（土曜日）～9月27日（日曜日）</div>
+      
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.sompo-museum.org/exhibitions/2025/yamaguchikayo/" target="_blank" rel="noopener"
+       data-venue="SOMPO美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">SOMPO美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">山口華楊展 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 1,600円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">開館カレンダー 観覧料 当日券 事前購入券 一般（26歳以上） 1,600円 1,500円 25歳以下 1,100円 1,000円 小中高校生 無料 無料 障がい者手帳をお持ちの方 無料 無料 25歳以下の方は生年月日が確認できるものをご提示ください。</span></div>
+    </a>
+    <a class="card" href="https://www.sompo-museum.org/exhibitions/2025/albertmarquet/" target="_blank" rel="noopener"
+       data-venue="SOMPO美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">SOMPO美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">アルベール・マルケ展 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 2,000円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">開館カレンダー 観覧料 当日券 事前購入券 一般（26歳以上） 2,000円 1,800円 25歳以下 1,200円 1,100円 小中高校生 無料 無料 障がい者手帳をお持ちの方 無料 無料 25歳以下の方は生年月日が確認できるものをご提示ください。</span></div>
+    </a>
+    <a class="card" href="https://www.toguri-museum.or.jp/" target="_blank" rel="noopener"
+       data-venue="戸栗美術館" data-free="1" data-open="0"
+       data-free-price="1" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">戸栗美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">酒がおいしい古伊万里展 </h3>
+      <div class='period'>2026年7月3日（金）～9月21日（月・祝）</div>
+      
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.shukokan.org/" target="_blank" rel="noopener"
+       data-venue="大倉集古館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">大倉集古館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">企画展祈りと救いの美―国宝 普賢菩薩騎象像との出会い </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.seikado.or.jp/current_exhibition" target="_blank" rel="noopener"
+       data-venue="静嘉堂文庫美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">静嘉堂文庫美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">開催中の展覧会 </h3>
+      <div class='period'>2026年6月27日 〜 8月23日</div>
+      
+      <div class='price-badge'>🎟️ 1500円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">入館料 一般 1500円 大高生 1000円 障がい者手帳をお持ちの方(同伴者1名〈無料〉を含む) 700円 中学生以下 無料 お得な前期後期セット券 2500円 粋に、自由に。</span></div>
+    </a>
+    <a class="card" href="https://www.gotoh-museum.or.jp/" target="_blank" rel="noopener"
+       data-venue="五島美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">五島美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">展覧会・イベント </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 1,100円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">祝日 祝日休館日 ミュージアムショップ コレクション 五島美術館について 開館時間・入館料 開館時間 午前10時―午後5時（入館受付は午後4時30分まで） 休館日 毎月曜日（祝日の場合は翌平日）、展示替期間、夏期整備期間、年末年始など 入館料 一般1,100円／高・大学生800円／中学生以下無料 ・障害者手帳をお持ちの方、ならびに介助者の方1名は200円引 ・庭園入園のみ（展覧会をご覧にならない場合）は1人300円（中学生以下無料） アクセス 交通 東急・大井町線（各駅停車）「上野毛（かみのげ）駅」下車徒歩5分 住所 〒158-8510 東京都世田谷区上野毛3-9-25 お問い合わせ 050-</span></div>
+    </a>
+    <a class="card" href="https://shozokan.nich.go.jp/exhibitions/upcoming" target="_blank" rel="noopener"
+       data-venue="皇居三の丸尚蔵館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">皇居三の丸尚蔵館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">これからの展覧会 </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://museum.geidai.ac.jp/exhibit/" target="_blank" rel="noopener"
+       data-venue="東京藝術大学大学美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京藝術大学大学美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">展覧会・催し物 </h3>
+      <div class='period'>2026年07月24日 〜 2026年09月23日</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://museum.geidai.ac.jp/exhibit/" target="_blank" rel="noopener"
+       data-venue="東京藝術大学大学美術館" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京藝術大学大学美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">展覧会・催し物 </h3>
+      <div class='period'>2026年07月24日 〜 2026年09月23日</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://toyo-bunko.or.jp/museum-exhibition/2631/" target="_blank" rel="noopener"
+       data-venue="東洋文庫ミュージアム" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東洋文庫ミュージアム</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">「怖い」本 </h3>
+      <div class='period'>2026年6月3日 〜 2026年9月23日</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.teien-art-museum.ne.jp/exhibition/lucie-rie/" target="_blank" rel="noopener"
+       data-venue="東京都庭園美術館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京都庭園美術館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">ルーシー・リー展―東西をつなぐ優美のうつわ― </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 1,400円</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">身体障害者手帳・愛の手帳・療育手帳・精神障害者保健福祉手帳・被爆者健康手帳をお持ちの方とその介護者2名は無料（ミライロID含む） （予約不要。</span></div>
+    </a>
+    <a class="card" href="https://www.operacity.jp/ag/exh300/" target="_blank" rel="noopener"
+       data-venue="東京オペラシティ アートギャラリー" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">東京オペラシティ アートギャラリー</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">ほぼ空　青木淳 + リチャード・タトル </h3>
+      <div class='period'>2026年7月18日［土］─ 9月23日［水］</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://nij.nikon.com/activity/exhibition/salon/schedule/" target="_blank" rel="noopener"
+       data-venue="ニコンサロン" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">ニコンサロン</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">【重要】大阪ニコンサロンは閉館済み／銀座ニコンサロンも2026年10月20日閉館予定 </h3>
+      <div class='period'>直近の写真展（銀座）: 下川晋平「Neon Calligraphy」9/23〜10/6、三浦健司「十勝晴れ」10/7〜10/20｜🔍手動確認 2026-08-02（JS描画サイトのため自動更新非対応）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">取得困難（要アクセス・JS描画サイトのため個別ページ自動確認不可）</span></div>
+    </a>
+    <a class="card" href="https://note.com/omsystem_plaza/n/na368ff2c610c" target="_blank" rel="noopener"
+       data-venue="OM SYSTEM GALLERY（現OM SYSTEM PLAZA）" data-free="0" data-open="0"
+       data-free-price="0" data-category="photo"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">OM SYSTEM GALLERY（現OM SYSTEM PLAZA）</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">写真展開催中（展覧会名は公式note記事の見出し画像内のみに記載のため自動取得不可） </h3>
+      <div class='period'>2026年7月30日 〜 8月10日｜🔍手動確認 2026-08-02（JS描画サイトのため自動更新非対応）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://store.leica-camera.jp/event/gallery-tokyo_yasuhiro-ogawa202607" target="_blank" rel="noopener"
+       data-venue="ライカギャラリー東京" data-free="0" data-open="0"
+       data-free-price="0" data-category="photo"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">ライカギャラリー東京</div><span class='cat-badge cat-photo'>📷 写真展</span></div>
+      <h3 class="title">ライカギャラリー東京 】小川康博写真展「Dream / Silence ― 夢と沈黙のあいだ」開催 </h3>
+      <div class='period'>2026年7月24日（金）- 2026年10月18日（日）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.sony.co.jp/camera/imaging-gallery/detail/260724/" target="_blank" rel="noopener"
+       data-venue="ソニーイメージングギャラリー" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">ソニーイメージングギャラリー</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">中村 卓哉 作品展 鬼界 </h3>
+      <div class='period'>2026年7月24日(金)〜8月6日(木)</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.sony.co.jp/camera/imaging-gallery/detail/260807/" target="_blank" rel="noopener"
+       data-venue="ソニーイメージングギャラリー" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">ソニーイメージングギャラリー</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">中島 裕翔 ×MEN’S NON-NO「GAROU」7okyo color space/東京色空間　〜#COT7DF〜 </h3>
+      <div class='period'>2026年8月7日(金)〜8月20日(木)</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.sony.co.jp/camera/imaging-gallery/detail/260821/" target="_blank" rel="noopener"
+       data-venue="ソニーイメージングギャラリー" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">ソニーイメージングギャラリー</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">一色 龍太郎 作品展 山に抱かれて 四国 </h3>
+      <div class='period'>2026年8月21日(金)〜9月3日(木)</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.sony.co.jp/camera/imaging-gallery/detail/260904/" target="_blank" rel="noopener"
+       data-venue="ソニーイメージングギャラリー" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">ソニーイメージングギャラリー</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">久井 唯花 作品展 QUALIA </h3>
+      <div class='period'>2026年9月4日(金)〜9月17日(木)</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://gallery.shiseido.com/jp/exhibition/9630/”" target="_blank" rel="noopener"
+       data-venue="資生堂ギャラリー" data-free="1" data-open="0"
+       data-free-price="1" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">資生堂ギャラリー</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">【お知らせ】 「うたう仲條 おどる仲條 －文字と画と、資生堂と」 *終了しました。 公式Instagramフォローお願いします。 https://www.instagram.com/shiseidogallery/ </h3>
+      <div class='period'>確認日: 2026-08-02時点のトップページ掲載内容</div>
+      
+      <div class='price-badge'>🎟️ 無料</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://dc.watch.impress.co.jp/docs/news/exhibition/2011541.html" target="_blank" rel="noopener"
+       data-venue="エプソンイメージングギャラリー epSITE" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">エプソンイメージングギャラリー epSITE</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">【閉廊】エプサイトギャラリーは施設所在の「エプソンスクエア丸の内」閉館に伴い2025年5月3日をもって閉廊しました </h3>
+      <div class='period'>（報道情報: デジカメWatch 2025年5月2日付）｜🔍手動確認 2026-08-02（JS描画サイトのため自動更新非対応）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">該当なし（施設閉廊のため）</span></div>
+    </a>
+    <a class="card" href="http://www.placem.com/schedule/2026/main/20260803/exhibition.php" target="_blank" rel="noopener"
+       data-venue="Place M" data-free="0" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="0" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">Place M</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">黄郁修／コウ イク シュウ 流れのない空間―溜め込む人々 </h3>
+      <div class='period'>2026.08.03 - 2026.08.16</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">公式ページに障害者手帳の記載なし（要現地確認）</span></div>
+    </a>
+    <a class="card" href="https://www.tatemonoen.jp/event/schedule.php" target="_blank" rel="noopener"
+       data-venue="江戸東京たてもの園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">江戸東京たてもの園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">綱島家年中行事 </h3>
+      <div class='period'>6月下旬～8月下旬</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者2名まで無料（公式ページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.tatemonoen.jp/event/page/2026_tanabata.php" target="_blank" rel="noopener"
+       data-venue="江戸東京たてもの園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">江戸東京たてもの園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">七夕飾り </h3>
+      <div class='period'>6月30日［火］～7日［火］</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者2名まで無料（公式ページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.tatemonoen.jp/event/schedule.php" target="_blank" rel="noopener"
+       data-venue="江戸東京たてもの園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">江戸東京たてもの園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">伝統工芸の実演 </h3>
+      <div class='period'>11日［土］・12日［日］</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者2名まで無料（公式ページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.tokyo-zoo.net/kasai/events/29434/index.html" target="_blank" rel="noopener"
+       data-venue="葛西臨海水族園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">葛西臨海水族園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">1/8-3/8 冬の周遊キャンペーン 都立動物園・水族園 謎めぐりを開催します！ </h3>
+      <div class='period'>2026/01/08 〜 2026/03/08</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名（原則）無料（公式チケットページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.tokyo-zoo.net/kasai/events/spotguide-shark/index.html" target="_blank" rel="noopener"
+       data-venue="葛西臨海水族園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">葛西臨海水族園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">スポットガイド：サメ </h3>
+      <div class='period'>2026/03/01 〜 2026/04/19</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名（原則）無料（公式チケットページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.tokyo-zoo.net/kasai/events/10527/index.html" target="_blank" rel="noopener"
+       data-venue="葛西臨海水族園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">葛西臨海水族園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">おがさわらのなかまたち スタンプラリー </h3>
+      <div class='period'>2026/02/08 〜 2026/03/31</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名（原則）無料（公式チケットページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.tokyo-zoo.net/ueno/events/29411/index.html" target="_blank" rel="noopener"
+       data-venue="恩賜上野動物園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">恩賜上野動物園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">両生爬虫類館 企画展示「カメカメエブリバディ」 </h3>
+      <div class='period'>2025/11/18 〜 2026/12/27</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名（原則）無料（公式チケットページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.tokyo-zoo.net/ueno/events/29338/index.html" target="_blank" rel="noopener"
+       data-venue="恩賜上野動物園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">恩賜上野動物園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">関東エコ・ネットカード、おしえてコウノトリBOOK配布 </h3>
+      <div class='period'>2025/10/02 〜 2026/02/28</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名（原則）無料（公式チケットページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.tokyo-zoo.net/ueno/events/29434/index.html" target="_blank" rel="noopener"
+       data-venue="恩賜上野動物園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">恩賜上野動物園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">1/8-3/8 冬の周遊キャンペーン 都立動物園・水族園 謎めぐりを開催します！ </h3>
+      <div class='period'>2026/01/08 〜 2026/03/08</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名（原則）無料（公式チケットページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.tokyo-zoo.net/tama/events/29434/index.html" target="_blank" rel="noopener"
+       data-venue="多摩動物公園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">多摩動物公園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">1/8-3/8 冬の周遊キャンペーン 都立動物園・水族園 謎めぐりを開催します！ </h3>
+      <div class='period'>2026/01/08 〜 2026/03/08</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名（原則）無料（公式チケットページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.tokyo-zoo.net/tama/events/29498-2/index.html" target="_blank" rel="noopener"
+       data-venue="多摩動物公園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">多摩動物公園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">関東エコ・ネットカード、おしえてコウノトリBOOK配布 </h3>
+      <div class='period'>2026/01/29 〜 2026/03/03</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名（原則）無料（公式チケットページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.tokyo-zoo.net/tama/events/29498/index.html" target="_blank" rel="noopener"
+       data-venue="多摩動物公園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">多摩動物公園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">パネル展示「おしえて！コウノトリ」 </h3>
+      <div class='period'>2026/01/29 〜 2026/03/03</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名（原則）無料（公式チケットページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.tokyo-zoo.net/inokashira/events/29434/index.html" target="_blank" rel="noopener"
+       data-venue="井の頭自然文化園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">井の頭自然文化園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">1/8-3/8 冬の周遊キャンペーン 都立動物園・水族園 謎めぐりを開催します！ </h3>
+      <div class='period'>2026/01/08 〜 2026/03/08</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名（原則）無料（公式チケットページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.tokyo-zoo.net/inokashira/events/29269/index.html" target="_blank" rel="noopener"
+       data-venue="井の頭自然文化園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">井の頭自然文化園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">Art and the Zoo vol.9「アヤ井アキコ 絵本『こうもり』原画展」 </h3>
+      <div class='period'>2025/09/09 〜 2026/04/05</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名（原則）無料（公式チケットページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.tokyo-zoo.net/inokashira/events/10527/index.html" target="_blank" rel="noopener"
+       data-venue="井の頭自然文化園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">井の頭自然文化園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">おがさわらのなかまたち スタンプラリー </h3>
+      <div class='period'>2026/02/08 〜 2026/03/31</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名（原則）無料（公式チケットページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.tokyo-park.or.jp/event_search/event_38.html" target="_blank" rel="noopener"
+       data-venue="神代植物公園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">神代植物公園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">神代植物公園ガイドボランテイアによるガイド </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名（原則）無料（公式ページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.tokyo-park.or.jp/event_search/jindai_tokyo_parks_play_2025.html" target="_blank" rel="noopener"
+       data-venue="神代植物公園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">神代植物公園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">神代植物公園「深大寺恋物語謎解き2025」 </h3>
+      <div class='period'>2025年10月1日（水）～2026年9月30日（水）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名（原則）無料（公式ページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.tokyo-park.or.jp/event_search/1_2_1_11_1_17_1_18_1_20_1_25_1_27_2_1_2_1.html" target="_blank" rel="noopener"
+       data-venue="神代植物公園" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">神代植物公園</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">今後の展示会（2026年 4月～6月） </h3>
+      <div class='period muted'>取得困難（要アクセス）</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名（原則）無料（公式ページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.yumenoshima.jp/botanicalhall/event/archive/5484" target="_blank" rel="noopener"
+       data-venue="夢の島熱帯植物館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">夢の島熱帯植物館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">8月のウィークエンドコンサート </h3>
+      <div class='period'>2026年8月15日(土)</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名 無料（受給者証は対象外、公式ページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.yumenoshima.jp/botanicalhall/event/archive/5480" target="_blank" rel="noopener"
+       data-venue="夢の島熱帯植物館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">夢の島熱帯植物館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">7月のウィークエンドコンサート </h3>
+      <div class='period'>2026年7月4日(土)</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名 無料（受給者証は対象外、公式ページ直接確認、2026-08-03）</span></div>
+    </a>
+    <a class="card" href="https://www.yumenoshima.jp/botanicalhall/event/archive/5457" target="_blank" rel="noopener"
+       data-venue="夢の島熱帯植物館" data-free="1" data-open="0"
+       data-free-price="0" data-category="other"
+       data-disc-free="1" data-disc-discount="0">
+      <div class="card-top"><div class="venue-tag">夢の島熱帯植物館</div><span class='cat-badge cat-other'>🖼 展覧会</span></div>
+      <h3 class="title">【予約制】カブトムシの昆虫標本教室 </h3>
+      <div class='period'>2026年7月25日(土)</div>
+      
+      <div class='price-badge'>🎟️ 料金情報取得中</div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">本人・付添者1名 無料（受給者証は対象外、公式ページ直接確認、2026-08-03）</span></div>
+    </a></div>
+
+  <footer>
+    データ取得状況（スキップログ）:
+    <ul><li>東京都現代美術館: JS描画サイトのため自動取得不可。🔍手動確認 2026-08-02（JS描画サイトのため自動更新非対応）のブラウザ目視確認データを使用</li><li>草間彌生美術館: JS描画サイトのため自動取得不可。🔍手動確認 2026-08-02（JS描画サイトのため自動更新非対応）のブラウザ目視確認データを使用</li><li>サントリー美術館: Akamaiボット対策のため自動取得不可（403）。🔍手動確認 2026-08-02（JS描画サイトのため自動更新非対応）のブラウザ目視確認データを使用</li><li>21_21 DESIGN SIGHT: JS描画サイトのため自動取得不可。🔍手動確認 2026-08-02（JS描画サイトのため自動更新非対応）のブラウザ目視確認データを使用</li><li>ニコンサロン: JS描画サイトのため自動取得不可。🔍手動確認 2026-08-02（JS描画サイトのため自動更新非対応）のブラウザ目視確認データを使用（閉館情報あり）</li><li>OM SYSTEM GALLERY（現OM SYSTEM PLAZA）: 名称がOM SYSTEM PLAZAに移行、展覧会名は画像内のため自動取得不可。🔍手動確認 2026-08-02（JS描画サイトのため自動更新非対応）のブラウザ目視確認データを使用</li><li>エプソンイメージングギャラリー epSITE: 2025年5月3日付で閉廊が確認されたため、以後の展覧会情報取得は行わない</li></ul>
+    <p>※「障害者手帳」は各展覧会ごとに記載形式が異なり自動判定が不確実なため、確認できたもの以外は正直に「取得困難（要アクセス）」と表示しています（誤った割引情報の掲載を避けるため）。</p>
+  </footer>
+</div>
+
+<script>
+  const filterButtons = document.querySelectorAll(".filter-btn");
+  const cards = document.querySelectorAll("#grid .card");
+  let activeFilters = new Set();
+
+  function matchesFilter(c, filter) {
+    switch (filter) {
+      case "disc-free": return c.dataset.discFree === "1";
+      case "disc-discount": return c.dataset.discDiscount === "1";
+      case "cat-art": return c.dataset.category === "art";
+      case "cat-photo": return c.dataset.category === "photo";
+      case "open": return c.dataset.open === "1";
+      default: return true;
+    }
+  }
+
+  function applyFilters() {
+    cards.forEach(c => {
+      let show = true;
+      activeFilters.forEach(f => { if (!matchesFilter(c, f)) show = false; });
+      c.style.display = show ? "" : "none";
+    });
+  }
+
+  filterButtons.forEach(btn => btn.addEventListener("click", () => {
+    btn.classList.toggle("active");
+    if (activeFilters.has(btn.dataset.filter)) activeFilters.delete(btn.dataset.filter);
+    else activeFilters.add(btn.dataset.filter);
+    applyFilters();
+  }));
+</script>
+</body>
+</html>
