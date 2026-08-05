@@ -1,47 +1,47 @@
 {
   "morning-news/": {
-    "last_ok": "2026-08-04 21:02 JST",
-    "last_checked": "2026-08-04 21:02 JST",
+    "last_ok": "2026-08-05 15:20 JST",
+    "last_checked": "2026-08-05 15:20 JST",
     "status_code": "生成済み"
   },
   "official-primary/": {
-    "last_ok": "2026-08-04 21:02 JST",
-    "last_checked": "2026-08-04 21:02 JST",
+    "last_ok": "2026-08-05 15:20 JST",
+    "last_checked": "2026-08-05 15:20 JST",
     "status_code": "生成済み"
   },
   "local-portal/": {
-    "last_ok": "2026-08-04 21:02 JST",
-    "last_checked": "2026-08-04 21:02 JST",
+    "last_ok": "2026-08-05 15:20 JST",
+    "last_checked": "2026-08-05 15:20 JST",
     "status_code": "生成済み"
   },
   "https://c6cgv9cnj4-ops.github.io/kitamoto-okegawa-konosu-portal/": {
-    "last_ok": "2026-08-04 21:02 JST",
-    "last_checked": "2026-08-04 21:02 JST",
+    "last_ok": "2026-08-05 15:20 JST",
+    "last_checked": "2026-08-05 15:20 JST",
     "status_code": 200
   },
   "newspaper/": {
-    "last_ok": "2026-08-04 21:02 JST",
-    "last_checked": "2026-08-04 21:02 JST",
+    "last_ok": "2026-08-05 15:20 JST",
+    "last_checked": "2026-08-05 15:20 JST",
     "status_code": "生成済み"
   },
   "economic/": {
-    "last_ok": "2026-08-04 21:02 JST",
-    "last_checked": "2026-08-04 21:02 JST",
+    "last_ok": "2026-08-05 15:20 JST",
+    "last_checked": "2026-08-05 15:20 JST",
     "status_code": "生成済み"
   },
   "badminton/": {
-    "last_ok": "2026-08-04 21:02 JST",
-    "last_checked": "2026-08-04 21:02 JST",
+    "last_ok": "2026-08-05 15:20 JST",
+    "last_checked": "2026-08-05 15:20 JST",
     "status_code": "生成済み"
   },
   "culture-exhibition/": {
-    "last_ok": "2026-08-04 21:02 JST",
-    "last_checked": "2026-08-04 21:02 JST",
+    "last_ok": "2026-08-05 15:20 JST",
+    "last_checked": "2026-08-05 15:20 JST",
     "status_code": "生成済み"
   },
   "photo-spot/": {
-    "last_ok": "2026-08-04 21:02 JST",
-    "last_checked": "2026-08-04 21:02 JST",
+    "last_ok": "2026-08-05 15:20 JST",
+    "last_checked": "2026-08-05 15:20 JST",
     "status_code": "生成済み"
   }
 }
