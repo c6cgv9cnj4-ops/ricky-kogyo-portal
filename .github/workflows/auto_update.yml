@@ -8,9 +8,15 @@ on:
 permissions:
   contents: write
 
+# 前回の実行が長引いても次のcronと重ならないようにする（2026-09-09 監査で追加）
+concurrency:
+  group: auto-update-portal
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 25   # スクレイパー8本の合計。ハングによる無制限実行を防ぐ（2026-09-09 監査で追加）
     steps:
       - name: Checkout
         uses: actions/checkout@v4
