@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>蕎麦粉営業ログ</title>
+<style>
+:root,
+:root[data-theme="dark"] {
+  --bg:            #0c1116;
+  --surface:       #14171c;
+  --surface-2:     #1a1e26;
+  --surface-3:     #232833;
+  --border:        #262c36;
+  --border-strong: #333b48;
+  --text:          #e6e9ee;
+  --text-muted:    #94a3b8;
+  --text-dim:      #64707f;
+  --accent:        #4da6ff;
+  --accent-hover:  #7ec8ff;
+  --accent-solid:  #3b82f6;
+  --accent-weak:   rgba(77,166,255,0.12);
+  --on-accent:     #0b1220;
+  --success:       #4fb08a;  --success-solid: #10b981;  --success-weak: rgba(79,176,138,0.14);
+  --warning:       #e0b356;  --warning-solid: #f59e0b;  --warning-weak: rgba(201,162,75,0.14);
+  --danger:        #ef6a5a;  --danger-solid:  #ef4444;  --danger-weak:  rgba(226,60,50,0.14);
+  --info:          #22d3ee;  --info-solid:    #06b6d4;  --info-weak:    rgba(34,211,238,0.13);
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-8: 48px;
+  --radius-sm: 6px; --radius: 10px; --radius-lg: 14px; --radius-pill: 999px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.30);
+  --shadow:    0 4px 16px rgba(0,0,0,.35);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,.50);
+  --ring: 0 0 0 3px rgba(77,166,255,0.35);
+  --font-sans: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
+               "Hiragino Sans", "Yu Gothic", "Yu Gothic UI", Meiryo,
+               "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+  --fs-xs: 12px; --fs-sm: 13px; --fs-base: 14px; --fs-md: 16px;
+  --fs-lg: 20px; --fs-xl: 26px; --fs-2xl: 34px;
+  --lh-body: 1.6; --lh-tight: 1.25;
+}
+:root[data-theme="light"] {
+  --bg: #f5f7fa; --surface: #ffffff; --surface-2: #eef1f5; --surface-3: #e2e7ee;
+  --border: #dfe4ea; --border-strong: #c6cdd6;
+  --text: #1c2430; --text-muted: #566173; --text-dim: #8a94a3;
+  --accent: #2563eb; --accent-hover: #1d4ed8; --accent-solid: #2563eb;
+  --accent-weak: rgba(37,99,235,0.10); --on-accent: #ffffff;
+  --success: #0f9d6b; --warning: #b7791f; --danger: #d64545; --info: #0e8ba8;
+  --success-weak: rgba(16,185,129,0.12); --warning-weak: rgba(245,158,11,0.12);
+  --danger-weak: rgba(214,69,69,0.10);  --info-weak: rgba(6,182,212,0.10);
+  --shadow-sm: 0 1px 2px rgba(16,24,40,.06);
+  --shadow:    0 4px 16px rgba(16,24,40,.10);
+  --shadow-lg: 0 16px 48px rgba(16,24,40,.16);
+  --ring: 0 0 0 3px rgba(37,99,235,0.30);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 116px;
+}
+h1,h2,h3 { line-height: var(--lh-tight); margin: 0 0 var(--space-2); font-weight: 700; }
+h1 { font-size: var(--fs-lg); }
+h2 { font-size: var(--fs-md); }
+a { color: var(--accent); }
+.text-muted { color: var(--text-muted); }
+:focus-visible { outline: none; box-shadow: var(--ring); border-radius: var(--radius-sm); }
+
+.layout { max-width: 560px; margin: 0 auto; padding: var(--space-4) var(--space-4) var(--space-3); }
+.row { display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap; }
+
+/* --- レイアウト: モバイルは縦積み、PC(768px以上)は2カラム --- */
+.app-grid { display: flex; flex-direction: column; gap: var(--space-4); }
+@media (min-width: 768px) {
+  .layout { max-width: 1120px; }
+  .app-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    grid-template-areas:
+      "basic prev"
+      "reference prev"
+      "stats prev"
+      "delivery prev"
+      "exterior history"
+      "equipment history"
+      "eqrisk history"
+      "tags history"
+      "vendor history"
+      "relation history"
+      "memo history"
+      "result result";
+    gap: var(--space-5);
+    align-items: start;
+  }
+  .area-prev      { grid-area: prev; }
+  .area-history   { grid-area: history; }
+  .area-basic     { grid-area: basic; }
+  .area-reference { grid-area: reference; }
+  .area-stats     { grid-area: stats; }
+  .area-delivery  { grid-area: delivery; }
+  .area-eqrisk    { grid-area: eqrisk; }
+  .area-exterior  { grid-area: exterior; }
+  .area-equipment { grid-area: equipment; }
+  .area-tags      { grid-area: tags; }
+  .area-vendor    { grid-area: vendor; }
+  .area-relation  { grid-area: relation; }
+  .area-memo      { grid-area: memo; }
+  .area-result    { grid-area: result; }
+}
+
+/* --- ヘッダー --- */
+.topbar {
+  position: sticky; top: 0; z-index: 30;
+  background: rgba(12,17,22,.92); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  padding: var(--space-3) var(--space-4);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-2);
+}
+:root[data-theme="light"] .topbar { background: rgba(245,247,250,.92); }
+.topbar__title { font-size: var(--fs-md); font-weight: 700; }
+.draft-indicator { font-size: var(--fs-xs); color: var(--text-dim); }
+
+/* --- カード --- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+.card__title {
+  font-size: var(--fs-sm); color: var(--text-muted); font-weight: 700;
+  text-transform: uppercase; letter-spacing: .04em; margin-bottom: var(--space-3);
+}
+.required { color: var(--danger); margin-left: 2px; }
+
+/* --- 前回ログ（アコーディオン） --- */
+details.card { padding: 0; overflow: hidden; }
+details.card[hidden] { display: none; }
+details.card summary {
+  list-style: none; cursor: pointer; padding: var(--space-4);
+  font-size: var(--fs-sm); color: var(--text-muted); font-weight: 700;
+  display: flex; align-items: center; justify-content: space-between;
+}
+details.card summary::-webkit-details-marker { display: none; }
+details.card summary::after { content: "▾"; color: var(--text-dim); transition: transform .15s ease; }
+details.card[open] summary::after { transform: rotate(180deg); }
+.prevlog-body { padding: 0 var(--space-4) var(--space-4); border-top: 1px solid var(--border); padding-top: var(--space-3); }
+.prevlog-row { margin-bottom: 6px; font-size: var(--fs-sm); }
+.prevlog-row b { color: var(--text); font-weight: 600; }
+
+/* --- フォーム --- */
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: var(--space-4); }
+.field:last-child { margin-bottom: 0; }
+.label { font-size: var(--fs-sm); font-weight: 600; color: var(--text); }
+.hint { font-size: var(--fs-xs); color: var(--text-dim); }
+.input, .textarea {
+  font: inherit; font-size: 16px; color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 13px 14px; width: 100%;
+  min-height: 48px;
+}
+.input::placeholder, .textarea::placeholder { color: var(--text-dim); }
+.input:focus, .textarea:focus { border-color: var(--accent); box-shadow: var(--ring); outline: none; }
+.textarea { min-height: 120px; resize: vertical; line-height: 1.7; }
+.textarea--memo { min-height: 220px; padding: 16px; }
+.textarea--ai { min-height: 160px; padding: 16px; }
+
+/* --- チップ共通 --- */
+.chip {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 48px; padding: 0 16px;
+  font: inherit; font-size: var(--fs-sm); font-weight: 600; line-height: 1;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-2); color: var(--text);
+  cursor: pointer; user-select: none; white-space: nowrap;
+  transition: background .12s ease, border-color .12s ease, color .12s ease, transform .06s ease;
+}
+.chip:active { transform: scale(0.96); }
+.chip--tag.chip--active {
+  background: var(--accent-solid); border-color: var(--accent-solid); color: var(--on-accent);
+}
+.chip--add {
+  background: transparent; border-style: dashed; color: var(--text-muted);
+}
+.chip-cloud { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+/* --- 数量クイックボタン --- */
+.qty-row { display: flex; gap: var(--space-2); margin-top: var(--space-2); flex-wrap: wrap; }
+.qtybtn {
+  min-width: 56px; min-height: 48px; border-radius: var(--radius);
+  border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--text);
+  font: inherit; font-weight: 700; font-size: var(--fs-md); cursor: pointer;
+}
+.qtybtn:active { transform: scale(0.96); background: var(--surface-3); }
+
+/* --- エゴサーチチップ --- */
+.egosearch { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-1); }
+.chip--search {
+  min-height: 44px; padding: 0 14px; text-decoration: none;
+  background: var(--surface-3); border-color: var(--border-strong); color: var(--text);
+  flex: 1 1 auto; justify-content: flex-start;
+}
+.chip--search.chip--disabled { opacity: .38; pointer-events: none; }
+
+/* --- ボタン --- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  font: inherit; font-weight: 700; line-height: 1;
+  border-radius: var(--radius); border: 1px solid transparent; cursor: pointer;
+  min-height: 48px; padding: 0 18px; white-space: nowrap;
+  transition: background .12s ease, filter .12s ease;
+}
+.btn--primary { background: var(--accent-solid); color: var(--on-accent); }
+.btn--primary:active { filter: brightness(1.1); }
+.btn--secondary { background: var(--surface-2); color: var(--text); border-color: var(--border-strong); }
+.btn--ghost { background: transparent; color: var(--text-muted); border-color: var(--border-strong); }
+.btn--sm { min-height: 40px; font-size: var(--fs-sm); padding: 0 14px; }
+.btn--block { width: 100%; }
+.btn:disabled { opacity: .45; pointer-events: none; }
+
+/* --- 下部固定バー --- */
+.bottombar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom));
+}
+.bottombar .btn--primary { font-size: var(--fs-md); min-height: 56px; }
+@media (min-width: 768px) {
+  .bottombar { position: static; box-shadow: none; border-top: none; padding: 0; background: transparent; }
+  .bottombar .btn--primary { max-width: 420px; margin: 0 auto; }
+  body { padding-bottom: var(--space-5); }
+}
+
+/* --- 結果カード --- */
+.result[hidden] { display: none; }
+.result-prompt {
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.6;
+  min-height: 180px; max-height: 320px; overflow-y: auto; white-space: pre-wrap;
+  background: var(--surface-2); border: 1px solid var(--border-strong);
+  border-radius: var(--radius); padding: var(--space-3); color: var(--text-muted);
+}
+.divider { border: none; border-top: 1px solid var(--border); margin: var(--space-4) 0; }
+
+/* --- バッジ --- */
+.badge {
+  display: inline-flex; align-items: center; font-size: var(--fs-xs); font-weight: 700;
+  padding: 3px 9px; border-radius: var(--radius-pill);
+  background: var(--surface-3); color: var(--text-muted); white-space: nowrap;
+}
+
+/* --- モーダル（産地・品種図鑑） --- */
+.modal[hidden] { display: none; }
+.modal {
+  position: fixed; inset: 0; z-index: 70;
+  display: grid; place-items: center; padding: var(--space-4);
+}
+.modal__overlay { position: absolute; inset: 0; background: rgba(4,7,12,.66); }
+.modal__panel {
+  position: relative; background: var(--surface);
+  border: 1px solid var(--border-strong); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg); width: min(640px, 100%);
+  max-height: 85vh; overflow-y: auto; padding: var(--space-5);
+}
+.modal__header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); }
+.modal__title { margin: 0; font-size: var(--fs-lg); }
+.modal__panel--wide { width: min(920px, 95vw); }
+
+/* --- タブ --- */
+.tabs { display: flex; gap: var(--space-1); border-bottom: 1px solid var(--border); margin-bottom: var(--space-3); flex-wrap: wrap; }
+.tab {
+  font: inherit; font-size: var(--fs-sm); font-weight: 600;
+  background: none; border: none; cursor: pointer;
+  color: var(--text-muted); padding: 10px 14px;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; min-height: 44px;
+}
+.tab:hover { color: var(--text); }
+.tab[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); }
+.tab-panel[hidden] { display: none; }
+
+/* --- データテーブル --- */
+.table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+.table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: var(--fs-sm); }
+.table th, .table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+.table thead th { background: var(--surface-2); color: var(--text-muted); font-weight: 600; position: sticky; top: 0; }
+.table tbody tr:hover { background: var(--surface-2); }
+.table td.num, .table th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.reference-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-3); margin-bottom: var(--space-3); }
+.reference-card__head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-2); margin-bottom: 4px; }
+.reference-card__region { font-weight: 700; font-size: var(--fs-md); }
+.reference-card__variety { color: var(--text-muted); font-size: var(--fs-sm); margin-bottom: 8px; }
+.reference-card__analogy {
+  background: var(--accent-weak); border: 1px solid var(--accent); border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3); font-size: var(--fs-sm); font-weight: 600; color: var(--text);
+  margin-bottom: 8px;
+}
+.reference-card__details { font-size: var(--fs-xs); color: var(--text-muted); display: flex; flex-direction: column; gap: 3px; }
+
+/* --- 履歴一覧 --- */
+.alert-box {
+  font-size: var(--fs-xs); color: var(--warning); background: var(--warning-weak);
+  border: 1px solid var(--warning); border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3); line-height: 1.5;
+}
+.history-list { display: flex; flex-direction: column; gap: var(--space-2); max-height: 420px; overflow-y: auto; margin-top: var(--space-3); }
+.history-item { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-3); }
+.history-item__head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-2); }
+.history-item__shop { font-weight: 700; font-size: var(--fs-sm); }
+.history-item__meta { color: var(--text-muted); font-size: var(--fs-xs); }
+
+/* --- トースト --- */
+.toast {
+  position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%) translateY(12px);
+  background: var(--surface-3); color: var(--text); border: 1px solid var(--border-strong);
+  padding: 10px 18px; border-radius: var(--radius-pill); font-size: var(--fs-sm); font-weight: 600;
+  box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none; z-index: 60;
+  transition: opacity .18s ease, transform .18s ease;
+}
+.toast--show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="topbar__title">🚚 蕎麦粉営業ログ</div>
+    <div class="draft-indicator" id="draftIndicator">下書き未保存</div>
+  </div>
+  <div class="row" style="gap:6px">
+    <button type="button" class="btn btn--ghost btn--sm" data-modal-open="settingsModal" title="クラウド同期設定">⚙️</button>
+    <button type="button" class="btn btn--ghost btn--sm" id="clearBtn">新規ログ</button>
+  </div>
+</div>
+
+<div class="layout">
+<div class="app-grid" id="appGrid">
+
+  <!-- 前回ログ（自動検出） -->
+  <details class="card area-prev" id="prevLogCard" hidden>
+    <summary>📋 前回の記録（自動検出）</summary>
+    <div class="prevlog-body" id="prevLogBody"></div>
+  </details>
+
+  <!-- 外観・店頭チェック -->
+  <div class="card area-exterior">
+    <div class="card__title">外観・店頭チェック（入店前に数秒で）</div>
+    <div class="chip-cloud" id="exteriorCloud"></div>
+  </div>
+
+  <!-- 基本情報 -->
+  <div class="card area-basic">
+    <div class="card__title">基本情報</div>
+    <div class="field">
+      <label class="label" for="shopName">店舗名<span class="required">*</span></label>
+      <input class="input" id="shopName" placeholder="例: 蕎麦処 浅草庵" autocomplete="off">
+    </div>
+    <div class="field">
+      <label class="label" for="station">最寄駅・立地</label>
+      <input class="input" id="station" placeholder="例: 浅草駅 徒歩5分" autocomplete="off">
+    </div>
+    <div class="field">
+      <span class="label">業態区分</span>
+      <div class="chip-cloud" id="bizTypeCloud"></div>
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <span class="label">価格帯（もり・ざる基準）</span>
+      <div class="chip-cloud" id="priceBandCloud"></div>
+    </div>
+    <div class="egosearch" id="egosearch" style="margin-top:var(--space-4)">
+      <a class="chip chip--search chip--disabled" id="mapLink" target="_blank" rel="noopener noreferrer">📍 マップ</a>
+      <a class="chip chip--search chip--disabled" id="tabelogLink" target="_blank" rel="noopener noreferrer">🥢 食べログ</a>
+      <a class="chip chip--search chip--disabled" id="xLink" target="_blank" rel="noopener noreferrer">🐦 X</a>
+      <a class="chip chip--search chip--disabled" id="googleLink" target="_blank" rel="noopener noreferrer">🔍 評判</a>
+      <a class="chip chip--search chip--disabled" id="jobsLink" target="_blank" rel="noopener noreferrer">👥 求人調査</a>
+    </div>
+  </div>
+
+  <!-- そば粉産地・品種リファレンス -->
+  <div class="card area-reference">
+    <div class="card__title">🌾 そば粉 産地・品種リファレンス（お米で例えると？）</div>
+    <p class="hint" style="margin:0 0 var(--space-3)">紙袋の銘柄を見た瞬間にポジショニングを掴めるよう、代表的な産地・品種をお米に例えて整理した早見表です。</p>
+    <div class="row">
+      <button type="button" class="btn btn--secondary btn--sm" data-modal-open="referenceModal">📖 図鑑を開く</button>
+      <button type="button" class="btn btn--secondary btn--sm" id="copyReferenceTsvBtn">📊 一覧をTSVコピー</button>
+    </div>
+  </div>
+
+  <!-- 統計・市場分析 -->
+  <div class="card area-stats">
+    <div class="card__title">📊 そば業界 統計・市場分析</div>
+    <p class="hint" style="margin:0 0 var(--space-3)">業界30年推移と都道府県別データ（主要16都道府県の抜粋）を確認できます。商談前の地域相場感・業界トレンドの把握に。</p>
+    <div class="row">
+      <button type="button" class="btn btn--secondary btn--sm" data-modal-open="statsModal">📊 統計を開く</button>
+    </div>
+  </div>
+
+  <!-- 納品データ -->
+  <div class="card area-delivery">
+    <div class="card__title">納品データ（原材料）</div>
+    <div class="field">
+      <label class="label" for="flourBrand">主力粉銘柄<span class="required">*</span></label>
+      <input class="input" id="flourBrand" placeholder="例: 常陸秋そば 石臼40メッシュ" autocomplete="off">
+    </div>
+    <div class="field">
+      <label class="label" for="bagCount">納品袋数（20kg袋）</label>
+      <input class="input" type="number" inputmode="numeric" min="0" step="1" id="bagCount" placeholder="0">
+      <div class="qty-row">
+        <button type="button" class="qtybtn" data-add="1">+1</button>
+        <button type="button" class="qtybtn" data-add="2">+2</button>
+        <button type="button" class="qtybtn" data-add="3">+3</button>
+        <button type="button" class="qtybtn" data-add="5">+5</button>
+      </div>
+    </div>
+    <div class="field">
+      <label class="label" for="freqPerWeek">配送頻度（週N回）</label>
+      <input class="input" type="number" inputmode="numeric" min="0" step="1" id="freqPerWeek" placeholder="例: 2">
+    </div>
+    <div class="field">
+      <label class="label" for="otherFlour">つなぎ粉・その他</label>
+      <input class="input" id="otherFlour" placeholder="例: つなぎ粉10%配合" autocomplete="off">
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <label class="label" for="visitDatetime">訪問日時</label>
+      <input class="input" type="datetime-local" id="visitDatetime">
+    </div>
+  </div>
+
+  <!-- 厨房設備 -->
+  <div class="card area-equipment">
+    <div class="card__title">厨房設備</div>
+    <div class="chip-cloud" id="equipmentCloud"></div>
+  </div>
+
+  <!-- 設備リスク観察 -->
+  <div class="card area-eqrisk">
+    <div class="card__title">🔧 設備リスク観察（銘板をチラ見して記録）</div>
+    <div class="field">
+      <label class="label" for="machineNote">銘板・メーカー名メモ</label>
+      <input class="input" id="machineNote" placeholder="例: 品川麺機、大和製作所、さぬき麺機、フジマック、不明・地場鉄工所など" autocomplete="off">
+    </div>
+    <div class="field">
+      <span class="label">製造年代・状態</span>
+      <div class="chip-cloud" id="machineEraCloud"></div>
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <span class="label">駆動・製麺方式</span>
+      <div class="chip-cloud" id="machineTypeCloud"></div>
+    </div>
+    <div class="row" style="margin-top:var(--space-4)">
+      <button type="button" class="btn btn--secondary btn--sm" data-modal-open="machineRefModal">📖 メーカー生存・リスク早見表</button>
+    </div>
+  </div>
+
+  <!-- バックヤード観察タグ -->
+  <div class="card area-tags">
+    <div class="card__title">バックヤード観察タグ（タップでON/OFF）</div>
+    <div class="chip-cloud" id="tagCloud"></div>
+    <div style="margin-top:var(--space-3)">
+      <button type="button" class="chip chip--add" id="addTagBtn">＋ タグ追加</button>
+    </div>
+  </div>
+
+  <!-- 競合・仕入れ観察 -->
+  <div class="card area-vendor">
+    <div class="card__title">仕入れ取引先＆ライバル差別化メモ</div>
+    <div class="field">
+      <label class="label" for="vendorObservation">他社仕入れ・取引先観察</label>
+      <input class="input" id="vendorObservation" placeholder="例: ○○乾物、○○酒販、○○油、製麺機メーカー名など" autocomplete="off">
+    </div>
+    <div class="field">
+      <label class="label" for="rivalDiff">主力ライバル店との違い（気付き）</label>
+      <input class="input" id="rivalDiff" placeholder="例: 2軒先の町蕎麦より天ぷらが弱い" autocomplete="off">
+    </div>
+    <div class="field">
+      <span class="label">相手の推定従業員規模（見た目・聞いた話ベース）</span>
+      <div class="chip-cloud" id="employeeScaleCloud"></div>
+      <span class="hint">「50人の壁」＝産業医・衛生委員会設置義務ライン。49人以下は社長・現場への直談判が効きやすく、50人以上はマニュアル対応で融通が利きにくい傾向</span>
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <span class="label">競合観察タグ（現場で聞いた生の声）</span>
+      <div class="chip-cloud" id="competitorTagCloud"></div>
+      <div style="margin-top:var(--space-3)">
+        <button type="button" class="chip chip--add" id="addCompetitorTagBtn">＋ タグ追加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 店主リレーション -->
+  <div class="card area-relation">
+    <div class="card__title">店主リレーション度</div>
+    <div class="chip-cloud" id="relationCloud"></div>
+  </div>
+
+  <!-- フリーメモ -->
+  <div class="card area-memo">
+    <div class="card__title">店主の本音・厨房の様子・調味料など（音声入力推奨🎤）</div>
+    <div class="field" style="margin-bottom:0">
+      <textarea class="textarea textarea--memo" id="freeMemo" placeholder="思いつくまま箇条書き・走り書きでOK。マイクボタンで一気に吹き込んでください。"></textarea>
+    </div>
+  </div>
+
+  <!-- 蓄積ログ一覧（PC閲覧向け） -->
+  <div class="card area-history">
+    <div class="card__title">📚 蓄積ログ（このブラウザ内保存）</div>
+    <div class="alert-box">⚠️ 記録はこの端末・このブラウザのlocalStorageにのみ保存され、他の端末やPCへは自動同期されません。スマホ→PCで見る場合は下のJSONダウンロード→ファイル転送（Drive/AirDrop等）→PC側でインポート、の手順が必要です。</div>
+    <div class="row" style="margin-top:var(--space-3)">
+      <button type="button" class="btn btn--secondary btn--sm" id="exportJsonBtn">📤 JSONダウンロード</button>
+      <button type="button" class="btn btn--secondary btn--sm" id="importJsonBtn">📥 JSONインポート</button>
+      <button type="button" class="btn btn--ghost btn--sm" id="copyAllTsvBtn">全件TSVコピー</button>
+      <input type="file" accept="application/json" id="importFileInput" hidden>
+    </div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+
+  <!-- 分析結果 -->
+  <div class="card result area-result" id="resultCard" hidden>
+    <div class="card__title">分析用プロンプト（コピーしてClaude / Geminiへ貼り付け）</div>
+    <textarea class="result-prompt" id="promptOutput" readonly></textarea>
+    <div class="row" style="margin-top:var(--space-3)">
+      <button type="button" class="btn btn--secondary btn--sm" id="copyPromptBtn">📋 プロンプトをコピー</button>
+      <a class="btn btn--secondary btn--sm" href="https://claude.ai/new" target="_blank" rel="noopener noreferrer">🤖 無料版Claudeを開く</a>
+      <a class="btn btn--secondary btn--sm" href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer">🔮 無料版Geminiを開く</a>
+    </div>
+    <p class="hint" style="margin-top:var(--space-3)">① コピー → ② 起動したClaude/Geminiに貼り付け → ③ 送信、で無料分析できます。</p>
+
+    <hr class="divider">
+
+    <div class="card__title">📥 AI分析結果の貼り付け（貼るとMarkdown/TSV/JSONに自動反映）</div>
+    <textarea class="textarea textarea--ai" id="aiResultInput" placeholder="Claude/Geminiが返した分析結果（推計・課題・キラーフレーズ・JSON等）をここに貼り付けてください。"></textarea>
+
+    <hr class="divider">
+
+    <div class="card__title">現場ログの保存用コピー</div>
+    <div class="row">
+      <button type="button" class="btn btn--secondary btn--sm" id="copyMdBtn">Markdownコピー（GitHub用）</button>
+      <button type="button" class="btn btn--secondary btn--sm" id="copyTsvBtn">📊 TSVコピー（スプレッドシート用）</button>
+      <button type="button" class="btn btn--secondary btn--sm" id="copyJsonBtn">🧬 JSONコピー（Python用）</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- そば粉産地・品種図鑑モーダル -->
+<div class="modal" id="referenceModal" role="dialog" aria-modal="true" aria-labelledby="referenceModalTitle" hidden>
+  <div class="modal__overlay" data-modal-close></div>
+  <div class="modal__panel">
+    <div class="modal__header">
+      <h2 class="modal__title" id="referenceModalTitle">🌾 そば粉 産地・品種図鑑</h2>
+      <button type="button" class="btn btn--ghost btn--sm" data-modal-close>閉じる ✕</button>
+    </div>
+    <div id="referenceList"></div>
+  </div>
+</div>
+
+<!-- 製麺機メーカー生存・リスク早見表モーダル -->
+<div class="modal" id="machineRefModal" role="dialog" aria-modal="true" aria-labelledby="machineRefModalTitle" hidden>
+  <div class="modal__overlay" data-modal-close></div>
+  <div class="modal__panel">
+    <div class="modal__header">
+      <h2 class="modal__title" id="machineRefModalTitle">🔧 製麺機メーカー生存・リスク早見表</h2>
+      <button type="button" class="btn btn--ghost btn--sm" data-modal-close>閉じる ✕</button>
+    </div>
+    <p class="hint" style="margin-bottom:var(--space-3)">Web検索で現存・稼働を確認できた主要メーカーのみ掲載しています。未確認のメーカー名を断定的に「廃業」と書くことはしません（誤情報のリスクが高いため）。</p>
+    <div id="machineRefList"></div>
+  </div>
+</div>
+
+<!-- 統計・市場分析モーダル -->
+<div class="modal" id="statsModal" role="dialog" aria-modal="true" aria-labelledby="statsModalTitle" hidden>
+  <div class="modal__overlay" data-modal-close></div>
+  <div class="modal__panel modal__panel--wide">
+    <div class="modal__header">
+      <h2 class="modal__title" id="statsModalTitle">📊 そば業界 統計・市場分析</h2>
+      <button type="button" class="btn btn--ghost btn--sm" data-modal-close>閉じる ✕</button>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-tab="trend">業界30年推移</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="pref">都道府県別データ</button>
+    </div>
+
+    <div class="tab-panel" data-panel="trend">
+      <p class="hint">全国のそば・うどん事業所数、そば専門店数（推定）、外食支出の推移。1990年代前半のピークから約20〜30年で店舗数は大きく減少しています。</p>
+      <div class="table-scroll">
+        <table class="table" id="trendTable"></table>
+      </div>
+      <div class="row" style="margin-top:var(--space-3)">
+        <button type="button" class="btn btn--secondary btn--sm" id="copyTrendTsvBtn">📊 このデータをTSVコピー</button>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-panel="pref" hidden>
+      <p class="hint">総務省経済センサス／電話帳統計、農林水産省『作物統計』、総務省『家計調査』ベース（司令部提供データ）。<b>全国47都道府県の完全版ではなく、主要16都道府県の抜粋</b>です。実際の商談・意思決定に使う際は一次統計での裏取りを推奨します。</p>
+      <div class="table-scroll">
+        <table class="table" id="prefTable"></table>
+      </div>
+      <div class="row" style="margin-top:var(--space-3)">
+        <button type="button" class="btn btn--secondary btn--sm" id="copyPrefTsvBtn">📊 このデータをTSVコピー</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- クラウド同期設定モーダル -->
+<div class="modal" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle" hidden>
+  <div class="modal__overlay" data-modal-close></div>
+  <div class="modal__panel modal__panel--wide">
+    <div class="modal__header">
+      <h2 class="modal__title" id="settingsModalTitle">⚙️ クラウド同期設定（Googleフォーム）</h2>
+      <button type="button" class="btn btn--ghost btn--sm" data-modal-close>閉じる ✕</button>
+    </div>
+    <p class="hint">完全無料・APIキー不要でGoogleスプレッドシートへ自動送信します。Googleフォームを作成し、送信先URL（末尾が /formResponse）と、各項目のentry.IDを下に設定してください。URL未設定の間は今まで通りローカル保存のみで安全に動作します。</p>
+    <p class="hint">entry.IDの調べ方: フォームの入力欄を右クリック→「検証」→ input要素の name="entry.xxxxxxxxx" を確認。送信先URLはフォーム編集画面のプレビューを開発者ツールのNetworkタブで見て、formResponseで終わるリクエスト先を確認するのが確実です。</p>
+    <div class="field">
+      <label class="label" for="gformUrl">GoogleフォームのURL（formResponseエンドポイント）</label>
+      <input class="input" id="gformUrl" placeholder="https://docs.google.com/forms/d/e/xxxxx/formResponse" autocomplete="off">
+    </div>
+    <div class="card__title" style="margin-top:var(--space-4)">各項目のentry.ID（必要な項目だけ設定すればOK）</div>
+    <div id="gformEntryFields" style="margin-top:var(--space-2)"></div>
+    <div class="row" style="margin-top:var(--space-4)">
+      <button type="button" class="btn btn--secondary btn--sm" id="gformTestBtn">🧪 テスト送信</button>
+      <button type="button" class="btn btn--ghost btn--sm" id="gformClearBtn">設定をクリア</button>
+    </div>
+  </div>
+</div>
+
+<div class="bottombar">
+  <button type="button" class="btn btn--primary btn--block" id="analyzeBtn">現場ログを確定 → 分析プロンプト作成</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  const DRAFT_KEY = "sobaLog_draft_v1";
+  const CUSTOM_TAGS_KEY = "sobaLog_customTags_v1";
+  const CUSTOM_COMPETITOR_TAGS_KEY = "sobaLog_customCompetitorTags_v1";
+  const HISTORY_KEY = "sobaLog_history_v1";
+  const GFORM_CONFIG_KEY = "sobaLog_gformConfig_v1";
+
+  const GFORM_FIELD_DEFS = [
+    ["visit_datetime", "訪問日時"],
+    ["shop_name", "店舗名"],
+    ["station", "最寄駅・立地"],
+    ["biz_type", "業態区分"],
+    ["price_band", "価格帯"],
+    ["flour_brand", "主力粉銘柄"],
+    ["bag_count", "納品袋数"],
+    ["freq_per_week", "配送頻度"],
+    ["other_flour", "つなぎ粉・その他"],
+    ["exterior_checks", "外観・店頭チェック"],
+    ["equipment", "厨房設備"],
+    ["tags", "バックヤード観察タグ"],
+    ["vendor_observation", "仕入れ観察"],
+    ["rival_diff", "ライバル差"],
+    ["relation_level", "リレーション度"],
+    ["free_memo", "フリーメモ"],
+    ["ai_result", "AI分析結果"]
+  ];
+
+  const DEFAULT_TAGS = ["#本膳/高級醤油","#業務用一斗缶","#節箱あり","#化調あり","#ワンオペ","#人手不足","#UberEats","#出前館","#自前出前"];
+  const EXTERIOR_CHECKS = ["⚠️値上げ告知あり","👥求人張り紙あり（人手不足）","🛵出前・デリバリー稼働","📋店外待ち・行列あり","🧹店先・暖簾が清潔","🥀店頭放置・荒れ気味"];
+  const EQUIPMENT_ITEMS = ["木鉢・手打ち一式","製麺機あり","チラー（冷水機）あり","大型丸釜/連続茹で機","専用フライヤー"];
+  const BIZ_TYPES = ["手打ち・高単価","町蕎麦・大衆","路麺・立ち食い","その他"];
+  const EMPLOYEE_SCALE_OPTIONS = ["10人未満（家族経営）","10〜49人（町工場規模）","50人以上（組織化企業）","不明"];
+  const DEFAULT_COMPETITOR_TAGS = ["#大ロットのみ対応と断られたと聞いた","#配送頻度が少ないと不満そう","#値上げの噂を聞いた","#後継者不在と聞いた","#機械が古い/よく故障すると聞いた","#機械打ち移行を迷っていると聞いた","#廃業を検討していると聞いた","#対応が事務的・マニュアル的だと聞いた"];
+  const MACHINE_ERA_CHECKS = ["昭和鋳物（骨董品・激動）","平成初期（ボタン/マイコン式）","2000年代以降（近代機）","異音・ガタつきあり（要メンテ）","ピカピカ（手入れ良好）"];
+  const MACHINE_TYPE_CHECKS = ["ロール圧延式","押し出し式（油圧シリンダー）","小型電動石臼","手動木鉢/手打ち"];
+  const MACHINE_MAKERS = [
+    {
+      name: "大和製作所", status: "現存確認済み",
+      info: "香川県綾歌郡宇多津町／創業1975年（昭和50年）。小型製麺機の国内シェアNo.1を公称し、麺学校・開業支援事業も展開。",
+      note: "🟢 2026年時点で公式サイト稼働中、直近のプレスリリース（新型大型製麺機発表）も確認済み。事業継続性は高いと見られる。"
+    },
+    {
+      name: "さぬき麺機", status: "現存確認済み",
+      info: "香川県三豊市／創業1910年。国内23拠点・海外15拠点のサービス網を持つ製麺機業界大手。麺学校「ドリームスタジオ」も運営。",
+      note: "🟢 公式サイト稼働中、代表者名（中野郁氏）も公開されている。サービス網が広く部品・修理対応は期待しやすい。"
+    },
+    {
+      name: "品川麺機", status: "現存確認済み（要フォローアップ）",
+      info: "東京都品川区／創業1950年。「機械打ちで手打ちの味を出す」を掲げる製麺機メーカー。",
+      note: "🟡 公式サイトは稼働中だが、業界紙での言及は確認できた範囲で2014年頃までのものが中心。直近の活動状況は要フォローアップ。"
+    }
+  ];
+
+  function renderMachineRefList() {
+    const container = $("machineRefList");
+    container.innerHTML = MACHINE_MAKERS.map((m) => `
+      <div class="reference-card">
+        <div class="reference-card__head">
+          <span class="reference-card__region">${escapeHtml(m.name)}</span>
+          <span class="badge">${escapeHtml(m.status)}</span>
+        </div>
+        <div class="reference-card__variety">${escapeHtml(m.info)}</div>
+        <div class="reference-card__analogy">${escapeHtml(m.note)}</div>
+      </div>
+    `).join("") + `
+      <div class="reference-card">
+        <div class="reference-card__head"><span class="reference-card__region">上記以外（不明・地場鉄工所等）</span></div>
+        <div class="reference-card__analogy">🔍 銘板のメーカー名を「銘板・メーカー名メモ」に残しておけば、分析用プロンプトにそのまま反映されます。小規模な町工場メーカーは公開情報がほとんどないため、AIに聞いても「不明」と返るのが正常な結果です。無理に断定せず、現存確認は都度Web検索で行ってください。</div>
+      </div>
+    `;
+  }
+  const PRICE_BANDS = ["〜¥690 (大衆/路麺)","¥700〜¥890 (標準町蕎麦)","¥900〜¥1,190 (手打ち中単価)","¥1,200超 (本格/高単価)"];
+  const RELATION_LEVELS = ["Lv1 挨拶のみ","Lv2 雑談","Lv3 現場・仕入れの愚痴","Lv4 経営本音・相談"];
+  const HISTORY_TSV_HEADERS = ["visit_datetime","shop_name","station","biz_type","price_band","flour_brand","bag_count","freq_per_week","other_flour","exterior_checks","equipment","tags","vendor_observation","rival_diff","relation_level","free_memo"];
+
+  const FLOUR_REFERENCE = [
+    {
+      category: "国内産地", region: "北海道（幌加内・深川・新得）", variety: "キタワセソバ、牡丹",
+      riceAnalogy: "「コシヒカリ」：全国どこでも手に入る絶対的標準米。味・香り・打ちやすさのバランス型",
+      developed: "1989年（北海道立北見農試）",
+      supplyRoute: "ホクレン、JA北ひびき、三菱商事、三井物産",
+      millers: "日穀製粉、柄木田製粉、松屋製粉、全国大手",
+      share: "国内生産の約40〜45%（第1位）",
+      traits: "安定した香り、端正な麺肌。大衆〜中単価手打ちの標準二八",
+      fieldTip: "「北海道産」「幌加内」の印字袋。業界の標準ベンチマーク"
+    },
+    {
+      category: "国内産地", region: "茨城県（常陸太田・筑西等）", variety: "常陸秋そば",
+      riceAnalogy: "「魚沼産コシヒカリ / つや姫」：甘みと粘りが抜群の高級ブランド米。十割でも切れない",
+      developed: "1985年（茨城県農試）",
+      supplyRoute: "JA常陸、JA北つくば、全農いばらき",
+      millers: "松屋製粉（栃木）、加納製粉、地場製粉",
+      share: "本州屈指のブランド（手打ちシェア特大）",
+      traits: "豊かな芳香、強い甘み、粘り（つながり）。高級手打ち十割（1,200円超〜）",
+      fieldTip: "手打ち職人の指名買いNo.1。薄緑がかった粉色"
+    },
+    {
+      category: "国内産地", region: "長野県（戸隠・安曇野・開田高原）", variety: "信濃1号、開田在来",
+      riceAnalogy: "「ササニシキ」：粘りすぎず、あっさり上品で喉越し重視。出汁の効いた江戸前・信州のつゆに合う",
+      developed: "1944年（長野県農試）",
+      supplyRoute: "JA全農長野、JAながの、JA松本ハイランド",
+      millers: "日穀製粉、柄木田製粉、大西製粉、高山製粉",
+      share: "伝統産地（ブランド力・知名度抜群）",
+      traits: "清涼感のある上品な香りと喉越し。信州手打ちそば・温冷両用",
+      fieldTip: "「信州産」地域ブランド規定あり。地元製粉会社の袋が多い"
+    },
+    {
+      category: "国内産地", region: "福井県（大野・勝山・越前市）", variety: "越前在来種（在来固定種）",
+      riceAnalogy: "「古代米 / 幻の原生種」：小粒だが穀物の野性味・旨味・香りが強烈。辛味大根にも負けない",
+      developed: "江戸時代以前〜（自然交配・固定種）",
+      supplyRoute: "JA福井県、地元農業生産法人直契約",
+      millers: "カガセイフン（加賀製粉）",
+      share: "収量僅少・極めて高価格帯",
+      traits: "濃厚な穀物香、強い粘りとコシ。越前おろしそば・挽きぐるみ十割",
+      fieldTip: "殻ごと挽き込む黒っぽい粉。店主のこだわり度MAX"
+    },
+    {
+      category: "国内産地", region: "山形県（大石田・尾花沢等）", variety: "でわかおり、最上早生",
+      riceAnalogy: "「新之助 / ゆめぴりか」：大粒で弾力・噛みごたえ最強。太打ちでも千切れない力強さ",
+      developed: "2001年（山形県農研）",
+      supplyRoute: "JA全農やまがた、JAみちのく村山",
+      millers: "東北製粉、山形県内製麺所各社",
+      share: "東北有数の産地（板そば文化圏）",
+      traits: "太打ちに耐える強い弾力とコシ。山形板そば・冷やし肉そば",
+      fieldTip: "コシの強さ重視。男性客・ボリューム系に強い"
+    },
+    {
+      category: "輸入原料", region: "中国（内モンゴル・黒竜江省）", variety: "中国産在来種・改良種",
+      riceAnalogy: "「ブレンド用業務用米」：香りは淡白だが低コストで加水が安定。小麦粉多めの麺に最適",
+      developed: "海外産地選抜",
+      supplyRoute: "兼松（圧倒的シェア）、伊藤忠商事、三菱商事、三井物産",
+      millers: "日穀製粉、柄木田製粉、日清製粉、ニップン等大手全般",
+      share: "輸入全体の約70〜80%（国内流通の過半）",
+      traits: "淡白だが製麺適性・加水安定性が高い。立ち食い・路麺・冷凍麺",
+      fieldTip: "「そば粉」のみの無地袋や大手業務用ミックス粉"
+    },
+    {
+      category: "輸入原料", region: "北米（米国ワシントン州・カナダ）", variety: "マンカン種等北米改良種",
+      riceAnalogy: "「カルローズ（カリフォルニア米）」：大粒で皮が剥きやすく加工性抜群。立ち食い界の主役",
+      developed: "1974年（カナダ農業・農食省）",
+      supplyRoute: "丸紅、住友商事、昭和産業、大手穀物商社",
+      millers: "日清製粉、ニップン、大手業務用メーカー",
+      share: "輸入シェア第2位グループ",
+      traits: "大粒で白度が高く歩留まり抜群。機械打ちチェーン・大衆ファミレス",
+      fieldTip: "ロール挽きの白っぽい粉。使い勝手とコスト重視"
+    }
+  ];
+
+  const INDUSTRY_TREND = [
+    { period: "1990年代前半", shops: "約 45,000 軒", sobaShops: "約 28,000 軒", spending: "-", background: "【ピーク期】町蕎麦の出前全盛期。家族経営の大衆店が各町内に点在。" },
+    { period: "2001年（平成13年）", shops: "35,086 軒", sobaShops: "約 23,000 軒", spending: "約 5,500 円", background: "長期デフレ突入、牛丼・ラーメン・ファミレスとの競争激化で減少開始。" },
+    { period: "2012年（平成24年）", shops: "31,869 軒", sobaShops: "約 20,500 軒", spending: "約 5,120 円", background: "大手セルフ讃岐うどんチェーン台頭、駅前立ち食いの集約化。" },
+    { period: "2016年（平成28年）", shops: "30,200 軒", sobaShops: "約 19,500 軒", spending: "約 5,540 円", background: "店主高齢化による廃業加速。健康志向（低GI/ルチン）で価値再評価。" },
+    { period: "2021年（令和3年）〜", shops: "約 26,500 軒", sobaShops: "約 17,500 軒", spending: "約 6,000 円超", background: "コロナ禍と原材料高。20年で店舗は3割減少し、高単価手打ち vs 高回転の二極化。" }
+  ];
+
+  const PREFECTURE_STATS = [
+    { area: "関東", pref: "東京都", shops: "約 3,200 軒", density: "22.8 軒", harvest: "-", share: "-", note: "店舗数全国1位。老舗江戸前手打ちから巨大路麺網まで全業態集中" },
+    { area: "関東", pref: "埼玉県", shops: "約 1,540 軒", density: "21.0 軒", harvest: "196 t", share: "0.5%", note: "店舗数全国2位。町蕎麦・セット物主力。武蔵野うどん文化と競合" },
+    { area: "関東", pref: "神奈川県", shops: "約 1,320 軒", density: "14.3 軒", harvest: "-", share: "-", note: "店舗数全国3位。横浜・川崎の大衆店と湘南・箱根の手打ち観光店" },
+    { area: "中部", pref: "愛知県", shops: "約 1,210 軒", density: "16.1 軒", harvest: "-", share: "-", note: "麺類食堂（うどん・きしめん合盛り）文化。" },
+    { area: "北海道", pref: "北海道", shops: "約 1,140 軒", density: "21.8 軒", harvest: "17,900 t", share: "44.3%", note: "収穫量日本一（幌加内・深川）。道内全域に手打ち・大衆店が多数" },
+    { area: "関東", pref: "千葉県", shops: "約 1,140 軒", density: "18.1 軒", harvest: "208 t", share: "0.5%", note: "東葛・千葉・成田周辺のロードサイド型・大衆町蕎麦" },
+    { area: "甲信越", pref: "長野県", shops: "約 1,100 軒", density: "44.5 軒 (全国1位)", harvest: "2,680 t", share: "6.6%", note: "密度日本一。信濃1号。観光手打ち・日常食の両面で高消費" },
+    { area: "東海", pref: "静岡県", shops: "約 750 軒", density: "20.8 軒", harvest: "-", share: "-", note: "茶そば・大衆町蕎麦。駿河湾の桜えび天そば文化" },
+    { area: "近畿", pref: "大阪府", shops: "約 680 軒", density: "7.7 軒", harvest: "-", share: "-", note: "うどん圧倒的優勢だが、都心ビジネス街の立ち食い・老舗町蕎麦が機能" },
+    { area: "関東", pref: "栃木県", shops: "約 650 軒", density: "35.1 軒 (全国4位)", harvest: "1,820 t", share: "4.5%", note: "鹿沼ニラそば・日光手打ち。うどん・そば外食支出全国トップクラス" },
+    { area: "関東", pref: "茨城県", shops: "約 620 軒", density: "21.8 軒", harvest: "2,670 t", share: "6.6%", note: "常陸秋そばの金砂郷本拠地。けんちんそば文化" },
+    { area: "東北", pref: "福島県", shops: "約 520 軒", density: "28.5 軒", harvest: "2,150 t", share: "5.3%", note: "会津のかおり・山都そば（飯豊山の十割）。" },
+    { area: "東北", pref: "山形県", shops: "約 460 軒", density: "43.1 軒 (全国2位)", harvest: "2,360 t", share: "5.8%", note: "板そば・冷やし肉そば。生そば・乾麺購入額が全国トップ" },
+    { area: "北陸", pref: "福井県", shops: "約 280 軒", density: "36.1 軒 (全国3位)", harvest: "2,440 t", share: "6.0%", note: "越前おろしそば。小粒在来種。外食支出全国屈指" },
+    { area: "四国", pref: "香川県", shops: "約 60 軒", density: "6.3 軒", harvest: "-", share: "-", note: "讃岐うどん王国。日本一蕎麦店密度が低い" },
+    { area: "四国", pref: "高知県", shops: "約 25 軒", density: "3.6 軒 (全国最少)", harvest: "-", share: "-", note: "カツオ・酒文化。日本蕎麦専門店は極めて希少" }
+  ];
+
+  const $ = (id) => document.getElementById(id);
+  const shopNameInput = $("shopName");
+  const stationInput = $("station");
+  const flourBrandInput = $("flourBrand");
+  const bagCountInput = $("bagCount");
+  const freqPerWeekInput = $("freqPerWeek");
+  const otherFlourInput = $("otherFlour");
+  const visitDatetimeInput = $("visitDatetime");
+  const vendorObservationInput = $("vendorObservation");
+  const rivalDiffInput = $("rivalDiff");
+  const freeMemoInput = $("freeMemo");
+  const aiResultInput = $("aiResultInput");
+  const machineNoteInput = $("machineNote");
+
+  const tagCloud = $("tagCloud");
+  const addTagBtn = $("addTagBtn");
+  const exteriorCloud = $("exteriorCloud");
+  const equipmentCloud = $("equipmentCloud");
+  const machineEraCloud = $("machineEraCloud");
+  const machineTypeCloud = $("machineTypeCloud");
+  const employeeScaleCloud = $("employeeScaleCloud");
+  const competitorTagCloud = $("competitorTagCloud");
+  const addCompetitorTagBtn = $("addCompetitorTagBtn");
+  const bizTypeCloud = $("bizTypeCloud");
+  const priceBandCloud = $("priceBandCloud");
+  const relationCloud = $("relationCloud");
+
+  const draftIndicator = $("draftIndicator");
+  const clearBtn = $("clearBtn");
+  const analyzeBtn = $("analyzeBtn");
+  const resultCard = $("resultCard");
+  const promptOutput = $("promptOutput");
+  const toast = $("toast");
+  const mapLink = $("mapLink");
+  const tabelogLink = $("tabelogLink");
+  const xLink = $("xLink");
+  const googleLink = $("googleLink");
+  const jobsLink = $("jobsLink");
+  const prevLogCard = $("prevLogCard");
+  const prevLogBody = $("prevLogBody");
+  const historyListEl = $("historyList");
+  const importFileInput = $("importFileInput");
+
+  let customTags = safeParse(localStorage.getItem(CUSTOM_TAGS_KEY), []);
+  let allTags = DEFAULT_TAGS.concat(customTags.filter((t) => DEFAULT_TAGS.indexOf(t) === -1));
+  let activeTags = new Set();
+  let activeExterior = new Set();
+  let activeEquipment = new Set();
+  let activeMachineEra = new Set();
+  let activeMachineType = new Set();
+  let customCompetitorTags = safeParse(localStorage.getItem(CUSTOM_COMPETITOR_TAGS_KEY), []);
+  let allCompetitorTags = DEFAULT_COMPETITOR_TAGS.concat(customCompetitorTags.filter((t) => DEFAULT_COMPETITOR_TAGS.indexOf(t) === -1));
+  let activeCompetitorTags = new Set();
+  let employeeScale = null;
+  let bizType = null;
+  let priceBand = null;
+  let relationLevel = null;
+
+  function safeParse(raw, fallback) {
+    if (!raw) return fallback;
+    try { return JSON.parse(raw); } catch (e) { return fallback; }
+  }
+
+  function pad(n) { return String(n).padStart(2, "0"); }
+
+  function nowLocalString() {
+    const d = new Date();
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function formatDateTime(iso) {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso || "";
+    return `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  function debounce(fn, wait) {
+    let t;
+    return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
+  }
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add("toast--show");
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove("toast--show"), 1800);
+  }
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (e) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (e2) { ok = false; }
+      document.body.removeChild(ta);
+      return ok;
+    }
+  }
+
+  /* --- 汎用: 単一選択チップ群 --- */
+  function renderSingleSelect(container, items, getValue, setValue) {
+    container.innerHTML = "";
+    items.forEach((item) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "chip chip--tag" + (getValue() === item ? " chip--active" : "");
+      btn.textContent = item;
+      btn.addEventListener("click", () => {
+        setValue(getValue() === item ? null : item);
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  /* --- 汎用: 複数選択トグル群 --- */
+  function renderMultiSelect(container, items, activeSet, onChange) {
+    container.innerHTML = "";
+    items.forEach((item) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "chip chip--tag" + (activeSet.has(item) ? " chip--active" : "");
+      btn.textContent = item;
+      btn.addEventListener("click", () => {
+        if (activeSet.has(item)) activeSet.delete(item); else activeSet.add(item);
+        onChange();
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  function renderTags() {
+    renderMultiSelect(tagCloud, allTags, activeTags, () => { renderTags(); saveDraft(); });
+  }
+  function renderExterior() {
+    renderMultiSelect(exteriorCloud, EXTERIOR_CHECKS, activeExterior, () => { renderExterior(); saveDraft(); });
+  }
+  function renderEquipment() {
+    renderMultiSelect(equipmentCloud, EQUIPMENT_ITEMS, activeEquipment, () => { renderEquipment(); saveDraft(); });
+  }
+  function renderMachineEra() {
+    renderMultiSelect(machineEraCloud, MACHINE_ERA_CHECKS, activeMachineEra, () => { renderMachineEra(); saveDraft(); });
+  }
+  function renderMachineType() {
+    renderMultiSelect(machineTypeCloud, MACHINE_TYPE_CHECKS, activeMachineType, () => { renderMachineType(); saveDraft(); });
+  }
+  function renderEmployeeScale() {
+    renderSingleSelect(employeeScaleCloud, EMPLOYEE_SCALE_OPTIONS, () => employeeScale, (v) => { employeeScale = v; renderEmployeeScale(); saveDraft(); });
+  }
+  function renderCompetitorTags() {
+    renderMultiSelect(competitorTagCloud, allCompetitorTags, activeCompetitorTags, () => { renderCompetitorTags(); saveDraft(); });
+  }
+
+  addCompetitorTagBtn.addEventListener("click", () => {
+    const raw = window.prompt("追加する競合観察タグを入力してください（例: 冷凍麺に切り替えたらしい）");
+    if (!raw) return;
+    let tag = raw.trim();
+    if (!tag) return;
+    if (tag.charAt(0) !== "#") tag = "#" + tag;
+    if (allCompetitorTags.indexOf(tag) === -1) {
+      allCompetitorTags.push(tag);
+      customCompetitorTags.push(tag);
+      localStorage.setItem(CUSTOM_COMPETITOR_TAGS_KEY, JSON.stringify(customCompetitorTags));
+    }
+    activeCompetitorTags.add(tag);
+    renderCompetitorTags();
+    saveDraft();
+  });
+  function renderBizType() {
+    renderSingleSelect(bizTypeCloud, BIZ_TYPES, () => bizType, (v) => { bizType = v; renderBizType(); saveDraft(); });
+  }
+  function renderPriceBand() {
+    renderSingleSelect(priceBandCloud, PRICE_BANDS, () => priceBand, (v) => { priceBand = v; renderPriceBand(); saveDraft(); });
+  }
+  function renderRelation() {
+    renderSingleSelect(relationCloud, RELATION_LEVELS, () => relationLevel, (v) => { relationLevel = v; renderRelation(); saveDraft(); });
+  }
+
+  addTagBtn.addEventListener("click", () => {
+    const raw = window.prompt("追加するタグを入力してください（例: 冷やし人気）");
+    if (!raw) return;
+    let tag = raw.trim();
+    if (!tag) return;
+    if (tag.charAt(0) !== "#") tag = "#" + tag;
+    if (allTags.indexOf(tag) === -1) {
+      allTags.push(tag);
+      customTags.push(tag);
+      localStorage.setItem(CUSTOM_TAGS_KEY, JSON.stringify(customTags));
+    }
+    activeTags.add(tag);
+    renderTags();
+    saveDraft();
+  });
+
+  document.querySelectorAll(".qtybtn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const amount = parseInt(btn.dataset.add, 10) || 0;
+      const current = parseInt(bagCountInput.value, 10) || 0;
+      bagCountInput.value = current + amount;
+      saveDraft();
+    });
+  });
+
+  function updateEgoLinks() {
+    const shop = shopNameInput.value.trim();
+    const station = stationInput.value.trim();
+    const query = [shop, station].filter(Boolean).join(" ");
+    const active = shop.length > 0;
+
+    mapLink.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(query);
+    tabelogLink.href = "https://tabelog.com/rstLst/?vs=1&sa=&sk=" + encodeURIComponent(query);
+    xLink.href = "https://twitter.com/search?q=" + encodeURIComponent(shop) + "&f=live";
+    googleLink.href = "https://www.google.com/search?q=" + encodeURIComponent(query + " 口コミ 評判");
+    jobsLink.href = "https://www.google.com/search?ibp=htl;jobs&q=" + encodeURIComponent(shop + " 求人 アルバイト 正社員");
+
+    [mapLink, tabelogLink, xLink, googleLink, jobsLink].forEach((a) => {
+      a.classList.toggle("chip--disabled", !active);
+      a.setAttribute("aria-disabled", String(!active));
+      if (!active) a.removeAttribute("href");
+    });
+  }
+
+  function updateDraftIndicator(iso) {
+    const d = new Date(iso);
+    draftIndicator.textContent = `下書き保存 ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+
+  function saveDraft() {
+    const draft = {
+      shopName: shopNameInput.value,
+      station: stationInput.value,
+      flourBrand: flourBrandInput.value,
+      bagCount: bagCountInput.value,
+      freqPerWeek: freqPerWeekInput.value,
+      otherFlour: otherFlourInput.value,
+      visitDatetime: visitDatetimeInput.value,
+      vendorObservation: vendorObservationInput.value,
+      rivalDiff: rivalDiffInput.value,
+      freeMemo: freeMemoInput.value,
+      aiResult: aiResultInput.value,
+      machineNote: machineNoteInput.value,
+      activeTags: Array.from(activeTags),
+      activeExterior: Array.from(activeExterior),
+      activeEquipment: Array.from(activeEquipment),
+      activeMachineEra: Array.from(activeMachineEra),
+      activeMachineType: Array.from(activeMachineType),
+      activeCompetitorTags: Array.from(activeCompetitorTags),
+      employeeScale: employeeScale,
+      bizType: bizType,
+      priceBand: priceBand,
+      relationLevel: relationLevel,
+      savedAt: new Date().toISOString()
+    };
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    updateDraftIndicator(draft.savedAt);
+  }
+  const saveDraftDebounced = debounce(saveDraft, 400);
+
+  function loadDraft() {
+    const draft = safeParse(localStorage.getItem(DRAFT_KEY), null);
+    if (!draft) {
+      visitDatetimeInput.value = nowLocalString();
+      return;
+    }
+    shopNameInput.value = draft.shopName || "";
+    stationInput.value = draft.station || "";
+    flourBrandInput.value = draft.flourBrand || "";
+    bagCountInput.value = draft.bagCount || "";
+    freqPerWeekInput.value = draft.freqPerWeek || "";
+    otherFlourInput.value = draft.otherFlour || "";
+    vendorObservationInput.value = draft.vendorObservation || "";
+    rivalDiffInput.value = draft.rivalDiff || "";
+    freeMemoInput.value = draft.freeMemo || "";
+    aiResultInput.value = draft.aiResult || "";
+    machineNoteInput.value = draft.machineNote || "";
+    visitDatetimeInput.value = draft.visitDatetime || nowLocalString();
+    activeTags = new Set(draft.activeTags || []);
+    activeExterior = new Set(draft.activeExterior || []);
+    activeEquipment = new Set(draft.activeEquipment || []);
+    activeMachineEra = new Set(draft.activeMachineEra || []);
+    activeMachineType = new Set(draft.activeMachineType || []);
+    activeCompetitorTags = new Set(draft.activeCompetitorTags || []);
+    employeeScale = draft.employeeScale || null;
+    bizType = draft.bizType || null;
+    priceBand = draft.priceBand || null;
+    relationLevel = draft.relationLevel || null;
+    if (draft.savedAt) updateDraftIndicator(draft.savedAt);
+  }
+
+  function updatePrevLog() {
+    const shop = shopNameInput.value.trim();
+    if (!shop) { prevLogCard.hidden = true; return; }
+    const history = safeParse(localStorage.getItem(HISTORY_KEY), []);
+    const matches = history.filter((h) => (h.shopName || "").trim() === shop);
+    if (matches.length === 0) { prevLogCard.hidden = true; return; }
+    matches.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+    const last = matches[0];
+
+    const rows = [
+      ["業態", last.bizType],
+      ["価格帯", last.priceBand],
+      ["主力粉銘柄", last.flourBrand],
+      ["納品袋数", last.bagCount ? last.bagCount + "袋" : null],
+      ["配送頻度", last.freqPerWeek ? "週" + last.freqPerWeek + "回" : null],
+      ["外観チェック", (last.exteriorChecks || []).join(" / ")],
+      ["設備", (last.equipment || []).join(" / ")],
+      ["観察タグ", (last.tags || []).join(" ")],
+      ["仕入れ観察", last.vendorObservation],
+      ["ライバル差", last.rivalDiff],
+      ["リレーション度", last.relationLevel],
+      ["本音メモ", last.freeMemo]
+    ].filter(([, v]) => v);
+
+    const header = `<div class="hint" style="margin-bottom:var(--space-2)">📅 ${formatDateTime(last.savedAt)} の記録</div>`;
+    const body = rows.map(([label, val]) =>
+      `<div class="prevlog-row"><b>${escapeHtml(label)}:</b> ${escapeHtml(String(val))}</div>`
+    ).join("");
+    prevLogBody.innerHTML = header + (body || `<div class="prevlog-row text-muted">詳細データなし</div>`);
+    prevLogCard.hidden = false;
+    prevLogCard.open = true;
+  }
+
+  /* --- 履歴一覧・TSV --- */
+  function historyEntryTsvRow(h) {
+    const esc = (s) => String(s == null ? "" : s).replace(/\t/g, " ").replace(/\r?\n/g, " / ");
+    return [
+      h.savedAt || "", h.shopName || "", h.station || "", h.bizType || "", h.priceBand || "",
+      h.flourBrand || "", h.bagCount || "0", h.freqPerWeek || "", h.otherFlour || "",
+      (h.exteriorChecks || []).join(" / "), (h.equipment || []).join(" / "), (h.tags || []).join(" "),
+      h.vendorObservation || "", h.rivalDiff || "", h.relationLevel || "", h.freeMemo || ""
+    ].map(esc).join("\t");
+  }
+
+  function renderHistoryList() {
+    const history = safeParse(localStorage.getItem(HISTORY_KEY), []);
+    const sorted = history.slice().sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt)).slice(0, 50);
+    historyListEl.innerHTML = "";
+    if (sorted.length === 0) {
+      historyListEl.innerHTML = `<div class="hint">まだ記録がありません</div>`;
+      return;
+    }
+    sorted.forEach((h) => {
+      const item = document.createElement("div");
+      item.className = "history-item";
+      const meta = [h.bizType, h.priceBand, h.bagCount ? h.bagCount + "袋" : null].filter(Boolean).join(" ・ ");
+      item.innerHTML = `
+        <div class="history-item__head">
+          <span class="history-item__shop">${escapeHtml(h.shopName || "(無題)")}</span>
+          <span class="history-item__meta">${formatDateTime(h.savedAt)}</span>
+        </div>
+        <div class="history-item__meta">${escapeHtml(meta || "-")}</div>
+      `;
+      const copyBtn = document.createElement("button");
+      copyBtn.type = "button";
+      copyBtn.className = "btn btn--ghost btn--sm";
+      copyBtn.style.marginTop = "6px";
+      copyBtn.textContent = "この行をTSVコピー";
+      copyBtn.addEventListener("click", async () => {
+        const ok = await copyText(historyEntryTsvRow(h));
+        showToast(ok ? "コピーしました" : "コピーに失敗しました");
+      });
+      item.appendChild(copyBtn);
+      historyListEl.appendChild(item);
+    });
+  }
+
+  /* --- そば粉産地・品種リファレンス --- */
+  function renderReferenceList() {
+    const container = $("referenceList");
+    container.innerHTML = FLOUR_REFERENCE.map((r) => `
+      <div class="reference-card">
+        <div class="reference-card__head">
+          <span class="reference-card__region">${escapeHtml(r.region)}</span>
+          <span class="badge">${escapeHtml(r.category)}</span>
+        </div>
+        <div class="reference-card__variety">代表品種: ${escapeHtml(r.variety)}</div>
+        <div class="reference-card__analogy">🍚 お米で例えると: ${escapeHtml(r.riceAnalogy)}</div>
+        <div class="reference-card__details">
+          <div>開発年・育成機関: ${escapeHtml(r.developed)}</div>
+          <div>主要調達ルート: ${escapeHtml(r.supplyRoute)}</div>
+          <div>主要製粉会社: ${escapeHtml(r.millers)}</div>
+          <div>シェア・規模: ${escapeHtml(r.share)}</div>
+          <div>麺質特性・用途: ${escapeHtml(r.traits)}</div>
+          <div>現場見分けポイント: ${escapeHtml(r.fieldTip)}</div>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function buildReferenceTsv() {
+    const esc = (s) => String(s).replace(/\t/g, " ").replace(/\r?\n/g, " ");
+    const headers = ["大分類","産地・地域","代表品種","お米で例えると？（直感解説）","開発年・育成機関","主要調達ルート（商社/全農）","主要製粉会社","シェア・規模","麺質特性・向いている用途","現場見分けポイント"];
+    const rows = FLOUR_REFERENCE.map((r) =>
+      [r.category, r.region, r.variety, r.riceAnalogy, r.developed, r.supplyRoute, r.millers, r.share, r.traits, r.fieldTip].map(esc).join("\t")
+    );
+    return [headers.join("\t")].concat(rows).join("\n");
+  }
+
+  $("copyReferenceTsvBtn").addEventListener("click", async () => {
+    const ok = await copyText(buildReferenceTsv());
+    showToast(ok ? `産地・品種リファレンスをTSVコピーしました（${FLOUR_REFERENCE.length}件）` : "コピーに失敗しました");
+  });
+
+  /* --- 統計・市場分析 --- */
+  function renderTrendTable() {
+    const headers = ["調査年代", "全国のそば・うどん事業所数", "そば専門店数（推定）", "外食年間支出（2人以上世帯）", "業界の構造変化・背景"];
+    const thead = `<thead><tr>${headers.map((h) => `<th>${escapeHtml(h)}</th>`).join("")}</tr></thead>`;
+    const tbody = `<tbody>${INDUSTRY_TREND.map((r) => `
+      <tr>
+        <td>${escapeHtml(r.period)}</td>
+        <td class="num">${escapeHtml(r.shops)}</td>
+        <td class="num">${escapeHtml(r.sobaShops)}</td>
+        <td class="num">${escapeHtml(r.spending)}</td>
+        <td>${escapeHtml(r.background)}</td>
+      </tr>`).join("")}</tbody>`;
+    $("trendTable").innerHTML = thead + tbody;
+  }
+
+  function renderPrefTable() {
+    const headers = ["地域", "都道府県", "店舗数（実数）", "人口10万人あたり密度", "収穫量（トン）", "国内シェア", "1世帯消費傾向・特徴"];
+    const thead = `<thead><tr>${headers.map((h) => `<th>${escapeHtml(h)}</th>`).join("")}</tr></thead>`;
+    const tbody = `<tbody>${PREFECTURE_STATS.map((r) => `
+      <tr>
+        <td>${escapeHtml(r.area)}</td>
+        <td>${escapeHtml(r.pref)}</td>
+        <td class="num">${escapeHtml(r.shops)}</td>
+        <td class="num">${escapeHtml(r.density)}</td>
+        <td class="num">${escapeHtml(r.harvest)}</td>
+        <td class="num">${escapeHtml(r.share)}</td>
+        <td>${escapeHtml(r.note)}</td>
+      </tr>`).join("")}</tbody>`;
+    $("prefTable").innerHTML = thead + tbody;
+  }
+
+  function buildTrendTsv() {
+    const esc = (s) => String(s).replace(/\t/g, " ").replace(/\r?\n/g, " ");
+    const headers = ["調査年代", "全国のそば・うどん事業所数", "そば専門店数（推定）", "外食年間支出（2人以上世帯）", "業界の構造変化・背景"];
+    const rows = INDUSTRY_TREND.map((r) => [r.period, r.shops, r.sobaShops, r.spending, r.background].map(esc).join("\t"));
+    return [headers.join("\t")].concat(rows).join("\n");
+  }
+
+  function buildPrefTsv() {
+    const esc = (s) => String(s).replace(/\t/g, " ").replace(/\r?\n/g, " ");
+    const headers = ["地域", "都道府県", "店舗数（実数）", "人口10万人あたり密度", "収穫量（トン）", "国内シェア", "1世帯消費傾向・特徴"];
+    const rows = PREFECTURE_STATS.map((r) => [r.area, r.pref, r.shops, r.density, r.harvest, r.share, r.note].map(esc).join("\t"));
+    return [headers.join("\t")].concat(rows).join("\n");
+  }
+
+  $("copyTrendTsvBtn").addEventListener("click", async () => {
+    const ok = await copyText(buildTrendTsv());
+    showToast(ok ? "業界30年推移をTSVコピーしました" : "コピーに失敗しました");
+  });
+  $("copyPrefTsvBtn").addEventListener("click", async () => {
+    const ok = await copyText(buildPrefTsv());
+    showToast(ok ? `都道府県別データをTSVコピーしました（${PREFECTURE_STATS.length}件）` : "コピーに失敗しました");
+  });
+
+  /* --- タブ切替（統計モーダル） --- */
+  document.querySelectorAll(".tabs").forEach((tabGroup) => {
+    const panelContainer = tabGroup.parentElement;
+    tabGroup.querySelectorAll(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        tabGroup.querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", String(t === tab)));
+        panelContainer.querySelectorAll(".tab-panel").forEach((p) => { p.hidden = p.dataset.panel !== tab.dataset.tab; });
+      });
+    });
+  });
+
+  /* --- 汎用モーダル制御 --- */
+  function closeModalEl(m) { m.hidden = true; }
+  document.querySelectorAll("[data-modal-open]").forEach((btn) => {
+    btn.addEventListener("click", () => { $(btn.dataset.modalOpen).hidden = false; });
+  });
+  document.querySelectorAll(".modal").forEach((m) => {
+    m.querySelectorAll("[data-modal-close]").forEach((el) => el.addEventListener("click", () => closeModalEl(m)));
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") document.querySelectorAll(".modal:not([hidden])").forEach(closeModalEl);
+  });
+
+  $("copyAllTsvBtn").addEventListener("click", async () => {
+    const history = safeParse(localStorage.getItem(HISTORY_KEY), []).slice().sort((a, b) => new Date(a.savedAt) - new Date(b.savedAt));
+    if (history.length === 0) { showToast("記録がありません"); return; }
+    const rows = [HISTORY_TSV_HEADERS.join("\t")].concat(history.map(historyEntryTsvRow));
+    const ok = await copyText(rows.join("\n"));
+    showToast(ok ? `${history.length}件をヘッダー付きTSVでコピーしました` : "コピーに失敗しました");
+  });
+
+  /* --- JSONエクスポート/インポート（Python連携・スマホ→PC橋渡し） --- */
+  function toSnakeRecord(e) {
+    return {
+      visit_datetime: e.savedAt || null,
+      shop_name: e.shopName || "",
+      station: e.station || "",
+      biz_type: e.bizType || null,
+      price_band: e.priceBand || null,
+      flour_brand: e.flourBrand || "",
+      bag_count: e.bagCount ? Number(e.bagCount) : 0,
+      freq_per_week: e.freqPerWeek ? Number(e.freqPerWeek) : null,
+      other_flour: e.otherFlour || "",
+      exterior_checks: e.exteriorChecks || [],
+      equipment: e.equipment || [],
+      tags: e.tags || [],
+      vendor_observation: e.vendorObservation || "",
+      rival_diff: e.rivalDiff || "",
+      relation_level: e.relationLevel || null,
+      free_memo: e.freeMemo || ""
+    };
+  }
+
+  function fromSnakeRecord(r) {
+    return {
+      savedAt: r.visit_datetime || new Date().toISOString(),
+      shopName: r.shop_name || "",
+      station: r.station || "",
+      bizType: r.biz_type || null,
+      priceBand: r.price_band || null,
+      flourBrand: r.flour_brand || "",
+      bagCount: r.bag_count != null ? String(r.bag_count) : "",
+      freqPerWeek: r.freq_per_week != null ? String(r.freq_per_week) : "",
+      otherFlour: r.other_flour || "",
+      exteriorChecks: r.exterior_checks || [],
+      equipment: r.equipment || [],
+      tags: r.tags || [],
+      vendorObservation: r.vendor_observation || "",
+      rivalDiff: r.rival_diff || "",
+      relationLevel: r.relation_level || null,
+      freeMemo: r.free_memo || ""
+    };
+  }
+
+  $("exportJsonBtn").addEventListener("click", () => {
+    const history = safeParse(localStorage.getItem(HISTORY_KEY), []);
+    const records = history.map(toSnakeRecord);
+    const payload = { exported_at: new Date().toISOString(), record_count: records.length, records: records };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const dateStr = nowLocalString().slice(0, 10).replace(/-/g, "");
+    a.href = url;
+    a.download = `soba_log_history_${dateStr}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`JSONをダウンロードしました（${records.length}件）`);
+  });
+
+  $("importJsonBtn").addEventListener("click", () => importFileInput.click());
+
+  importFileInput.addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const payload = JSON.parse(String(reader.result));
+        const records = Array.isArray(payload.records) ? payload.records : (Array.isArray(payload) ? payload : []);
+        if (records.length === 0) { showToast("有効なログが見つかりませんでした"); importFileInput.value = ""; return; }
+        const imported = records.map(fromSnakeRecord);
+        const existing = safeParse(localStorage.getItem(HISTORY_KEY), []);
+        const seen = new Set(existing.map((h) => h.savedAt + "|" + h.shopName));
+        let added = 0;
+        imported.forEach((rec) => {
+          const key = rec.savedAt + "|" + rec.shopName;
+          if (!seen.has(key)) { existing.push(rec); seen.add(key); added++; }
+        });
+        existing.sort((a, b) => new Date(a.savedAt) - new Date(b.savedAt));
+        while (existing.length > 500) existing.shift();
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(existing));
+        renderHistoryList();
+        updatePrevLog();
+        showToast(`${added}件を取り込みました（重複${records.length - added}件はスキップ）`);
+      } catch (err) {
+        showToast("JSONの読み込みに失敗しました");
+      }
+      importFileInput.value = "";
+    };
+    reader.readAsText(file);
+  });
+
+  /* --- クラウド同期（Googleフォーム裏送信・完全無料/APIキー不要） --- */
+  let gformConfig = safeParse(localStorage.getItem(GFORM_CONFIG_KEY), { actionUrl: "", entries: {} });
+  if (!gformConfig.entries) gformConfig.entries = {};
+
+  function saveGformConfig() {
+    localStorage.setItem(GFORM_CONFIG_KEY, JSON.stringify(gformConfig));
+  }
+  const saveGformConfigDebounced = debounce(saveGformConfig, 300);
+
+  function renderGformFields() {
+    const container = $("gformEntryFields");
+    container.innerHTML = GFORM_FIELD_DEFS.map(([key, label]) => `
+      <div class="field" style="margin-bottom:10px">
+        <label class="label" for="gentry_${key}">${escapeHtml(label)} <span class="hint">(${key})</span></label>
+        <input class="input" id="gentry_${key}" placeholder="entry.123456789" autocomplete="off">
+      </div>
+    `).join("");
+    GFORM_FIELD_DEFS.forEach(([key]) => {
+      const el = document.getElementById("gentry_" + key);
+      el.value = gformConfig.entries[key] || "";
+      el.addEventListener("input", () => {
+        gformConfig.entries[key] = el.value.trim();
+        saveGformConfigDebounced();
+      });
+    });
+  }
+
+  const gformUrlInput = $("gformUrl");
+  gformUrlInput.value = gformConfig.actionUrl || "";
+  gformUrlInput.addEventListener("input", () => {
+    gformConfig.actionUrl = gformUrlInput.value.trim();
+    saveGformConfigDebounced();
+  });
+
+  function isGformConfigured() {
+    return !!(gformConfig.actionUrl && gformConfig.actionUrl.trim());
+  }
+
+  function syncToGoogleForm(record) {
+    if (!isGformConfigured()) return false;
+    try {
+      const formData = new FormData();
+      Object.keys(gformConfig.entries).forEach((key) => {
+        const entryId = gformConfig.entries[key];
+        if (!entryId) return;
+        let val = record[key];
+        if (Array.isArray(val)) val = val.join(", ");
+        if (val == null) val = "";
+        formData.append(entryId, String(val));
+      });
+      fetch(gformConfig.actionUrl, { method: "POST", mode: "no-cors", body: formData }).catch(() => {});
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  $("gformTestBtn").addEventListener("click", () => {
+    if (!isGformConfigured()) { showToast("先にGoogleフォームのURLを入力してください"); return; }
+    syncToGoogleForm(buildJsonRecord());
+    showToast("テスト送信しました。到達確認はブラウザ側ではできないため、スプレッドシート側で新しい行が増えたか確認してください");
+  });
+
+  $("gformClearBtn").addEventListener("click", () => {
+    if (!window.confirm("クラウド同期設定（URL・entry.ID）をすべてクリアしますか？")) return;
+    gformConfig = { actionUrl: "", entries: {} };
+    saveGformConfig();
+    gformUrlInput.value = "";
+    renderGformFields();
+    showToast("クラウド同期設定をクリアしました");
+  });
+
+  function buildJsonRecord() {
+    return {
+      visit_datetime: visitDatetimeInput.value || nowLocalString(),
+      shop_name: shopNameInput.value.trim(),
+      station: stationInput.value.trim(),
+      biz_type: bizType,
+      price_band: priceBand,
+      flour_brand: flourBrandInput.value.trim(),
+      bag_count: parseInt(bagCountInput.value, 10) || 0,
+      freq_per_week: freqPerWeekInput.value ? parseInt(freqPerWeekInput.value, 10) : null,
+      other_flour: otherFlourInput.value.trim(),
+      exterior_checks: Array.from(activeExterior),
+      equipment: Array.from(activeEquipment),
+      tags: Array.from(activeTags),
+      vendor_observation: vendorObservationInput.value.trim(),
+      rival_diff: rivalDiffInput.value.trim(),
+      relation_level: relationLevel,
+      free_memo: freeMemoInput.value.trim(),
+      ai_result: aiResultInput.value.trim(),
+      machine_note: machineNoteInput.value.trim(),
+      machine_era: Array.from(activeMachineEra),
+      machine_type: Array.from(activeMachineType),
+      employee_scale: employeeScale,
+      competitor_tags: Array.from(activeCompetitorTags)
+    };
+  }
+
+  clearBtn.addEventListener("click", () => {
+    if (!window.confirm("入力中のログをクリアして新規ログを開始しますか？（保存済みタグ一覧・蓄積ログは消えません）")) return;
+    localStorage.removeItem(DRAFT_KEY);
+    shopNameInput.value = "";
+    stationInput.value = "";
+    flourBrandInput.value = "";
+    bagCountInput.value = "";
+    freqPerWeekInput.value = "";
+    otherFlourInput.value = "";
+    vendorObservationInput.value = "";
+    rivalDiffInput.value = "";
+    freeMemoInput.value = "";
+    aiResultInput.value = "";
+    machineNoteInput.value = "";
+    visitDatetimeInput.value = nowLocalString();
+    activeTags = new Set();
+    activeExterior = new Set();
+    activeEquipment = new Set();
+    activeMachineEra = new Set();
+    activeMachineType = new Set();
+    activeCompetitorTags = new Set();
+    employeeScale = null;
+    bizType = null;
+    priceBand = null;
+    relationLevel = null;
+    renderTags();
+    renderExterior();
+    renderEquipment();
+    renderMachineEra();
+    renderMachineType();
+    renderCompetitorTags();
+    renderEmployeeScale();
+    renderBizType();
+    renderPriceBand();
+    renderRelation();
+    updateEgoLinks();
+    updatePrevLog();
+    resultCard.hidden = true;
+    draftIndicator.textContent = "下書き未保存";
+  });
+
+  [shopNameInput, stationInput, flourBrandInput, bagCountInput, freqPerWeekInput, otherFlourInput,
+   visitDatetimeInput, vendorObservationInput, rivalDiffInput, freeMemoInput, aiResultInput, machineNoteInput].forEach((el) => {
+    el.addEventListener("input", () => { saveDraftDebounced(); });
+  });
+  shopNameInput.addEventListener("input", () => { updateEgoLinks(); updatePrevLog(); });
+  stationInput.addEventListener("input", updateEgoLinks);
+
+  function buildPrompt() {
+    const shop = shopNameInput.value.trim() || "(店舗名未入力)";
+    const station = stationInput.value.trim() || "(未入力)";
+    const biz = bizType || "(未選択)";
+    const price = priceBand || "(未選択)";
+    const flour = flourBrandInput.value.trim() || "(未入力)";
+    const bags = bagCountInput.value || "0";
+    const freq = freqPerWeekInput.value || "(未入力)";
+    const otherFlour = otherFlourInput.value.trim() || "(なし)";
+    const exterior = Array.from(activeExterior).join(" / ") || "(チェックなし)";
+    const equipment = Array.from(activeEquipment).join(" / ") || "(なし)";
+    const tags = Array.from(activeTags).join(" ") || "(タグなし)";
+    const vendorObs = vendorObservationInput.value.trim() || "(観察なし)";
+    const rivalDiff = rivalDiffInput.value.trim() || "(気付きなし)";
+    const relation = relationLevel || "(未選択)";
+    const memo = freeMemoInput.value.trim() || "(メモなし)";
+    const machineNote = machineNoteInput.value.trim() || "(未記入)";
+    const machineEra = Array.from(activeMachineEra).join(" / ") || "(未選択)";
+    const machineType = Array.from(activeMachineType).join(" / ") || "(未選択)";
+    const empScale = employeeScale || "(未選択)";
+    const competitorTags = Array.from(activeCompetitorTags).join(" / ") || "(なし)";
+    const dt = visitDatetimeInput.value || nowLocalString();
+
+    return [
+      "あなたは蕎麦店専門の経営コンサルタント兼原価アナリストです。以下は蕎麦粉ルート配送スタッフが訪問直後に現場で記録した生のメモです。乱雑な箇条書き・話し言葉のままですが、読み解いて分析してください。",
+      "",
+      "# 訪問記録",
+      `- 日時: ${dt}`,
+      `- 店舗名: ${shop}`,
+      `- 最寄駅・立地: ${station}`,
+      `- 業態区分: ${biz}`,
+      `- 価格帯（もり・ざる基準）: ${price}`,
+      `- 主力粉銘柄: ${flour}`,
+      `- 納品袋数（20kg）: ${bags}袋`,
+      `- 配送頻度: 週${freq}回`,
+      `- つなぎ粉・その他: ${otherFlour}`,
+      `- 外観・店頭チェック（入店前の観察）: ${exterior}`,
+      `- 厨房設備: ${equipment}`,
+      `- バックヤード観察タグ: ${tags}`,
+      `- 他社仕入れ・取引先観察: ${vendorObs}`,
+      `- 主力ライバル店との違い（気付き）: ${rivalDiff}`,
+      `- 店主リレーション度: ${relation}`,
+      `- 設備 銘板・メーカー名メモ: ${machineNote}`,
+      `- 設備 製造年代・状態タグ: ${machineEra}`,
+      `- 設備 駆動・製麺方式タグ: ${machineType}`,
+      `- 相手の推定従業員規模: ${empScale}`,
+      `- 競合観察タグ（現場で聞いた生の声）: ${competitorTags}`,
+      "- フリーメモ（音声入力の走り書き）:",
+      memo,
+      "",
+      "# 分析の型（競合比較・提案の組み立て方）",
+      "以下の3ステップで考えること。ただし各ステップは、上記の入力データ（タグ・メモ）に実際に根拠がある場合のみ埋めること。入力データに根拠がない場合は、そのステップを『情報不足のため判断不可』と明記し、絶対に憶測で断定しないこと。",
+      "  Step1: 相手（競合・訪問先）が構造上できないこと・苦手なことは何か（例: 50人以上の組織化企業ならマニュアル対応中心で小ロット特注に弱い傾向、49人以下の町工場モデルなら社長・専務への直談判が効きやすい可能性がある、という一般的傾向を参考にしつつ、入力データの裏付けがある範囲でのみ言及）",
+      "  Step2: 自社（対面密着・小ロット特注対応・日配ルートでの通い箱回収）の強みで、Step1の弱みのどこを肩代わりできるか",
+      "  Step3: 店主に対して『完全には無理だが、ここまでは確実にやれる』と誠実に言い切れる現実的な提案は何か",
+      "",
+      "# 出力してほしい内容（5項目、見出し付きで）",
+      "1. 日杯数・月商逆算: 主力粉銘柄・納品袋数・配送頻度から日次提供杯数、粉原価率、月商を逆算して推定",
+      "2. 競合比較＆設備リスク: 上記「分析の型」Step1〜2を用いて、業態区分・立地・価格帯・外観チェック・競合観察タグ・従業員規模タグから、想定競合との差別化ポイントを整理。加えて設備メーカー名・年代・状態タグから、そのメーカーが現存するか／部品供給や修理対応に懸念がないかを考察すること。ただし裏付けのない憶測で「倒産」「廃業」「弱点」等と断定しないこと。確認できない場合は必ず「不明・要確認」と明記すること。",
+      "3. 店主心理の裏読み: リレーション度と店主の発言（フリーメモ）から見える本当の経営課題（技術・動線・人手不足・プライドなど）",
+      "4. 次回のキラーフレーズ: 上記「分析の型」Step3を用いて、次回配送時に「業者」から「頼れる相談相手」に昇格するための、誠実に言い切れる範囲の一言の問いかけ（設備が老朽化している場合は、メンテナンス相談や代替提案の糸口も1案含めてよい）",
+      "5. Python集計用JSONデータ: 上記1〜4の分析結果と入力データすべてを、キー名はsnake_case（例: shop_name, bag_count, price_band, machine_note）に統一したフラットなKey-Value形式のJSONで出力（今後項目が増減しても対応できるよう、キーは自由に追加してよい）"
+    ].join("\n");
+  }
+
+  function buildMarkdown() {
+    const shop = shopNameInput.value.trim() || "(未入力)";
+    const station = stationInput.value.trim() || "-";
+    const biz = bizType || "-";
+    const price = priceBand || "-";
+    const flour = flourBrandInput.value.trim() || "(未入力)";
+    const bags = bagCountInput.value || "0";
+    const freq = freqPerWeekInput.value || "-";
+    const otherFlour = otherFlourInput.value.trim() || "-";
+    const exterior = Array.from(activeExterior).join(" / ") || "(チェックなし)";
+    const equipment = Array.from(activeEquipment).join(" / ") || "-";
+    const tags = Array.from(activeTags).join(" ") || "(タグなし)";
+    const vendorObs = vendorObservationInput.value.trim() || "-";
+    const rivalDiff = rivalDiffInput.value.trim() || "-";
+    const relation = relationLevel || "-";
+    const memo = freeMemoInput.value.trim() || "(メモなし)";
+    const aiResult = aiResultInput.value.trim() || "(未貼付)";
+    const machineNote = machineNoteInput.value.trim() || "-";
+    const machineEra = Array.from(activeMachineEra).join(" / ") || "-";
+    const machineType = Array.from(activeMachineType).join(" / ") || "-";
+    const empScale = employeeScale || "-";
+    const competitorTags = Array.from(activeCompetitorTags).join(" / ") || "-";
+    const dt = visitDatetimeInput.value || nowLocalString();
+    return [
+      `## 現場ログ ${dt}`,
+      `- **店舗名**: ${shop}`,
+      `- **最寄駅・立地**: ${station}`,
+      `- **業態区分**: ${biz}`,
+      `- **価格帯**: ${price}`,
+      `- **主力粉銘柄**: ${flour}`,
+      `- **納品袋数**: ${bags}袋`,
+      `- **配送頻度**: 週${freq}回`,
+      `- **つなぎ粉・その他**: ${otherFlour}`,
+      `- **外観・店頭チェック**: ${exterior}`,
+      `- **厨房設備**: ${equipment}`,
+      `- **バックヤード観察タグ**: ${tags}`,
+      `- **他社仕入れ・取引先観察**: ${vendorObs}`,
+      `- **主力ライバル店との違い**: ${rivalDiff}`,
+      `- **店主リレーション度**: ${relation}`,
+      `- **設備メモ（銘板・メーカー名）**: ${machineNote}`,
+      `- **設備 年代・状態**: ${machineEra}`,
+      `- **設備 駆動・方式**: ${machineType}`,
+      `- **相手の推定従業員規模**: ${empScale}`,
+      `- **競合観察タグ**: ${competitorTags}`,
+      "- **メモ**:",
+      "  " + memo.split("\n").join("\n  "),
+      "- **AI分析結果**:",
+      "  " + aiResult.split("\n").join("\n  ")
+    ].join("\n");
+  }
+
+  function buildTsv() {
+    const esc = (s) => String(s).replace(/\t/g, " ").replace(/\r?\n/g, " / ");
+    const shop = shopNameInput.value.trim();
+    const station = stationInput.value.trim();
+    const biz = bizType || "";
+    const price = priceBand || "";
+    const flour = flourBrandInput.value.trim();
+    const bags = bagCountInput.value || "0";
+    const freq = freqPerWeekInput.value || "";
+    const otherFlour = otherFlourInput.value.trim();
+    const exterior = Array.from(activeExterior).join(" / ");
+    const equipment = Array.from(activeEquipment).join(" / ");
+    const tags = Array.from(activeTags).join(" ");
+    const vendorObs = vendorObservationInput.value.trim();
+    const rivalDiff = rivalDiffInput.value.trim();
+    const relation = relationLevel || "";
+    const memo = freeMemoInput.value.trim();
+    const aiResult = aiResultInput.value.trim();
+    const machineNote = machineNoteInput.value.trim();
+    const machineEra = Array.from(activeMachineEra).join(" / ");
+    const machineType = Array.from(activeMachineType).join(" / ");
+    const empScale = employeeScale || "";
+    const competitorTags = Array.from(activeCompetitorTags).join(" / ");
+    const dt = visitDatetimeInput.value || nowLocalString();
+    return [dt, shop, station, biz, price, flour, bags, freq, otherFlour, exterior, equipment, tags, vendorObs, rivalDiff, relation, machineNote, machineEra, machineType, empScale, competitorTags, memo, aiResult]
+      .map(esc).join("\t");
+  }
+
+  function pushHistory(entry) {
+    const history = safeParse(localStorage.getItem(HISTORY_KEY), []);
+    history.push(entry);
+    while (history.length > 200) history.shift();
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  }
+
+  analyzeBtn.addEventListener("click", async () => {
+    if (!shopNameInput.value.trim()) {
+      showToast("店舗名は必須です");
+      shopNameInput.focus();
+      return;
+    }
+    if (!flourBrandInput.value.trim()) {
+      showToast("主力粉銘柄は必須です");
+      flourBrandInput.focus();
+      return;
+    }
+    saveDraft();
+    const prompt = buildPrompt();
+    promptOutput.value = prompt;
+    resultCard.hidden = false;
+    resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    pushHistory({
+      savedAt: new Date().toISOString(),
+      shopName: shopNameInput.value.trim(),
+      station: stationInput.value.trim(),
+      bizType: bizType,
+      priceBand: priceBand,
+      flourBrand: flourBrandInput.value.trim(),
+      bagCount: bagCountInput.value,
+      freqPerWeek: freqPerWeekInput.value,
+      otherFlour: otherFlourInput.value.trim(),
+      exteriorChecks: Array.from(activeExterior),
+      equipment: Array.from(activeEquipment),
+      tags: Array.from(activeTags),
+      vendorObservation: vendorObservationInput.value.trim(),
+      rivalDiff: rivalDiffInput.value.trim(),
+      relationLevel: relationLevel,
+      freeMemo: freeMemoInput.value.trim(),
+      machineNote: machineNoteInput.value.trim(),
+      machineEra: Array.from(activeMachineEra),
+      machineType: Array.from(activeMachineType),
+      employeeScale: employeeScale,
+      competitorTags: Array.from(activeCompetitorTags)
+    });
+    renderHistoryList();
+
+    const synced = syncToGoogleForm(buildJsonRecord());
+    const ok = await copyText(prompt);
+    let msg = ok ? "💾 保存＆プロンプトをコピーしました" : "コピーに失敗しました。手動で選択してください";
+    if (synced) msg += " ／ ☁️ クラウド送信を試行（到達確認不可・要シート側確認）";
+    showToast(msg);
+  });
+
+  $("copyPromptBtn").addEventListener("click", async () => {
+    const ok = await copyText(promptOutput.value);
+    showToast(ok ? "プロンプトをコピーしました" : "コピーに失敗しました");
+  });
+  $("copyMdBtn").addEventListener("click", async () => {
+    const ok = await copyText(buildMarkdown());
+    showToast(ok ? "Markdownをコピーしました" : "コピーに失敗しました");
+  });
+  $("copyTsvBtn").addEventListener("click", async () => {
+    const ok = await copyText(buildTsv());
+    showToast(ok ? "TSVをコピーしました" : "コピーに失敗しました");
+  });
+  $("copyJsonBtn").addEventListener("click", async () => {
+    const ok = await copyText(JSON.stringify(buildJsonRecord(), null, 2));
+    showToast(ok ? "JSONをコピーしました" : "コピーに失敗しました");
+  });
+
+  loadDraft();
+  renderTags();
+  renderExterior();
+  renderEquipment();
+  renderMachineEra();
+  renderMachineType();
+  renderMachineRefList();
+  renderEmployeeScale();
+  renderCompetitorTags();
+  renderBizType();
+  renderPriceBand();
+  renderRelation();
+  updateEgoLinks();
+  updatePrevLog();
+  renderHistoryList();
+  renderReferenceList();
+  renderTrendTable();
+  renderPrefTable();
+  renderGformFields();
+})();
+</script>
+</body>
+</html>
