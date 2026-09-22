@@ -372,6 +372,14 @@ details.card[open] summary::after { transform: rotate(180deg); }
       <input class="input" id="station" placeholder="例: 浅草駅 徒歩5分" autocomplete="off">
     </div>
     <div class="field">
+      <label class="label" for="addressInput">住所</label>
+      <div class="row" style="align-items:stretch; flex-wrap:nowrap">
+        <input class="input" id="addressInput" placeholder="例: 東京都台東区浅草2-3-1" autocomplete="off" style="flex:1 1 auto; min-width:0">
+        <button type="button" class="btn btn--secondary" id="addressMapBtn" style="flex:0 0 auto">🗺️ マップ</button>
+      </div>
+      <span class="hint">住所が空なら店舗名でGoogleマップ検索を開きます</span>
+    </div>
+    <div class="field">
       <span class="label">業態区分</span>
       <div class="chip-cloud" id="bizTypeCloud"></div>
     </div>
@@ -720,7 +728,7 @@ details.card[open] summary::after { transform: rotate(180deg); }
   }
   const PRICE_BANDS = ["〜¥690 (大衆/路麺)","¥700〜¥890 (標準町蕎麦)","¥900〜¥1,190 (手打ち中単価)","¥1,200超 (本格/高単価)"];
   const RELATION_LEVELS = ["Lv1 挨拶のみ","Lv2 雑談","Lv3 現場・仕入れの愚痴","Lv4 経営本音・相談"];
-  const HISTORY_TSV_HEADERS = ["visit_datetime","shop_name","station","biz_type","price_band","flour_brand","bag_count","freq_per_week","other_flour","exterior_checks","equipment","tags","vendor_observation","rival_diff","relation_level","free_memo"];
+  const HISTORY_TSV_HEADERS = ["visit_datetime","shop_name","station","address","biz_type","price_band","flour_brand","bag_count","freq_per_week","other_flour","exterior_checks","equipment","tags","vendor_observation","rival_diff","relation_level","free_memo"];
 
   const FLOUR_REFERENCE = [
     {
@@ -825,6 +833,8 @@ details.card[open] summary::after { transform: rotate(180deg); }
   const $ = (id) => document.getElementById(id);
   const shopNameInput = $("shopName");
   const stationInput = $("station");
+  const addressInput = $("addressInput");
+  const addressMapBtn = $("addressMapBtn");
   const flourBrandInput = $("flourBrand");
   const bagCountInput = $("bagCount");
   const freqPerWeekInput = $("freqPerWeek");
@@ -1055,6 +1065,18 @@ details.card[open] summary::after { transform: rotate(180deg); }
     });
   }
 
+  function buildMapUrl(query) {
+    return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(query);
+  }
+
+  addressMapBtn.addEventListener("click", () => {
+    const addr = addressInput.value.trim();
+    const shop = shopNameInput.value.trim();
+    const query = addr || shop;
+    if (!query) { showToast("住所または店舗名を入力してください"); return; }
+    window.open(buildMapUrl(query), "_blank", "noopener,noreferrer");
+  });
+
   function updateDraftIndicator(iso) {
     const d = new Date(iso);
     draftIndicator.textContent = `下書き保存 ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
@@ -1064,6 +1086,7 @@ details.card[open] summary::after { transform: rotate(180deg); }
     const draft = {
       shopName: shopNameInput.value,
       station: stationInput.value,
+      address: addressInput.value,
       flourBrand: flourBrandInput.value,
       bagCount: bagCountInput.value,
       freqPerWeek: freqPerWeekInput.value,
@@ -1099,6 +1122,7 @@ details.card[open] summary::after { transform: rotate(180deg); }
     }
     shopNameInput.value = draft.shopName || "";
     stationInput.value = draft.station || "";
+    addressInput.value = draft.address || "";
     flourBrandInput.value = draft.flourBrand || "";
     bagCountInput.value = draft.bagCount || "";
     freqPerWeekInput.value = draft.freqPerWeek || "";
@@ -1132,6 +1156,7 @@ details.card[open] summary::after { transform: rotate(180deg); }
     const last = matches[0];
 
     const rows = [
+      ["住所", last.address],
       ["業態", last.bizType],
       ["価格帯", last.priceBand],
       ["主力粉銘柄", last.flourBrand],
@@ -1159,7 +1184,7 @@ details.card[open] summary::after { transform: rotate(180deg); }
   function historyEntryTsvRow(h) {
     const esc = (s) => String(s == null ? "" : s).replace(/\t/g, " ").replace(/\r?\n/g, " / ");
     return [
-      h.savedAt || "", h.shopName || "", h.station || "", h.bizType || "", h.priceBand || "",
+      h.savedAt || "", h.shopName || "", h.station || "", h.address || "", h.bizType || "", h.priceBand || "",
       h.flourBrand || "", h.bagCount || "0", h.freqPerWeek || "", h.otherFlour || "",
       (h.exteriorChecks || []).join(" / "), (h.equipment || []).join(" / "), (h.tags || []).join(" "),
       h.vendorObservation || "", h.rivalDiff || "", h.relationLevel || "", h.freeMemo || ""
@@ -1178,12 +1203,17 @@ details.card[open] summary::after { transform: rotate(180deg); }
       const item = document.createElement("div");
       item.className = "history-item";
       const meta = [h.bizType, h.priceBand, h.bagCount ? h.bagCount + "袋" : null].filter(Boolean).join(" ・ ");
+      const addressQuery = (h.address || h.shopName || "").trim();
+      const addressLine = h.address
+        ? `<div class="history-item__meta">📍 ${escapeHtml(h.address)} <a href="${buildMapUrl(addressQuery)}" target="_blank" rel="noopener noreferrer">🗺️</a></div>`
+        : "";
       item.innerHTML = `
         <div class="history-item__head">
           <span class="history-item__shop">${escapeHtml(h.shopName || "(無題)")}</span>
           <span class="history-item__meta">${formatDateTime(h.savedAt)}</span>
         </div>
         <div class="history-item__meta">${escapeHtml(meta || "-")}</div>
+        ${addressLine}
       `;
       const copyBtn = document.createElement("button");
       copyBtn.type = "button";
@@ -1491,6 +1521,7 @@ details.card[open] summary::after { transform: rotate(180deg); }
       visit_datetime: visitDatetimeInput.value || nowLocalString(),
       shop_name: shopNameInput.value.trim(),
       station: stationInput.value.trim(),
+      address: addressInput.value.trim(),
       biz_type: bizType,
       price_band: priceBand,
       flour_brand: flourBrandInput.value.trim(),
@@ -1518,6 +1549,7 @@ details.card[open] summary::after { transform: rotate(180deg); }
     localStorage.removeItem(DRAFT_KEY);
     shopNameInput.value = "";
     stationInput.value = "";
+    addressInput.value = "";
     flourBrandInput.value = "";
     bagCountInput.value = "";
     freqPerWeekInput.value = "";
@@ -1554,7 +1586,7 @@ details.card[open] summary::after { transform: rotate(180deg); }
     draftIndicator.textContent = "下書き未保存";
   });
 
-  [shopNameInput, stationInput, flourBrandInput, bagCountInput, freqPerWeekInput, otherFlourInput,
+  [shopNameInput, stationInput, addressInput, flourBrandInput, bagCountInput, freqPerWeekInput, otherFlourInput,
    visitDatetimeInput, vendorObservationInput, rivalDiffInput, freeMemoInput, aiResultInput, machineNoteInput].forEach((el) => {
     el.addEventListener("input", () => { saveDraftDebounced(); });
   });
@@ -1564,6 +1596,7 @@ details.card[open] summary::after { transform: rotate(180deg); }
   function buildPrompt() {
     const shop = shopNameInput.value.trim() || "(店舗名未入力)";
     const station = stationInput.value.trim() || "(未入力)";
+    const address = addressInput.value.trim() || "(未入力)";
     const biz = bizType || "(未選択)";
     const price = priceBand || "(未選択)";
     const flour = flourBrandInput.value.trim() || "(未入力)";
@@ -1591,6 +1624,7 @@ details.card[open] summary::after { transform: rotate(180deg); }
       `- 日時: ${dt}`,
       `- 店舗名: ${shop}`,
       `- 最寄駅・立地: ${station}`,
+      `- 住所: ${address}`,
       `- 業態区分: ${biz}`,
       `- 価格帯（もり・ざる基準）: ${price}`,
       `- 主力粉銘柄: ${flour}`,
@@ -1629,6 +1663,7 @@ details.card[open] summary::after { transform: rotate(180deg); }
   function buildMarkdown() {
     const shop = shopNameInput.value.trim() || "(未入力)";
     const station = stationInput.value.trim() || "-";
+    const address = addressInput.value.trim() || "-";
     const biz = bizType || "-";
     const price = priceBand || "-";
     const flour = flourBrandInput.value.trim() || "(未入力)";
@@ -1653,6 +1688,7 @@ details.card[open] summary::after { transform: rotate(180deg); }
       `## 現場ログ ${dt}`,
       `- **店舗名**: ${shop}`,
       `- **最寄駅・立地**: ${station}`,
+      `- **住所**: ${address}`,
       `- **業態区分**: ${biz}`,
       `- **価格帯**: ${price}`,
       `- **主力粉銘柄**: ${flour}`,
@@ -1681,6 +1717,7 @@ details.card[open] summary::after { transform: rotate(180deg); }
     const esc = (s) => String(s).replace(/\t/g, " ").replace(/\r?\n/g, " / ");
     const shop = shopNameInput.value.trim();
     const station = stationInput.value.trim();
+    const address = addressInput.value.trim();
     const biz = bizType || "";
     const price = priceBand || "";
     const flour = flourBrandInput.value.trim();
@@ -1701,7 +1738,7 @@ details.card[open] summary::after { transform: rotate(180deg); }
     const empScale = employeeScale || "";
     const competitorTags = Array.from(activeCompetitorTags).join(" / ");
     const dt = visitDatetimeInput.value || nowLocalString();
-    return [dt, shop, station, biz, price, flour, bags, freq, otherFlour, exterior, equipment, tags, vendorObs, rivalDiff, relation, machineNote, machineEra, machineType, empScale, competitorTags, memo, aiResult]
+    return [dt, shop, station, address, biz, price, flour, bags, freq, otherFlour, exterior, equipment, tags, vendorObs, rivalDiff, relation, machineNote, machineEra, machineType, empScale, competitorTags, memo, aiResult]
       .map(esc).join("\t");
   }
 
@@ -1733,6 +1770,7 @@ details.card[open] summary::after { transform: rotate(180deg); }
       savedAt: new Date().toISOString(),
       shopName: shopNameInput.value.trim(),
       station: stationInput.value.trim(),
+      address: addressInput.value.trim(),
       bizType: bizType,
       priceBand: priceBand,
       flourBrand: flourBrandInput.value.trim(),
