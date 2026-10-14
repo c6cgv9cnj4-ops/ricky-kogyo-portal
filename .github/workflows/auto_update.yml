@@ -36,8 +36,22 @@ jobs:
       - name: "Fetch: バドミントン代表・動向インテリジェンス"
         run: python badminton_intelligence.py
 
+      # カルチャーは失敗しても他ページのコミットを止めない。失敗時は公開ページをHEADへ戻し、最後のゲートでジョブを失敗させる
       - name: "Fetch: 都内 美術館・写真展データベース"
-        run: python culture_exhibition_dashboard.py
+        id: culture
+        shell: bash
+        run: |
+          set +e
+          timeout 900 python culture_exhibition_dashboard.py
+          rc=$?
+          set -e
+          if [ "$rc" -ne 0 ]; then
+            echo "culture_failed=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::カルチャー生成が失敗（rc=$rc）。公開ページは前回版を維持し、他ページは続行"
+            # カルチャーのフォルダだけを HEAD に戻し、未追跡の残骸（.tmp・途中出力）も除去する。他のフォルダには触れない
+            git checkout HEAD -- docs/culture-exhibition/ || { echo "::error::カルチャーの公開ページの復元に失敗"; exit 1; }
+            git clean -fdq -- docs/culture-exhibition/ || { echo "::error::カルチャーの残骸の除去に失敗"; exit 1; }
+          fi
 
       - name: "Fetch: 経済ポータルダッシュボード"
         run: python economic_portal_dashboard.py
@@ -65,3 +79,11 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add docs/
           git diff --cached --quiet && echo "No changes" || (git commit -m "auto: update all-deliverables portal $(date -u +'%Y-%m-%d %H:%M UTC')" && git push)
+
+      # 最後のゲート: カルチャーが失敗していた場合のみジョブを失敗させる（他ページのコミット後に実行）
+      - name: "Gate: カルチャー生成の失敗をジョブ結果に反映"
+        if: ${{ always() && steps.culture.outputs.culture_failed == 'true' }}
+        shell: bash
+        run: |
+          echo "::error::カルチャー生成が失敗。他ページは更新済み。公開ページは前回版のまま。ガード作動なら内容確認後に CULTURE_FORCE_UPDATE=1 で再実行"
+          exit 1
