@@ -1726,6 +1726,13 @@ def self_test(items):
 
 
 def main():
+    # VERIFY-ONLY: 検証用の強制失敗（verify/culture-failure-injection ブランチのみ。本番・mainには入れない）
+    # 途中書き込みの残骸（.tmp）と、カルチャー配下の既存ファイルの上書きを模擬してから失敗させる
+    import os as _os
+    _d = _os.path.join("docs", "culture-exhibition")
+    with open(_os.path.join(_d, "index.html.tmp"), "w", encoding="utf-8") as _f: _f.write("PARTIAL")
+    with open(_os.path.join(_d, "verify-sibling.txt"), "w", encoding="utf-8") as _f: _f.write("SIBLING_NEW")
+    raise SystemExit(1)
     start_time = time.time()
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
