@@ -58,6 +58,347 @@ DISCOUNT_INFO = {
     "夢の島熱帯植物館": "本人・付添者1名 無料（受給者証は対象外、公式ページ直接確認、2026-08-03）",
 }
 
+
+# ============================================================
+# 施設規定を個別項目に適用する方式。"推定"（既定）＝個別確認なしでは確認済みにしない／"確認済み"＝施設規定の範囲内で確認済みとする
+FACILITY_RULE_MODE = "施設種別別"  # 推奨: 入園・入館の常設規定は確認済み、展覧会型の美術館は推定
+# 施設種別別: 入園・入館の常設規定（料金が展覧会ごとに変わらない）は確認済み、展覧会型の美術館は個別料金があるため推定
+FACILITY_KIND_MODE = {
+    "恩賜上野動物園": "確認済み", "多摩動物公園": "確認済み", "葛西臨海水族園": "確認済み", "井の頭自然文化園": "確認済み",
+    "神代植物公園": "確認済み", "夢の島熱帯植物館": "確認済み", "江戸東京たてもの園": "確認済み",
+    "国立新美術館": "推定", "国立西洋美術館": "推定", "アーティゾン美術館": "推定", "渋谷区立松濤美術館": "推定",
+    "東京国立博物館": "推定", "東京都美術館": "推定", "森美術館": "推定", "東京都写真美術館": "推定", "根津美術館": "推定",
+}
+
+# ---- 公式の確認結果（引用文は取得した本文に含まれることを検証済み。検証は CULTURE_FIX_TEST で実施）----
+# kind: 展覧会 / 上映 / 施設規定。scope: 施設規定の適用範囲
+OFFICIAL_CHECKED_AT = "2026-10-14"  # OFFICIAL_FACTS の内容を公式ページで確認した日
+OFFICIAL_FACTS = {
+    # 個別ページ（展覧会・上映）
+    "https://topmuseum.jp/exhibition/5423/": dict(venue="東京都写真美術館", kind="展覧会", scope="個別", subject="本人（障害者手帳）", companion="介護者2名まで無料", fee="無料", quote="中学生以下および障害者手帳をお持ちの方とその介護者（2名まで）無料"),
+    "https://topmuseum.jp/exhibition/5421/": dict(venue="東京都写真美術館", kind="展覧会", scope="個別", subject="本人（障害者手帳）", companion="介護者2名まで無料", fee="無料", quote="中学生以下および障害者手帳をお持ちの方とその介護者（2名まで）は無料"),
+    "https://topmuseum.jp/movie/12613/": dict(venue="東京都写真美術館", kind="上映", scope="個別", subject="本人（障害者手帳）", companion="介護者2名まで1名につき1,000円", fee="1,000円", quote="障害者手帳をお持ちの方（介護者2名まで1名につき）1,000円"),
+    "https://topmuseum.jp/movie/13035/": dict(venue="東京都写真美術館", kind="上映", scope="個別", subject="本人（障害者手帳）", companion="介護者2名まで1名につき1,000円", fee="1,000円", quote="障害者手帳をお持ちの方（介護者2名まで1名につき）1,000円"),
+    "https://topmuseum.jp/movie/13025/": dict(venue="東京都写真美術館", kind="上映", scope="個別", subject="本人（障害者手帳）", companion="介護者2名まで1名につき1,000円", fee="1,000円", quote="障害者手帳をお持ちの方（介護者2名まで1名につき）1,000円"),
+    "https://topmuseum.jp/exhibition/12474/": dict(venue="東京都写真美術館", kind="展覧会", scope="個別", subject="一般と同じ", companion="該当記載なし", fee="無料", quote="料金：無料"),
+    "https://topmuseum.jp/exhibition/5478/": dict(venue="東京都写真美術館", kind="展覧会", scope="個別", subject="不明", companion="不明", fee="料金未定", quote="料金：未定 詳細が決まり次第掲載します"),
+    "https://www.nact.jp/exhibition_special/2026/louvre2026/": dict(venue="国立新美術館", kind="展覧会", scope="個別", subject="本人（障害者手帳等）", companion="付添者1名まで無料", fee="無料", quote="中学生以下、障害者手帳等をお持ちの方とその付添者 1 名は無料です"),
+    "https://www.nact.jp/exhibition_special/2026/shojomanga/": dict(venue="国立新美術館", kind="展覧会", scope="個別", subject="本人（障害者手帳等）", companion="付添者1名まで無料", fee="無料", quote="中学生以下、障害者手帳等をお持ちの方とその付添者 1 名は無料です"),
+    "https://www.nezu-muse.or.jp/jp/exhibitions/current/": dict(venue="根津美術館", kind="展覧会", scope="個別", subject="本人（障害者手帳提示者）と同伴者", companion="同伴者（人数の記載なし）", fee="200円引き", quote="障害者手帳提示者および同伴者は200円引き、高校生以下は無料"),
+    "https://www.tobikan.jp/exhibition/2026_britishmuseum.html": dict(venue="東京都美術館", kind="展覧会", scope="個別", subject="本人（障害者手帳）", companion="介護者1名まで無料", fee="無料", quote="身体障害者手帳・愛の手帳・療育手帳・精神障害者保健福祉手帳・被爆者健康手帳をお持ちの方とその介護者（1名まで）は無料"),
+    "https://www.tobikan.jp/exhibition/2026_orsay.html": dict(venue="東京都美術館", kind="展覧会", scope="個別", subject="本人（障害者手帳）", companion="介護者1名まで無料", fee="無料", quote="身体障害者手帳・愛の手帳・療育手帳・精神障害者保健福祉手帳・被爆者健康手帳をお持ちの方とその介護者（1名まで）は無料"),
+    "https://www.tobikan.jp/exhibition/2026_viewsofthisplace.html": dict(venue="東京都美術館", kind="展覧会", scope="個別", subject="本人（障害者手帳）", companion="介護者1名まで無料", fee="無料", quote="身体障害者手帳・愛の手帳・療育手帳・精神障害者保健福祉手帳・被爆者健康手帳をお持ちの方とその介護者（1名まで）は無料"),
+    # 施設規定（展覧会・入園などの一般規定。個別項目には推定として適用）
+    "https://www.nact.jp/ticket/index.html": dict(venue="国立新美術館", kind="施設規定", scope="企画展示室・展覧会（施設規定）", subject="本人（障害者手帳等）", companion="付添者1名まで無料", fee="無料", quote="中学生以下、障害者手帳等をお持ちの方とその付添者1名は無料です"),
+    "https://www.artizon.museum/ticket/": dict(venue="アーティゾン美術館", kind="施設規定", scope="施設（チケット案内）", subject="本人（障がい者手帳）", companion="付き添いの方1名まで無料", fee="無料", quote="障がい者手帳をお持ちの方と付き添いの方1名 無料"),
+    "https://www.nmwa.go.jp/jp/visit/index.html": dict(venue="国立西洋美術館", kind="施設規定", scope="施設（入館案内）", subject="本人（障害者手帳）", companion="付添者1名まで無料", fee="無料", quote="障害者手帳*をお持ちの方とその付添者1名は無料"),
+    "https://shoto-museum.jp/visit/": dict(venue="渋谷区立松濤美術館", kind="施設規定", scope="施設（入館案内）", subject="本人（障がい者手帳等）", companion="付添の方各1名まで無料", fee="無料", quote="障がい者とその付添の方各1名は無料です"),
+    "https://www.tatemonoen.jp/raien/holiday.php": dict(venue="江戸東京たてもの園", kind="施設規定", scope="施設（来園案内）", subject="本人（障害者手帳）", companion="付き添いの方2名まで無料", fee="無料", quote="身体障害者手帳・愛の手帳・療育手帳・精神障害者保健福祉手帳・被爆者健康手帳をお持ちの方とその付き添いの方(2名まで)は無料"),
+    "https://www.tokyo-zoo.net/ueno/visitor-info/tickets/index.html": dict(venue="恩賜上野動物園", kind="施設規定", scope="施設（入園）", subject="本人（手帳）", companion="付添（原則1名）無料", fee="無料", quote="ご本人と付添の方（原則1名）が無料"),
+    "https://www.tokyo-zoo.net/tama/visitor-info/tickets/index.html": dict(venue="多摩動物公園", kind="施設規定", scope="施設（入園）", subject="本人（手帳）", companion="付添者（原則1名）無料", fee="無料", quote="その付添者（原則1名）は無料です"),
+    "https://www.tokyo-zoo.net/kasai/visitor-info/tickets/index.html": dict(venue="葛西臨海水族園", kind="施設規定", scope="施設（入園）", subject="本人（手帳）", companion="付添の方（原則1名）無料", fee="無料", quote="ご本人と付添の方（原則1名）が無料"),
+    "https://www.tokyo-zoo.net/inokashira/visitor-info/tickets/index.html": dict(venue="井の頭自然文化園", kind="施設規定", scope="施設（入園）", subject="本人（手帳）", companion="付添者（原則1名）無料", fee="無料", quote="その付添者（原則1名）は無料です"),
+    "https://www.tokyo-park.or.jp/park/jindai/index.html": dict(venue="神代植物公園", kind="施設規定", scope="施設（入園）", subject="本人（手帳）", companion="付添（原則1名まで）無料", fee="無料", quote="付添の方は原則1名まで無料"),
+    "https://www.yumenoshima.jp/botanicalhall/access": dict(venue="夢の島熱帯植物館", kind="施設規定", scope="施設（入館）", subject="本人（障害者手帳）", companion="付添者1名まで無料", fee="無料", quote="付添者1名は無料です"),
+    "https://www.tnm.jp/modules/r_free_page/index.php?id=113": dict(venue="東京国立博物館", kind="施設規定", scope="平常展（東博コレクション展）のみ", subject="障害者", companion="介護者1名まで無料", fee="無料", quote="障害者とその介護者各1名 東博コレクション展（平常展）が無料です"),
+}
+# 施設規定の適用除外（室）・対象外の種別
+FACILITY_EXCLUDED_ROOMS = {"東京都写真美術館": {"B1F", "地下1階", "地下１階"}}
+FACILITY_FACT_BY_VENUE = {
+    "東京都写真美術館": "https://topmuseum.jp/guide/",  # 施設規定（展覧会・B1F除外）は下の FACILITY_OVERRIDES で定義
+    "国立新美術館": "https://www.nact.jp/ticket/index.html",
+    "アーティゾン美術館": "https://www.artizon.museum/ticket/",
+    "国立西洋美術館": "https://www.nmwa.go.jp/jp/visit/index.html",
+    "渋谷区立松濤美術館": "https://shoto-museum.jp/visit/",
+    "江戸東京たてもの園": "https://www.tatemonoen.jp/raien/holiday.php",
+    "恩賜上野動物園": "https://www.tokyo-zoo.net/ueno/visitor-info/tickets/index.html",
+    "多摩動物公園": "https://www.tokyo-zoo.net/tama/visitor-info/tickets/index.html",
+    "葛西臨海水族園": "https://www.tokyo-zoo.net/kasai/visitor-info/tickets/index.html",
+    "井の頭自然文化園": "https://www.tokyo-zoo.net/inokashira/visitor-info/tickets/index.html",
+    "神代植物公園": "https://www.tokyo-park.or.jp/park/jindai/index.html",
+    "夢の島熱帯植物館": "https://www.yumenoshima.jp/botanicalhall/access",
+    "東京国立博物館": "https://www.tnm.jp/modules/r_free_page/index.php?id=113",
+}
+# 写真美術館の施設規定（topmuseum.jp/guide/）: 展覧会のみ・B1F除外・手帳提示者とその介護者（2名まで）無料
+PHOTO_MUSEUM_FACILITY = dict(venue="東京都写真美術館", kind="展覧会", scope="施設規定（展覧会・B1F除外）", subject="本人（障害者手帳提示者）",
+    companion="介護者2名まで無料", fee="無料", source="https://topmuseum.jp/guide/",
+    quote="＜無料対象＞ 展覧会を無料でご観覧いただけます。B1F展示室は対象外です。")
+
+STATUS_CONFIRMED = "確認済み"
+STATUS_ESTIMATE = "推定"
+STATUS_UNKNOWN = "未確認"
+STATUS_FETCH_FAILED = "取得不能"
+STATUS_CONFLICT = "矛盾"
+
+
+# 施設規定の分類（v4）: 個別の催事に無料を確定する根拠（公式の個別ページ）が無いため、施設規定は常に「推定」に留める。
+APPLICABLE_CATEGORIES = {"平常展", "展覧会（施設の一般規定）", "入園型の展示"}
+# 入園・入館の常設規定を当てはめる施設（展示以外の参加型イベントは対象外）
+ADMISSION_TYPE_VENUES = {"恩賜上野動物園", "多摩動物公園", "葛西臨海水族園", "井の頭自然文化園",
+                         "神代植物公園", "夢の島熱帯植物館", "江戸東京たてもの園"}
+PARTICIPATION_WORDS = re.compile(r"予約制|ワークショップ|セミナー|体験(会|教室|講座|セミナー|ツアー|型)|講座|ガイド|教室|キャンペーン|謎|スタンプラリー|配布|イベント|実演|飾り|年中行事|夕涼み|ツアー|講演|コンサート|飲み比べ")
+EXHIBITION_WORDS = re.compile(r"展示|展")
+DATED_PERIOD = re.compile(r"\d{4}\s*[年/.]\s*\d{1,2}\s*[月/.]\s*\d{1,2}")
+
+
+def facility_category(venue, kind, room, title, period=""):
+    """施設規定の分類。タイトル語・日付は「分類のヒント」にだけ使い、無料の確定には使わない。
+    分類: 参加型・イベント / 平常展 / 特別展・個別催事 / 上映 / 展覧会（施設の一般規定） / 入園型の展示 / 不明"""
+    t = title or ""
+    if PARTICIPATION_WORDS.search(t):
+        return "参加型・イベント"
+    if venue == "東京国立博物館":
+        return "平常展" if ("平常展" in t or "コレクション" in t) else "特別展・個別催事"
+    if venue == "東京都写真美術館":
+        if kind == "上映":
+            return "上映"
+        if _room_excluded(venue, room):
+            return "特別展・個別催事"
+        return "展覧会（施設の一般規定）" if kind == "展覧会" else "不明"
+    if venue in ADMISSION_TYPE_VENUES:
+        return "入園型の展示" if (EXHIBITION_WORDS.search(t) and DATED_PERIOD.search(period or "")) else "不明"
+    return "展覧会（施設の一般規定）" if kind == "展覧会" else "不明"
+
+
+def _facility_scope_ok(venue, kind, room, title, period=""):
+    """施設規定を当てはめてよいかの判定。範囲が不明な場合は False（推測で当てはめない）。
+    - 参加型のイベント（予約制・体験・配布・キャンペーン等）は、入館料に含まれるか公式に確認できないため対象外
+    - 入園型の施設は、日付つきの展示（企画展示など）だけを対象とする（展示名でない項目は対象外）
+    - 東京国立博物館は平常展のみ、写真美術館は展覧会（B1F除外）のみ"""
+    title = title or ""
+    if PARTICIPATION_WORDS.search(title):
+        return False
+    if venue == "東京国立博物館":
+        return "平常展" in title or "コレクション" in title
+    if venue == "東京都写真美術館":
+        return kind == "展覧会" and not _room_excluded(venue, room)
+    if venue in ADMISSION_TYPE_VENUES:
+        return bool(EXHIBITION_WORDS.search(title)) and bool(DATED_PERIOD.search(period or ""))
+    return True
+
+
+def _room_excluded(venue, room):
+    return bool(room) and room in FACILITY_EXCLUDED_ROOMS.get(venue, set())
+
+
+def judge_discount(card):
+    """card: venue, link, kind(展覧会/上映/その他), room, title, source(手書き表/個別ページ/固定文/記載なし/取得困難), text, general_price
+    戻り値: 手帳本人・介護者・一般料金の状態と、表示文、根拠。"""
+    venue, link, kind, room, src, text = card["venue"], card["link"], card["kind"], card.get("room", ""), card["source"], card["text"]
+    res = dict(手帳本人="未確認", 介護者="未確認", 一般料金=card.get("general_price", "") or "未確認", 根拠URL="", 根拠="", 施設規定="適用なし")
+    if venue == "東京都写真美術館":
+        if kind == "展覧会" and not _room_excluded(venue, room):
+            res["施設規定"] = "推定（施設規定の対象の可能性。個別未確認）"
+            res["根拠URL"] = PHOTO_MUSEUM_FACILITY["source"]; res["根拠"] = PHOTO_MUSEUM_FACILITY["quote"]
+        elif kind == "展覧会" and _room_excluded(venue, room):
+            res["施設規定"] = "適用なし（B1F展示室は対象外）"
+        else:
+            res["施設規定"] = "適用なし（上映には適用しない）"
+    # 1) 個別項目の公式確認（同じURLの確認結果）
+    fact = OFFICIAL_FACTS.get(link)
+    if fact and fact["scope"] == "個別":
+        fee = fact["fee"]
+        if "未定" in fee:
+            h = STATUS_UNKNOWN + ":料金未定（公式ページ）"
+        elif "円引" in fee:
+            h = STATUS_CONFIRMED + ":割引" + fee
+        elif fee == "無料" and "一般" in fact["subject"]:
+            h = STATUS_CONFIRMED + ":一般料金と同じ（無料）"
+        else:
+            h = STATUS_CONFIRMED + ":" + fee
+        res.update(手帳本人=h, 介護者=fact["companion"], 根拠URL=link, 根拠=fact["quote"])
+        return _display(res, card)
+    # 2) 施設規定（展覧会のみ・除外室あり）。個別に確認できない場合は推定
+    if venue == "東京都写真美術館":
+        pass  # 施設規定の注記は judge_card の冒頭で設定済み
+    else:
+        f2 = FACILITY_FACT_BY_VENUE.get(venue)
+        if f2 and OFFICIAL_FACTS.get(f2):
+            ff = OFFICIAL_FACTS[f2]
+            if ff["kind"] == "施設規定":
+                # v4: 施設規定は個別の催事に無料を確定しない（個別の公式根拠が無いため）。分類だけを記録し、推定とする
+                cat = facility_category(venue, kind, room, card.get("title", ""), card.get("period", ""))
+                if cat in APPLICABLE_CATEGORIES:
+                    res["施設規定"] = f"推定（分類: {cat}。個別の催事への適用は公式で未確認）"
+                    res["根拠URL"] = f2; res["根拠"] = ff["quote"]
+                else:
+                    res["施設規定"] = f"適用なし（分類: {cat}）"
+    # 3) 手書き表（出典URLなし）＝推定。無料とは扱わない
+    if src == "手書き表" and res["手帳本人"] == STATUS_UNKNOWN:
+        res["手帳本人"] = STATUS_ESTIMATE + ":手書き表（出典未特定）"
+        return _display(res, card)
+    if src == "手書き表" and res["手帳本人"] != STATUS_UNKNOWN:
+        return _display(res, card)
+    # 4) 取得失敗・記載なし
+    if src == "取得困難":
+        res["手帳本人"] = STATUS_FETCH_FAILED; return _display(res, card)
+    if src == "記載なし":
+        res["手帳本人"] = STATUS_UNKNOWN + ":ページ読了・記載なし"; return _display(res, card)
+    if src == "固定文":
+        res["手帳本人"] = STATUS_UNKNOWN + ":固定文は一般料金のみ"; return _display(res, card)
+    # 5) 個別ページ由来の本文（生成時に取得）: 手帳節の文字列判定
+    if res["手帳本人"] == "未確認":
+        res.update(_text_judge(text))
+        if res["手帳本人"].startswith(STATUS_CONFIRMED) and card.get("source") == "個別ページ":
+            # 根拠は、本文を取得した対象ページ自身（施設規定のページではない）
+            res["根拠URL"] = card["link"]
+    return _display(res, card)
+
+
+# 本人（手帳提示者）を指す語。「障害者手帳等をお持ちの方」「障害者手帳をご呈示いただいた方」「手帳提示者」「本人」を含む
+HOLDER_PHRASE = re.compile(r"手帳[^、。]{0,12}?(の方|をお持ちの方|提示者|保持者|いただいた方|をご?呈示|をご?提示)|本人")
+
+
+def _price_gap(text):
+    """手帳提示者の料金が一般より低く、割引の文言がない場合の料金差（推定）。"""
+    HAND = re.compile(r"手帳|療育|被爆者|愛の手帳|精神障害者")
+    hm = HAND.search(text)
+    if not hm: return None
+    am = re.search(r"([\d,]{3,6})円", text[hm.end():hm.end() + 40])
+    gm = re.search(r"一般\s*([\d,]{3,6})円", text)
+    if am and gm and int(am.group(1).replace(",", "")) < int(gm.group(1).replace(",", "")):
+        return "料金差（手帳" + am.group(1) + "円・一般" + gm.group(1) + "円。割引の文言なし）"
+    return None
+
+
+def _text_judge(text):
+    HAND = re.compile(r"手帳|療育|被爆者|愛の手帳|精神障害者")
+    GROUP = re.compile(r"中学生以下|高校生以下|高校生|大学生|小学生|学生|未就学児|乳幼児|幼児|子ども|子供|18歳|65歳以上|シニア")
+    COMP = re.compile(r"同伴者|付添者|付添の方|付き添いの方|介護者|介助者")
+    HOLDER = HOLDER_PHRASE  # 本人（手帳提示者）を指す語
+    # 否定文（「無料ではありません」「無料にはなりません」「割引は適用されません」「割引対象外」「割引なし」「除外」）は肯定の根拠にしない
+    NEG = re.compile(r"(無料|割引|引き|半額|減免)[^。]{0,10}(ではありません|ではない|ではございません|にはなりません|になりません|対象外|適用されません|適用外|はありません|はできません)|(無料|割引)なし|除外")
+    out = {}
+    clauses = [c for c in re.split(r"[。\n■●○＊※|｜]|\s{2,}", text) if HAND.search(c) and not NEG.search(c)]
+    if not clauses:
+        return {"手帳本人": STATUS_UNKNOWN + ":手帳の記載なし（または否定文のみ）", "根拠": ""}
+    # 割引: 手帳提示者（本人）の割引だけを採用。同伴者のみ・中学生以下などの割引は除外
+    for c in clauses:
+        for m in re.finditer(r"円引|割引|半額|減免", c):
+            before = c[:m.start()]
+            g = max([x.start() for x in GROUP.finditer(before)] or [-1])
+            h = max([x.start() for x in HAND.finditer(before)] or [-1])
+            cp = max([x.start() for x in COMP.finditer(before)] or [-1])
+            if g >= 0 and g > h:
+                continue  # 中学生以下などの割引は手帳の割引ではない
+            holder_any = HOLDER_PHRASE.search(before)  # 本人を指す語が割引の前に無ければ同伴者のみ
+            if cp >= 0 and not holder_any:
+                out["手帳本人"] = STATUS_UNKNOWN + ":割引は同伴者のみ"; out["根拠"] = c.strip()[:160]; return out
+            am = re.search(r"(\d{2,5})円引", c)
+            out["手帳本人"] = STATUS_CONFIRMED + ":割引" + (am.group(1) + "円引" if am else "（額は要確認）")
+            out["根拠"] = c.strip()[:160]; return out
+    # 無料: 中学生以下・同伴者の無料は本人の無料として扱わない
+    for c in clauses:
+        for m in re.finditer("無料", c):
+            before = c[:m.start()]
+            g = max([x.start() for x in GROUP.finditer(before)] or [-1])
+            h = max([x.start() for x in HAND.finditer(before)] or [-1])
+            cp = max([x.start() for x in COMP.finditer(before)] or [-1])
+            if g >= 0 and g > h:
+                continue
+            if re.search(r"(同伴者|付添者|付添の方|付き添いの方|介護者|介助者)のみ", c[:m.end()]) or (cp >= 0 and not HOLDER.search(before)):
+                # 介助者・同伴者の無料で、本人（手帳提示者）を指す語が無い（「介助者のみ無料」など）
+                out["手帳本人"] = STATUS_UNKNOWN + ":無料は同伴者・介助者のみ"; out["根拠"] = c.strip()[:160]; return out
+            if re.search(r"同伴者[^）)〉]{0,3}[（(〈][^）)〉]*無料", c):
+                pd = _price_gap(text)
+                out["手帳本人"] = (STATUS_ESTIMATE + ":" + pd) if pd else (STATUS_UNKNOWN + ":無料は同伴者のみ")
+                out["根拠"] = c.strip()[:160]; return out
+            out["手帳本人"] = STATUS_CONFIRMED + ":無料"; out["根拠"] = c.strip()[:160]; return out
+    pd = _price_gap(text)
+    if pd:
+        return {"手帳本人": STATUS_ESTIMATE + ":" + pd, "根拠": clauses[0].strip()[:160]}
+    return {"手帳本人": STATUS_UNKNOWN + ":手帳の文に無料・割引の記載なし", "根拠": clauses[0].strip()[:160]}
+
+
+def _display(res, card):
+    h = res["手帳本人"]
+    if h.startswith(STATUS_CONFIRMED + ":無料") or h.startswith(STATUS_CONFIRMED + ":一般料金と同じ"):
+        disp = "無料（確認済み）"
+    elif h.startswith(STATUS_CONFIRMED + ":割引"):
+        disp = "割引（確認済み）: " + h.split(":", 1)[1]
+    elif h.startswith(STATUS_CONFIRMED):
+        disp = "確認済み: " + h.split(":", 1)[1]
+    elif h.startswith(STATUS_ESTIMATE):
+        disp = "要確認（推定）"
+    elif h.startswith(STATUS_FETCH_FAILED):
+        disp = "要確認（取得不能）"
+    else:
+        disp = "要確認（未確認）"
+    res["表示"] = disp
+    res["無料表示"] = disp.startswith("無料")
+    res["割引表示"] = disp.startswith("割引")
+    return res
+
+
+def period_label(period_text):
+    """期間を日付化できない場合は「期間不明」として表示対象に残す（既存の終了フィルターで消さない）。"""
+    if re.search(r"20\d\d年\s*\d{1,2}月\s*\d{1,2}日", period_text or ""):
+        return period_text
+    return "期間不明（表示は残す）"
+
+
+def discount_kind(link):
+    """URLの種別: 映画上映（/movie/）・展覧会（/exhibition/）・その他。種別の混同を防ぐため判定に使う。"""
+    if "/movie/" in link: return "上映"
+    if "/exhibition/" in link: return "展覧会"
+    return "その他"
+
+
+def discount_room(period, title):
+    m = re.search(r"(B1F|地下[１1]階|1F ホール|1F|2F|3F|4F)", (period or "") + " " + (title or ""))
+    return m.group(1) if m else ""
+
+
+def process_discount(item, ticket_discount, page_checked):
+    """個別ページ取得結果から障害者本人・介護者の判定を行う。手書き情報（DISCOUNT_INFO）は消さずに保持する。
+    item["discount"] には表示用の文言、item["judgment"] には判定結果（状態・根拠URL・施設規定など）を入れる。"""
+    legacy = DISCOUNT_INFO.get(item["venue"], "")
+    original = item.get("discount", "")
+    fact = OFFICIAL_FACTS.get(item.get("link", ""))
+    if fact and "未定" in fact.get("fee", "") and item.get("general_price", "") in ("", "料金情報取得中"):
+        item["general_price"] = "料金未定（公式ページ）"  # 「取得中」と「未定」を区別する
+    if ticket_discount:
+        source, text = "個別ページ", ticket_discount
+    elif legacy and original == legacy and not page_checked:
+        source, text = "手書き表", legacy
+    elif page_checked and (original == "取得困難（要アクセス）" or original == legacy):
+        # v5: 個別ページを読了して手帳の記載が無い場合は、施設の手書き情報（出典未特定）より優先して「記載なし＝未確認」とする。
+        # 手書き表の「推定」は、個別ページを読めなかった場合のみ使う（読了済みなのに推定にすると、確認の無い無料が推定として残る）
+        source, text = "記載なし", "公式ページに障害者手帳の記載なし（要現地確認）"
+    elif original.startswith("入場無料"):
+        source, text = "固定文", original
+    elif "記載なし" in original:
+        source, text = "記載なし", original
+    elif "該当なし" in original:
+        source, text = "該当なし", original
+    else:
+        source, text = "取得困難", original or "取得困難（要アクセス）"
+    judge = judge_discount(dict(venue=item["venue"], link=item["link"], kind=discount_kind(item["link"]),
+                                room=discount_room(item.get("period", ""), item["title"]), title=item["title"], period=item.get("period", ""),
+                                source=source, text=text, general_price=item.get("general_price", "")))
+    # 手書き情報との関係を記録する（上書きで矛盾・欠落を残さないため）
+    relation = ""
+    if legacy and "無料" in legacy and source == "個別ページ" and not judge["無料表示"]:
+        relation = "矛盾: 手書き情報は無料、個別ページでは手帳の無料を確認できない"
+    judge["手書き情報"] = legacy
+    judge["手書き情報との関係"] = relation
+    url = judge.get("根拠URL") or (item["link"] if source == "個別ページ" else "")
+    judge["確認日"] = ""
+    if judge["手帳本人"].startswith("確認済み"):
+        if not (isinstance(url, str) and url.startswith(("http://", "https://"))):
+            # 根拠URLが無い「確認済み」は確定させない（推定に格下げ）
+            judge.update(手帳本人=STATUS_ESTIMATE + ":根拠URLなし", 無料表示=False, 割引表示=False, 表示="要確認（推定）")
+        elif judge.get("根拠URL") in OFFICIAL_FACTS:
+            judge["確認日"] = OFFICIAL_CHECKED_AT
+        elif source == "個別ページ":
+            judge["確認日"] = datetime.date.today().isoformat()
+    item["judgment"] = judge
+    item["discount"] = judge["表示"]
+    item["discount_source_url"] = url if judge["手帳本人"].startswith("確認済み") else ""
+    item["discount_raw"] = text
+    return item
+
+
 # 最寄駅・徒歩分数：各施設のアクセス案内を実際に調査した内容のみを記載（未調査の施設は空欄のまま＝捏造しない）
 ACCESS_INFO = {
     "国立新美術館": "🚶 東京メトロ千代田線「乃木坂駅」6出口 徒歩1分（直結）",
@@ -1406,8 +1747,8 @@ def status_priority(status):
     return 2
 
 
-FULL_DATE_PATTERN = re.compile(r"(\d{4})[年.](\d{1,2})[月.](\d{1,2})")
-SHORT_DATE_PATTERN = re.compile(r"(?<!\d)(\d{1,2})[月.](\d{1,2})日?(?!\d)")
+FULL_DATE_PATTERN = re.compile(r"(\d{4})[年.]\s*(\d{1,2})\s*[月.]\s*(\d{1,2})")
+SHORT_DATE_PATTERN = re.compile(r"(?<!\d)(\d{1,2})\s*[月.]\s*(\d{1,2})日?(?!\d)")
 
 
 def parse_end_date(period_str):
@@ -1471,12 +1812,18 @@ def fetch_ticket_info(url):
         return None, None, None, False
     try:
         r = requests.get(url, headers=HEADERS, timeout=8)
+        if r.status_code != 200:
+            # 404・5xx は「読めなかった」。「記載なし」と区別するため読了扱いにしない
+            return None, None, None, False
         r.encoding = "utf-8"
         # 生HTMLを文字数でスライスするとタグの途中で切れて壊れたHTML断片が
         # 混入する事故につながるため、必ず先にBeautifulSoupでページ全体を
         # 解析してから、タグを含まないクリーンなテキストの上で検索する。
         text = BeautifulSoup(r.text, "html.parser").get_text(" ", strip=True)
     except Exception:
+        return None, None, None, False
+    if len(text) < 300:
+        # 本文が極端に短い（エラーページ・準備中・壊れたHTML）は読了とみなさない
         return None, None, None, False
 
     price = None
@@ -1521,10 +1868,23 @@ def fetch_ticket_info(url):
     return price, discount, period, True
 
 
+def dedupe_items(items):
+    """同じ会場・展覧会名・期間の重複レコードを1件にする。同じURLでも展覧会名が違えば別物として残す。"""
+    seen, out = set(), []
+    for it in items:
+        title = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", str(it.get("title", "")))).strip()
+        key = (str(it.get("venue", "")), title, re.sub(r"\s+", "", str(it.get("period", ""))))
+        if key in seen:
+            continue
+        seen.add(key); out.append(it)
+    return out
+
+
 def build_dataset():
     all_items = []
     for fetcher in FETCHERS:
         all_items.extend(fetcher())
+    all_items = dedupe_items(all_items)
     for item in all_items:
         cat, cat_name = classify_category(item["title"])
         item["category"] = cat
@@ -1533,17 +1893,12 @@ def build_dataset():
 
         price, ticket_discount, ticket_period, page_checked = fetch_ticket_info(item["link"])
         item["general_price"] = price if price else "料金情報取得中"
-        if ticket_discount:
-            # 展覧会個別ページで実際に確認できた割引文言を優先採用する
-            item["discount"] = ticket_discount
-        elif page_checked and item["discount"] == "取得困難（要アクセス）":
-            # ページは実際に読み込めたが「障害者手帳」の記載が見当たらなかった、という
-            # 確認できた事実のみを伝える。「割引なし」という結論までは断定しない。
-            item["discount"] = "公式ページに障害者手帳の記載なし（要現地確認）"
         if not item.get("period") and ticket_period:
             # 一覧ページに会期がなかった場合のみ、詳細ページから取得した会期で補完する
             item["period"] = ticket_period
         item["is_free_price"] = bool(price == "無料")
+        # 手書き情報を消さずに、個別ページの結果と並べて判定する（施設規定・本人・介護者を分離）
+        process_discount(item, ticket_discount, page_checked)
 
     today = datetime.date.today()
     ended_count = 0
@@ -1569,30 +1924,42 @@ def esc(value):
 
 
 def render_card(item):
+    item = dict(item)  # 呼び出し元のデータを書き換えない
+    for k, v in {"venue": "", "link": "", "title": "", "category": "other", "category_name": "その他",
+                 "status": "", "period": "", "access": "", "general_price": "", "discount": "取得困難（要アクセス）"}.items():
+        item.setdefault(k, v)
+    href = item["link"] if str(item["link"]).startswith(("http://", "https://")) else "#"
     status_badge = f"<span class='status-badge'>{esc(item['status'])}</span>" if item["status"] else ""
     cat_badge = f"<span class='cat-badge cat-{item['category']}'>{esc(item['category_name'])}</span>"
     period_html = f"<div class='period'>{esc(item['period'])}</div>" if item["period"] else "<div class='period muted'>取得困難（要アクセス）</div>"
-    is_free = "無料" in item["discount"] or item.get("is_free_price")
     # 実際に取得できたstatusが「開催中」または「予約受付中」（＝現在鑑賞・予約可能）の場合のみ「現在開催中」扱いにする
     is_open = "開催中" in item["status"] or "予約受付中" in item["status"]
     access_html = f"<div class='access-badge'>{esc(item['access'])}</div>" if item.get("access") else ""
     price_html = f"<div class='price-badge'>🎟️ {esc(item.get('general_price',''))}</div>"
     data_free_price = "1" if item.get("is_free_price") else "0"
-    # 障害者手帳の割引区分：実際に取得できたdiscountテキストのみで判定する（推測しない）
-    disc_text = item["discount"]
-    disc_free = "1" if "無料" in disc_text else "0"
-    disc_discount = "1" if disc_free == "0" and any(k in disc_text for k in ["割引", "半額", "減免"]) else "0"
+    # 障害者手帳の判定：確認済みの無料・割引だけを1にする（推定・未確認・取得不能は0）
+    judge = item.get("judgment") or {}
+    disc_free = "1" if judge.get("無料表示") else "0"
+    disc_discount = "1" if judge.get("割引表示") else "0"
+    state = (judge.get("手帳本人") or "未確認").split(":")[0]
+    source_html = ""
+    if item.get("discount_source_url") and state == "確認済み":
+        source_html = f" <a class='evidence' href='{esc(item['discount_source_url'])}' target='_blank' rel='noopener'>根拠</a>"
+    if judge.get("確認日"):
+        source_html += f" <span class='checked'>確認日 {esc(judge['確認日'])}</span>"
+    relation_html = f"<div class='relation'>{esc(judge['手書き情報との関係'])}</div>" if judge.get("手書き情報との関係") else ""
     return f"""
-    <a class="card" href="{esc(item['link'])}" target="_blank" rel="noopener"
-       data-venue="{esc(item['venue'])}" data-free="{'1' if is_free else '0'}" data-open="{'1' if is_open else '0'}"
+    <a class="card" href="{esc(href)}" target="_blank" rel="noopener"
+       data-venue="{esc(item['venue'])}" data-free="{data_free_price}" data-open="{'1' if is_open else '0'}"
        data-free-price="{data_free_price}" data-category="{item['category']}"
-       data-disc-free="{disc_free}" data-disc-discount="{disc_discount}">
+       data-disc-free="{disc_free}" data-disc-discount="{disc_discount}" data-state="{esc(state)}">
       <div class="card-top"><div class="venue-tag">{esc(item['venue'])}</div>{cat_badge}</div>
       <h3 class="title">{esc(item['title'])} {status_badge}</h3>
       {period_html}
       {access_html}
       {price_html}
-      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">{esc(item['discount'])}</span></div>
+      <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">{esc(item['discount'])}{source_html}</span></div>
+      {relation_html}
     </a>"""
 
 
@@ -1725,21 +2092,90 @@ def self_test(items):
     return len(failures) == 0
 
 
+def quality_check(html, items):
+    """生成HTMLの整合性検品。戻り値は不整合の一覧（空なら合格）。"""
+    problems = []
+    blocks = html.split('<a class="card"')[1:]
+    if len(blocks) != len(items):
+        problems.append(f"カード数{len(blocks)}件と取得件数{len(items)}件が一致しない")
+    for b in blocks:
+        head = b.split(">", 1)[0]
+        st = re.search(r'data-state="([^"]*)"', head)
+        state = st.group(1) if st else ""
+        if state not in ("確認済み", "推定", "未確認", "取得不能", "矛盾"):
+            problems.append(f"状態属性が不正: {state!r}")
+            continue
+        if state != "確認済み":
+            if 'data-disc-free="1"' in head or 'data-disc-discount="1"' in head:
+                problems.append(f"確認済み以外（{state}）で無料・割引フラグが立っている")
+            if "無料（確認済み）" in b:
+                problems.append(f"確認済み以外（{state}）で「無料（確認済み）」と表示")
+        if state == "確認済み" and 'data-disc-free="1"' in head and "class='evidence'" not in b:
+            problems.append("確認済みの無料に根拠リンクが無い")
+    return problems
+
+
+def existing_page_counts():
+    """既存の公開ページについて (会期中のカード件数, 会期中の確認済み無料件数) を返す。
+    会期終了が実際の日付で確認できたものは除く（終了の一斉更新は正当な更新のため比較対象から外す）。
+    読めない場合は (0, 0)（比較しない）。"""
+    try:
+        with open(OUTPUT_HTML, encoding="utf-8") as f:
+            text = f.read()
+    except OSError:
+        return 0, 0
+    today = datetime.date.today()
+    running = free = 0
+    for block in text.split('<a class="card"')[1:]:
+        m = re.search(r"<div class='period[^']*'>(.*?)</div>", block, re.S)
+        end = parse_end_date(html_lib.unescape(m.group(1))) if m else None
+        if end is None or end >= today:
+            running += 1
+            if 'data-disc-free="1"' in block.split(">", 1)[0]:
+                free += 1
+    return running, free
+
+
 def main():
     start_time = time.time()
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     items, ended_count, open_count = build_dataset()
     passed = self_test(items)
+    if not passed:
+        # 自己検証NGは公開データとして不適格。既存ファイルを残して異常終了する
+        print("❌ 自己検証NG: 本番ファイルは書き換えずに終了します")
+        raise SystemExit(1)
+
+    # 件数急減ガード: 取得失敗で一部の施設しか残らなかった場合に、既存の公開ページを部分的な内容で上書きしない
+    previous, previous_free = existing_page_counts()
+    # 運用上の逃げ道: 恒久的な件数減少（サイト改修など）で更新が止まり続けた場合に、担当者が意図的に上書きする
+    force = os.environ.get("CULTURE_FORCE_UPDATE") == "1"
+    # 下限（FORCEでも解除しない）: 既存の50%未満への急減は全件失敗・大量失敗とみなして止める
+    if previous and len(items) < previous * 0.5:
+        print(f"❌ 下限ガード: 既存{previous}件 → 今回{len(items)}件（50%未満）。FORCEでも解除しません。本番ファイルは書き換えずに終了します")
+        raise SystemExit(1)
+    if force and (len(items) < previous * 0.8 or previous_free >= 5):
+        print("⚠️ CULTURE_FORCE_UPDATE=1: 件数（50%以上）・無料の急減ガードを無効化して上書きします（担当者の確認済みであること）")
+    if not force and previous and len(items) < previous * 0.8:
+        print(f"❌ 件数急減ガード: 既存{previous}件 → 今回{len(items)}件（80%未満）。取得失敗の可能性があるため本番ファイルは書き換えずに終了します")
+        raise SystemExit(1)
+    # 確認済み無料の急減ガード: 詳細ページの取得失敗で、確認済みの無料表示だけが消えるのを防ぐ（件数は残るため件数ガードでは拾えない）
+    new_free = sum(1 for i in items if (i.get("judgment") or {}).get("無料表示"))
+    if not force and previous_free >= 5 and new_free < previous_free * 0.8:
+        print(f"❌ 無料急減ガード: 既存の確認済み無料{previous_free}件 → 今回{new_free}件（80%未満）。詳細ページの取得失敗の可能性があるため本番ファイルは書き換えずに終了します")
+        raise SystemExit(1)
+
     html = render_html(items)
 
-    # 「要確認」という逃げ文言が画面に残っていないかの最終検品
-    ng_count = html.count("要確認")
-    if ng_count > 0:
-        print(f"❌ 検品NG: 「要確認」という文言が{ng_count}箇所残っています")
-        passed = False
-    else:
-        print("✅ 検品OK: 「要確認」という文言は0件です")
+    # 検品: 文言の有無ではなく、データと表示の整合性を見る（「要確認」は正式な状態表示であり、NG条件ではない）
+    problems = quality_check(html, items)
+    if problems:
+        print(f"❌ 検品NG: {len(problems)}件の不整合。本番ファイルは書き換えずに終了します")
+        for pr in problems[:20]:
+            print(f"   - {pr}")
+        raise SystemExit(1)
+    print(f"✅ 検品OK: カード{len(items)}件の状態・フラグ・根拠の整合性を確認しました")
 
     temp_file = OUTPUT_HTML + ".tmp"
     try:
@@ -1751,6 +2187,7 @@ def main():
         print(f"❌ ファイル保存エラー: {e}")
         if os.path.exists(temp_file):
             os.remove(temp_file)
+        raise SystemExit(1)  # 保存失敗を成功扱いにしない
 
     by_venue = {}
     for i in items:
