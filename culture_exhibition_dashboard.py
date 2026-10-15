@@ -7,6 +7,10 @@ import datetime
 import urllib.parse
 import requests
 import feedparser
+import sys as _sys
+import os as _os
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))  # 共通データ契約（同じフォルダ）を、-I などの実行方法に関わらず読めるようにする
+import event_records as ER
 from bs4 import BeautifulSoup
 
 # ============================================================
@@ -2130,7 +2134,16 @@ def esc(value):
     return html_lib.escape(str(value), quote=True)
 
 
-def render_card(item):
+DIFF_BADGES = {
+    "新着": ("#7ee8a0", "新着", "今回初めて確認した展覧会"),
+    "復帰": ("#9ad0ff", "再掲載", "過去に掲載され、再び確認できた展覧会（新着ではありません）"),
+    "変更": ("#ffd166", "変更あり", "会期・価格・割引のいずれかが前回と異なる（前回の状態と比べた結果）"),
+    "掲載確認できず": ("#c9b6ff", "今回の掲載未確認", "掲載一覧で今回は確認できなかった（会期終了ではありません）"),
+    "保持（取得失敗）": ("#ff9b9b", "取得失敗・前回データ", "今回この施設は取得できなかったため、前回の正常データを表示しています"),
+}
+
+
+def render_card(item, label=None):
     item = dict(item)  # 呼び出し元のデータを書き換えない
     for k, v in {"venue": "", "link": "", "title": "", "category": "other", "category_name": "その他",
                  "status": "", "period": "", "access": "", "general_price": "", "discount": "取得困難（要アクセス）"}.items():
@@ -2155,14 +2168,26 @@ def render_card(item):
     if judge.get("確認日"):
         source_html += f" <span class='checked'>確認日 {esc(judge['確認日'])}</span>"
     relation_html = f"<div class='relation'>{esc(judge['手書き情報との関係'])}</div>" if judge.get("手書き情報との関係") else ""
+    # 差分の表示（新着・変更・掲載未確認・取得失敗）。ラベルがない項目は何も表示しない（差分なし）
+    diff_badge = ""
+    badge_key = "掲載確認できず" if str(label or "").startswith("掲載確認できず") else label
+    if badge_key in DIFF_BADGES:
+        color, text, tip = DIFF_BADGES[badge_key]
+        diff_badge = (f"<span class='diff-badge' title='{esc(tip)}' "
+                      f"style='background:{color};color:#1a0d0a;border-radius:4px;padding:2px 6px;font-size:11px;margin-left:6px'>"
+                      f"{esc(text)}</span>")
+    # 会期終了日：既存の期限解析で終了日が分かる場合のみ表示（終了の閾値は新たに設けない）
+    end_date = parse_end_date(item["period"]) if item["period"] else None
+    end_html = f"<div class='end-badge'>会期終了日 {end_date.isoformat()}</div>" if end_date else ""
     return f"""
     <a class="card" href="{esc(href)}" target="_blank" rel="noopener"
        data-venue="{esc(item['venue'])}" data-free="{data_free_price}" data-open="{'1' if is_open else '0'}"
        data-free-price="{data_free_price}" data-category="{item['category']}"
        data-disc-free="{disc_free}" data-disc-discount="{disc_discount}" data-state="{esc(state)}">
-      <div class="card-top"><div class="venue-tag">{esc(item['venue'])}</div>{cat_badge}</div>
+      <div class="card-top"><div class="venue-tag">{esc(item['venue'])}</div>{cat_badge}{diff_badge}</div>
       <h3 class="title">{esc(item['title'])} {status_badge}</h3>
       {period_html}
+      {end_html}
       {access_html}
       {price_html}
       <div class="info-row"><span class="info-label">障害者手帳</span><span class="info-value">{esc(item['discount'])}{source_html}</span></div>
@@ -2170,9 +2195,100 @@ def render_card(item):
     </a>"""
 
 
-def render_html(items):
+def render_diff_summary(diff):
+    """ページ上部の差分の要約。差分がない・初回・取得失敗を、それぞれ区別して示す。"""
+    if not diff:
+        return ""
+    if diff.get("baseline"):
+        return "<div class='diffsum'>初回の基準データを記録しました（新着・変更は表示していません）。</div>"
+    c = diff.get("counts", {})
+    text = (f"今回の差分（前回との比較）：新着 {c.get('新着', 0)}件／変更 {c.get('変更', 0)}件／"
+            f"今回の掲載未確認 {c.get('掲載確認できず', 0)}件（会期終了ではありません）")
+    failed = diff.get("failed") or []
+    if failed:
+        text += f"<br>今回取得できなかった施設（前回データがある場合は保持して表示）：{esc('、'.join(failed))}"
+    return f"<div class='diffsum'>{text}</div>"
+
+
+CULTURE_STATE_MAP = {"新着": "新着", "復帰": "再掲載", "変更": "変更", "変更なし": "通常",
+                     "保持（取得失敗）": "取得失敗・前回データ", "終了": "終了"}
+
+
+def parse_start_date(period_str):
+    """会期の開始日（年表記のある最初の日付）。判明しない場合は None。"""
+    m = FULL_DATE_PATTERN.search(period_str or "")
+    if not m:
+        return None
+    try:
+        return datetime.date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+    except ValueError:
+        return None
+
+
+def culture_record(item, label, checked_at, key=None):
+    """文化展示の1件を、共通データ契約（event_records）の記録に変換する。
+    不明な日付は unknown のまま（架空の値を入れない）。発売日・締切・公式発表日時は、文化データに無いため unknown。"""
+    judge = item.get("judgment") or {}
+    confidence = (judge.get("手帳本人") or "未確認").split(":")[0]
+    if confidence not in ER.CONFIDENCE_VALUES:
+        confidence = "未確認"
+    state = CULTURE_STATE_MAP.get(label or "", "掲載未確認" if str(label or "").startswith("掲載確認できず") else "通常")
+    source = ER.official_url(item.get("link", ""))
+    evidence = ER.official_url(item.get("discount_source_url", "")) if confidence == "確認済み" else ""
+    start = parse_start_date(item.get("period", ""))
+    end = parse_end_date(item.get("period", ""))
+    return {
+        "id": "culture|" + (key or item_id(item)),
+        "genre": "美術展",
+        "title": item.get("title", ""),
+        "venue": item.get("venue", ""),
+        "source_url": source,
+        "evidence_url": evidence,
+        "state": state,
+        "confidence": confidence,
+        "last_checked_at": checked_at,
+        "dates": {
+            "event_start": ER.day_date(start, source) if start else ER.unknown_date(),
+            "event_end": ER.day_date(end, source) if end else ER.unknown_date(),
+            "ticket_sale_start": ER.unknown_date(),
+            "general_sale_start": ER.unknown_date(),
+            "application_deadline": ER.unknown_date(),
+            "announced_at": ER.unknown_date(),
+        },
+        "genre_extra": {"price": item.get("general_price", ""), "discount": item.get("discount", ""),
+                        "period_text": item.get("period", "")},
+    }
+
+
+def write_culture_events(items, view_labels, checked_at, path=None, failed_venues=()):
+    """公開用の共通データ（docs/culture-exhibition/events.json）を書き出す。公開ページの書き込み成功後に呼ぶ。
+    日次の不要な差分を防ぐため、内容（記録・失敗施設）が前回と同じなら、時刻を含めて書き込まない。
+    各記録の last_checked_at は、その記録の内容が変わった時刻（内容が同じ間は前回の値を保つ）。"""
+    path = path or os.path.join(OUTPUT_DIR, "events.json")
+    previous = {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            for rec in (json.load(f) or {}).get("records", []):
+                previous[rec["id"]] = rec
+    except (OSError, ValueError, KeyError, TypeError):
+        previous = {}
+    records = [culture_record(item, view_labels.get(id(item)), checked_at, key=key) for key, item in keyed(items).items()]
+    for rec in records:
+        before = previous.get(rec["id"])
+        if before and ER.content_key(before) == ER.content_key(rec):
+            rec["last_checked_at"] = before["last_checked_at"]   # 内容が同じ：時刻は動かさない
+    bad = [(r["id"], ER.validate_record(r)) for r in records if ER.validate_record(r)]
+    if bad:
+        raise ValueError(f"共通データ契約に合わない記録があります: {bad[:3]}")
+    payload = {"schema": ER.SCHEMA_VERSION, "genre": "美術展",
+               "failed_venues": sorted(failed_venues), "records": records}
+    return ER.write_json_atomic(path, payload)
+
+
+def render_html(items, labels=None, diff=None):
     now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    cards_html = "".join(render_card(i) for i in items) if items else "<p class='empty'>展覧会情報を取得できませんでした。</p>"
+    cards_html = "".join(render_card(i, (labels or {}).get(id(i))) for i in items) if items else "<p class='empty'>展覧会情報を取得できませんでした。</p>"
+    summary_html = render_diff_summary(diff)
     skip_html = "".join(f"<li>{s}</li>" for s in skip_log) if skip_log else "<li>なし（すべての施設から正常に取得できました）</li>"
 
     return f"""<!DOCTYPE html>
@@ -2228,6 +2344,7 @@ def render_html(items):
   <header>
     <h1>都内 美術館・写真展データベース</h1>
     <div class="meta">最終生成: {now_str}｜取得件数: {len(items)}件</div>
+    {summary_html}
   </header>
 
   <div class="filters">
@@ -2388,7 +2505,8 @@ def main():
     if force:
         print(f"⚠️ 強制実行（理由: {reason}）: 件数・無料の急減ガードを今回のみ無効化（下限50%は有効）")
 
-    html = render_html(items)
+    view_labels = {id(v): LAST_DIFF["labels"][k] for k, v in LAST_DIFF.get("merged", {}).items() if k in LAST_DIFF.get("labels", {})}
+    html = render_html(items, view_labels, LAST_DIFF)
 
     # 検品: 文言の有無ではなく、データと表示の整合性を見る（「要確認」は正式な状態表示であり、NG条件ではない）
     problems = quality_check(html, items)
@@ -2425,6 +2543,14 @@ def main():
                 f.write(old_html)
             os.replace(temp_file, OUTPUT_HTML)
         raise SystemExit(1)
+
+    # 共通データ（events.json）：公開ページの書き込みと検証に成功した後だけ書き出す
+    checked_at = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
+    try:
+        changed_events = write_culture_events(items, view_labels, checked_at, failed_venues=LAST_DIFF.get("failed", []))
+        print("🗂️ 共通データ更新" if changed_events else "🗂️ 共通データ: 内容に変更なし")
+    except (OSError, ValueError) as e:
+        print(f"⚠️ 共通データの書き出しに失敗（公開ページは更新済み）: {e}")
 
     # 状態の保存（P1）：公開ページの書き込みと検証に成功した後だけ、次回の前回値として保存する
     diff = LAST_DIFF

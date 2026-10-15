@@ -564,5 +564,78 @@ class IdStabilityTest(VolatilityHelpers, unittest.TestCase):
         self.assertEqual(diff["counts"]["消失"], 0)
 
 
+class RenderTest(unittest.TestCase):
+    """ホームページ表示：差分バッジ、初回の扱い、取得失敗、会期終了日、リンクと確度の維持（メモリ内で描画する）"""
+
+    def card(self, title="展1", label=None, period="2026年9月1日～2026年12月1日", state="確認済み", **extra):
+        judgment = {"無料表示": False, "割引表示": False, "手帳本人": state, "確認日": "2026-10-15"}
+        it = {"venue": "A館", "title": title, "link": "https://a.example/1", "period": period, "status": "開催中",
+              "category": "art", "category_name": "美術展", "access": "", "general_price": "1,000円",
+              "discount": "未確認", "judgment": judgment, "discount_source_url": extra.pop("src", "")}
+        it.update(extra)
+        return it, label
+
+    def render(self, pairs, diff=None):
+        items = [p[0] for p in pairs]
+        labels = {id(p[0]): p[1] for p in pairs if p[1]}
+        return D.render_html(items, labels, diff or {})
+
+    def test_1_new_badge_only_for_new_label(self):
+        new_it, _ = self.card("新着展", "新着")
+        same_it, _ = self.card("既存展", "変更なし")
+        page = self.render([(new_it, "新着"), (same_it, "変更なし")], {"baseline": False, "counts": {}})
+        self.assertEqual(page.count("diff-badge"), 1)
+        self.assertIn("新着</span>", page)
+
+    def test_2_changed_badge_matches_changed_label(self):
+        changed, _ = self.card("変更展", "変更")
+        page = self.render([(changed, "変更")], {"baseline": False, "counts": {}})
+        self.assertIn("変更あり</span>", page)
+        unchanged, _ = self.card("同じ展", "変更なし")
+        page2 = self.render([(unchanged, "変更なし")], {"baseline": False, "counts": {}})
+        self.assertNotIn("変更あり</span>", page2)
+
+    def test_3_baseline_shows_no_new_badges(self):
+        it, _ = self.card("初回展", None)
+        page = self.render([(it, None)], {"baseline": True, "counts": {}})
+        self.assertNotIn("diff-badge", page)
+        self.assertIn("初回の基準データを記録しました", page)
+
+    def test_4_listing_absence_is_not_shown_as_end(self):
+        it, _ = self.card("限定掲載展", "掲載確認できず（限定掲載・3回以上）", period="取得困難（要アクセス）")
+        page = self.render([(it, "掲載確認できず（限定掲載・3回以上）")], {"baseline": False, "counts": {"掲載確認できず": 1}})
+        self.assertIn("今回の掲載未確認</span>", page)
+        self.assertIn("会期終了ではありません", page)
+        self.assertNotIn("会期終了日", page)            # 期間が不明なので終了日は表示しない
+
+    def test_5_failure_is_distinguished_from_normal(self):
+        it, _ = self.card("保持展", "保持（取得失敗）")
+        diff = {"baseline": False, "counts": {}, "failed": ["松岡美術館"]}
+        page = self.render([(it, "保持（取得失敗）")], diff)
+        self.assertIn("取得失敗・前回データ</span>", page)
+        self.assertIn("今回取得できなかった施設（前回データがある場合は保持して表示）：松岡美術館", page)
+
+    def test_6_end_date_shown_only_when_known(self):
+        known, _ = self.card("期限展", None, period="2026年7月8日 〜 8月30日")
+        unknown, _ = self.card("不明展", None, period="取得困難（要アクセス）")
+        page = self.render([(known, None), (unknown, None)], {"baseline": False, "counts": {}})
+        self.assertIn("会期終了日 2026-08-30", page)
+        self.assertEqual(page.count("会期終了日"), 1)
+        self.assertIsNotNone(D.parse_end_date("2026年7月8日 〜 8月30日"))
+        self.assertLess(D.parse_end_date("2026年7月8日 〜 8月30日"), TODAY)   # 終了済み（非表示は build で判定）
+
+    def test_7_official_link_and_evidence_kept(self):
+        it, _ = self.card("根拠展", None, state="確認済み", src="https://a.example/evidence")
+        page = self.render([(it, None)], {"baseline": False, "counts": {}})
+        self.assertIn('href="https://a.example/1"', page)
+        self.assertIn("href='https://a.example/evidence'", page)
+
+    def test_8_confidence_state_kept(self):
+        for state in ["確認済み", "推定", "未確認"]:
+            it, _ = self.card("状態展", None, state=state)
+            page = self.render([(it, None)], {"baseline": False, "counts": {}})
+            self.assertIn(f'data-state="{state}"', page)
+
+
 if __name__ == "__main__":
     unittest.main()

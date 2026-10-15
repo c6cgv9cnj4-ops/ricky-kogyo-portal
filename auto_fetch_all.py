@@ -2,6 +2,10 @@ import os
 import json
 import datetime
 import requests
+import sys as _sys
+import os as _os
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))  # 共通データ契約（同じフォルダ）を、-I などの実行方法に関わらず読めるようにする
+import event_records as ER
 
 # ============================================================
 # 全成果物集約ポータル 自動生成スクリプト
@@ -115,6 +119,53 @@ def check_internal(path):
     file_path = os.path.join(OUTPUT_DIR, path, "index.html")
     exists = os.path.isfile(file_path)
     return ("生成済み" if exists else "未生成"), exists
+
+
+CULTURE_EVENTS_JSON = os.path.join(OUTPUT_DIR, "culture-exhibition", "events.json")
+
+
+def load_culture_events():
+    """美術展の共通データ（events.json）を読む。無い・壊れている場合は空（ホームは取得済みの情報だけを示す）。"""
+    try:
+        with open(CULTURE_EVENTS_JSON, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, ValueError):
+        return []
+    return data.get("records", []) if isinstance(data, dict) else []
+
+
+import html as _html
+
+
+def H_esc(value):
+    return _html.escape(str(value), quote=True)
+
+
+def load_culture_failed_venues():
+    try:
+        with open(CULTURE_EVENTS_JSON, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, ValueError):
+        return []
+    return data.get("failed_venues", []) if isinstance(data, dict) else []
+
+
+def news_section_html(records, failed_venues=()):
+    """ホームの「新着・変更・取得状況」欄。初回の基準データは新着として出さない（状態が 新着 の記録だけを出す）。"""
+    rows = ER.news_rows(records)
+    body = ER.render_news_html(rows, "新着・変更・取得状況の掲載はありません（差分なし、または初回の基準データ）。")
+    failed_line = ""
+    if failed_venues:
+        names = "、".join(H_esc(v) for v in failed_venues)
+        failed_line = f"<p class='note'>今回取得できなかった施設（前回の正常データを表示、またはデータなし）：{names}</p>"
+    return f"""
+<section class="news">
+  <h2>新着・変更・取得状況（{len(rows)}件）</h2>
+  {failed_line}
+  <p class="note">「取得失敗・前回データ」は、今回取得できず前回の正常データを表示している施設です。「掲載未確認」は、掲載一覧で今回確認できなかったもので、会期終了ではありません。</p>
+  {body}
+</section>
+"""
 
 
 def load_history():
@@ -259,6 +310,7 @@ def main():
   <div class="summary">✅ {ok_count} / {total} 件 生存確認OK ｜ 最終更新: {now_str}</div>
 </header>
 <main>
+{news_section_html(load_culture_events(), load_culture_failed_venues())}
 {sections_html}
 </main>
 <footer>
