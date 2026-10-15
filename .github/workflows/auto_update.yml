@@ -3,7 +3,16 @@ name: Update all-deliverables portal
 on:
   schedule:
     - cron: "0 21 * * *"   # 毎日 06:00 JST（24時間ごとの定期巡回）
-  workflow_dispatch: {}    # 手動実行ボタン用
+  workflow_dispatch:       # 手動実行ボタン用
+    inputs:
+      culture_force_update:
+        description: "カルチャーの件数・無料の急減ガードを、担当者が確認したうえで一度だけ無効化する（下限50%ガードは有効のまま）"
+        type: boolean
+        default: false
+      culture_force_reason:
+        description: "強制実行の理由（確認者・根拠）。空欄の場合は強制を適用しない"
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -40,8 +49,15 @@ jobs:
       - name: "Fetch: 都内 美術館・写真展データベース"
         id: culture
         shell: bash
+        # 強制は workflow_dispatch で「強制」にチェックし、理由を入力した場合だけ有効（定期実行は常に通常ガード）
+        env:
+          CULTURE_FORCE_UPDATE: ${{ github.event_name == 'workflow_dispatch' && inputs.culture_force_update && inputs.culture_force_reason != '' && '1' || '0' }}
+          CULTURE_FORCE_REASON: ${{ inputs.culture_force_reason }}
         run: |
           set +e
+          if [ "$CULTURE_FORCE_UPDATE" = "1" ]; then
+            echo "::warning::カルチャーの強制実行（理由: $CULTURE_FORCE_REASON）。件数・無料の急減ガードを無効化（下限50%は有効）"
+          fi
           timeout 900 python culture_exhibition_dashboard.py
           rc=$?
           set -e
@@ -85,5 +101,5 @@ jobs:
         if: ${{ always() && steps.culture.outputs.culture_failed == 'true' }}
         shell: bash
         run: |
-          echo "::error::カルチャー生成が失敗。他ページは更新済み。公開ページは前回版のまま。ガード作動なら内容確認後に CULTURE_FORCE_UPDATE=1 で再実行"
+          echo "::error::カルチャー生成が失敗。他ページは更新済み。公開ページは前回版のまま。ガード作動なら内容確認後に『手動実行』で culture_force_update と理由を指定して再実行"
           exit 1
