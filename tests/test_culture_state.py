@@ -92,10 +92,13 @@ class ClassifyAndMergeTest(unittest.TestCase):
         _, labels = D.classify_and_merge(self.state_of(old), [old], set(), TODAY)
         self.assertEqual(labels[D.item_id(old)], "終了")
 
-    def test_missing_from_successful_venue_is_removed_and_labelled(self):
+    def test_missing_once_is_kept_as_not_confirmed(self):
         merged, labels = D.classify_and_merge(self.state_of(self.a, self.b), [self.a], set(), TODAY)
-        self.assertNotIn(D.item_id(self.b), merged)
-        self.assertEqual(labels[D.item_id(self.b)], "消失")
+        key = D.keyed([self.b])
+        bk = list(key)[0]
+        self.assertIn(bk, merged)
+        self.assertEqual(labels[bk], "掲載確認できず")
+        self.assertEqual(merged[bk]["missed"], 1)
 
     def test_failed_venue_keeps_previous_item(self):
         merged, labels = D.classify_and_merge(self.state_of(self.a, self.b), [self.a], {"B館"}, TODAY)
@@ -105,7 +108,7 @@ class ClassifyAndMergeTest(unittest.TestCase):
     def test_same_url_different_titles_are_separate_ids(self):
         x = item("A館", "展X", "https://a/same", "2026年9月1日～2026年12月1日")
         y = item("A館", "展Y", "https://a/same", "2026年9月1日～2026年12月1日")
-        self.assertNotEqual(D.item_id(x), D.item_id(y))
+        self.assertEqual(len(D.keyed([x, y])), 2)
 
 
 class BuildDatasetTest(unittest.TestCase):
@@ -181,10 +184,11 @@ class BuildDatasetTest(unittest.TestCase):
         base = [item("A館", f"展{i}", f"https://a/{i}", "2026年9月1日～2026年12月1日") for i in range(10)]
         self.venues = {"A館": base}
         self.run_once()
-        self.venues["A館"] = base[:8]   # 10件 → 8件（80%）は正常な減少として扱う
+        self.venues["A館"] = base[:8]   # 10件 → 8件（80%）は正常な減少。ただし1回の欠落では消失にしない
         active, diff = self.run_once()
-        self.assertEqual(len([i for i in active if i["venue"] == "A館"]), 8)
-        self.assertEqual(diff["counts"]["消失"], 2)
+        self.assertEqual(len([i for i in active if i["venue"] == "A館"]), 10)
+        self.assertEqual(diff["counts"]["掲載確認できず"], 2)
+        self.assertEqual(diff["counts"]["消失"], 0)
 
     def test_ended_item_is_hidden_and_counted(self):
         old = item("A館", "展0", "https://a/0", "2026年7月8日 〜 8月30日")
@@ -220,8 +224,8 @@ class StableIdTest(unittest.TestCase):
         self.assertEqual(list(labels.values()), ["変更なし"])
 
 
-class InitialRunSafetyTest(unittest.TestCase):
-    """初回移行の保護：状態JSONがない初回の、取得失敗と既存の公開展示の扱い（main() を通して検証する）"""
+class MainHarness(unittest.TestCase):
+    """main() を通して検証するための共通部分（テストは含まない）"""
 
     PER = "2026年9月1日～2026年12月1日"
 
@@ -266,6 +270,9 @@ class InitialRunSafetyTest(unittest.TestCase):
             except SystemExit as e:
                 code = e.code
         return code, out.getvalue()
+
+class InitialRunSafetyTest(MainHarness):
+    """初回移行の保護：状態JSONがない初回の、取得失敗と既存の公開展示の扱い"""
 
     def test_1_initial_failure_with_published_venue_stops_without_change(self):
         self.write_published("松岡美術館")
@@ -327,6 +334,234 @@ class InitialRunSafetyTest(unittest.TestCase):
         self.assertEqual(D.initial_run_blockers({"baseline": True, "failed": ["A"]}, ["B"]), set())
         self.assertEqual(D.initial_run_blockers({"baseline": False, "failed": ["A"]}, ["A"]), set())
         self.assertEqual(D.initial_run_blockers({"baseline": True, "failed": []}, ["A"]), set())
+
+
+class StateChurnTest(unittest.TestCase):
+    """状態JSONの不要な差分の抑制：内容が同じなら書き込まない、キー順序は固定、確認日は差分の原因にしない"""
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        self.path = os.path.join(self.dir, "data", "culture_state.json")
+
+    def tearDown(self):
+        shutil.rmtree(self.dir, ignore_errors=True)
+
+    def state(self, title="展1", confirmed="2026-10-14", updated="2026-10-15T01:00:00+00:00"):
+        judgment = {"無料表示": False, "割引表示": False, "手帳本人": "未確認", "確認日": confirmed}
+        it = {"venue": "A館", "title": title, "link": "https://a/1", "period": "2026年9月1日～2026年12月1日",
+              "status": "開催中", "judgment": judgment}
+        return {"version": 1, "updated_at": updated, "venue_counts": {"A館": 1},
+                "items": {D.item_id(it): it}}
+
+    def read_bytes(self):
+        with open(self.path, "rb") as f:
+            return f.read()
+
+    def test_first_write_then_identical_content_is_not_written(self):
+        self.assertTrue(D.save_state(self.state(), self.path))
+        before = self.read_bytes()
+        self.assertFalse(D.save_state(self.state(updated="2026-10-16T01:00:00+00:00"), self.path))
+        self.assertEqual(self.read_bytes(), before)
+
+    def test_confirmation_date_only_change_is_not_written(self):
+        D.save_state(self.state(confirmed="2026-10-14"), self.path)
+        before = self.read_bytes()
+        self.assertFalse(D.save_state(self.state(confirmed="2026-10-15"), self.path))
+        self.assertEqual(self.read_bytes(), before)
+
+    def test_real_content_change_is_written(self):
+        D.save_state(self.state(title="展1"), self.path)
+        self.assertTrue(D.save_state(self.state(title="展1改"), self.path))
+
+    def test_key_order_does_not_change_bytes(self):
+        a = self.state()
+        b = {"venue_counts": {"A館": 1}, "items": a["items"], "updated_at": a["updated_at"], "version": 1}
+        D.save_state(a, self.path)
+        first = self.read_bytes()
+        os.remove(self.path)
+        D.save_state(b, self.path)
+        self.assertEqual(self.read_bytes(), first)
+
+
+class MainChurnTest(MainHarness):
+    """main() を通して、同一入力の連続実行で状態JSONが変わらないこと"""
+
+    def test_5_same_input_twice_does_not_rewrite_state(self):
+        self.venues = {"A館": [item("A館", "展1", "https://a/1", self.PER)]}
+        self.assertEqual(self.run_main()[0], 0)
+        with open(self.state, "rb") as f:
+            first = f.read()
+        code, out = self.run_main()
+        self.assertEqual(code, 0)
+        self.assertIn("内容に変更なし", out)
+        with open(self.state, "rb") as f:
+            self.assertEqual(f.read(), first)
+
+
+class VolatilityHelpers:
+    """掲載変動のテスト共通の補助（テストは含まない）"""
+
+    PER = "2026年9月1日～2026年12月1日"
+
+    def setUp(self):
+        self.saved = (D.FETCHERS, D.fetch_ticket_info, set(D.FULL_LISTING_VENUES))
+        D.fetch_ticket_info = lambda url: ("", "", "", False)
+        self.today = TODAY
+
+    def tearDown(self):
+        D.FETCHERS, D.fetch_ticket_info = self.saved[0], self.saved[1]
+        D.FULL_LISTING_VENUES.clear()
+        D.FULL_LISTING_VENUES.update(self.saved[2])
+
+    def run_round(self, state, listings, today=None):
+        """listings: 施設名 -> 取得結果（リスト）または None（取得失敗）。状態は main と同じ形で作り直す。"""
+        def make(name, result):
+            def fetch():
+                if result is None:
+                    D.log_skip(name, "取得エラー (テスト)")
+                    return []
+                return [dict(i) for i in result]
+            fetch.__name__ = f"fetch_{name}"
+            return fetch
+        D.FETCHERS = [make(n, r) for n, r in listings.items()]
+        D.skip_log.clear()
+        active, _, _ = D.build_dataset(today=today or self.today, state=state)
+        diff = D.LAST_DIFF
+        new_state = {"version": 1, "venue_counts": diff["venue_counts"], "items": diff["merged"]}
+        return active, diff, new_state
+
+    def ti(self, title, link="https://a/x", venue="A館"):
+        return item(venue, title, link, self.PER)
+
+
+
+
+class ListingVolatilityTest(VolatilityHelpers, unittest.TestCase):
+    """掲載変動（入れ替わり・1回の欠落・取得失敗・復帰・会期終了）と、新着・消失の誤判定の抑制"""
+    def test_1_single_miss_is_not_removal(self):
+        a, b = self.ti("展1", "https://a/1"), self.ti("展2", "https://a/2")
+        _, _, st = self.run_round(None, {"A館": [a, b]})
+        active, diff, _ = self.run_round(st, {"A館": [a]})
+        self.assertEqual(len(active), 2)
+        self.assertEqual(diff["counts"]["消失"], 0)
+        self.assertEqual(diff["counts"]["掲載確認できず"], 1)
+
+    def test_2_two_consecutive_misses_are_not_removal(self):
+        a, b = self.ti("展1", "https://a/1"), self.ti("展2", "https://a/2")
+        _, _, st = self.run_round(None, {"A館": [a, b]})
+        _, _, st = self.run_round(st, {"A館": [a]})
+        active, diff, _ = self.run_round(st, {"A館": [a]})
+        self.assertEqual(len(active), 2)
+        self.assertEqual(diff["counts"]["消失"], 0)
+
+    def test_3_three_misses_on_limited_listing_are_not_confirmed_removal(self):
+        a, b = self.ti("展1", "https://a/1"), self.ti("展2", "https://a/2")
+        _, _, st = self.run_round(None, {"A館": [a, b]})
+        for _ in range(3):
+            active, diff, st = self.run_round(st, {"A館": [a]})
+        self.assertEqual(len(active), 2)
+        self.assertEqual(diff["counts"]["消失"], 0)
+        self.assertEqual(diff["counts"]["掲載確認できず"], 1)
+
+    def test_3b_three_misses_on_full_listing_venue_is_removal(self):
+        D.FULL_LISTING_VENUES.add("A館")
+        a, b = self.ti("展1", "https://a/1"), self.ti("展2", "https://a/2")
+        _, _, st = self.run_round(None, {"A館": [a, b]})
+        for _ in range(3):
+            active, diff, st = self.run_round(st, {"A館": [a]})
+        self.assertEqual([i["title"] for i in active], ["展1"])
+        self.assertEqual(diff["counts"]["消失"], 1)
+
+    def test_4_failure_keeps_data_and_does_not_count_misses(self):
+        a, b = self.ti("展1", "https://a/1"), self.ti("展2", "https://a/2")
+        _, _, st = self.run_round(None, {"A館": [a, b]})
+        for _ in range(4):
+            active, diff, st = self.run_round(st, {"A館": None})
+        self.assertEqual(len(active), 2)
+        self.assertEqual(diff["counts"]["保持（取得失敗）"], 2)
+        self.assertTrue(all(int(v.get("missed", 0)) == 0 for v in st["items"].values()))
+
+    def test_5_reappearance_is_recovery_not_new(self):
+        a, b = self.ti("展1", "https://a/1"), self.ti("展2", "https://a/2")
+        _, _, st = self.run_round(None, {"A館": [a, b]})
+        _, _, st = self.run_round(st, {"A館": [a]})
+        _, diff, _ = self.run_round(st, {"A館": [a, b]})
+        self.assertEqual(diff["counts"]["復帰"], 1)
+        self.assertEqual(diff["counts"]["新着"], 0)
+
+    def test_6_official_end_is_separate_from_listing_absence(self):
+        ended = dict(self.ti("終了展", "https://a/9"), period="2026年7月8日 〜 8月30日")
+        a = self.ti("展1", "https://a/1")
+        _, _, st = self.run_round(None, {"A館": [a, ended]})
+        active, diff, _ = self.run_round(st, {"A館": [a]})   # 掲載なし（会期終了の日付あり）
+        self.assertEqual(diff["counts"]["終了"], 1)
+        self.assertEqual([i["title"] for i in active], ["展1"])
+        self.assertEqual(diff["counts"]["掲載確認できず"], 0)
+
+    def test_7_tnm_style_rotation_causes_no_false_new_or_removal(self):
+        pool = [self.ti(f"注目{i}", f"https://tnm/{i}", venue="東京国立博物館") for i in range(5)]
+        pool[0] = self.ti("Living with Horses", "https://tnm/0", venue="東京国立博物館")  # 英語表記の回
+        rotations = [[0, 1, 2], [1, 2, 3], [0, 2, 3], [2, 3, 4], [0, 1, 2], [1, 3, 4], [0, 2, 4], [1, 2, 3], [0, 3, 4], [1, 2, 4]]
+        # 初回（基準）で全件を一度記録してから、掲載の入れ替わりだけを流す
+        _, _, st = self.run_round(None, {"東京国立博物館": pool})
+        news, removals = 0, 0
+        for idx in rotations:
+            listing = {"東京国立博物館": [pool[i] for i in idx]}
+            _, diff, st = self.run_round(st, listing)
+            news += diff["counts"]["新着"]
+            removals += diff["counts"]["消失"]
+        self.assertEqual(news, 0)
+        self.assertEqual(removals, 0)
+        self.assertEqual(len(st["items"]), 5)
+
+    def test_8_identical_input_twice_does_not_change_state(self):
+        a = self.ti("展1", "https://a/1")
+        _, _, st = self.run_round(None, {"A館": [a]})
+        _, _, st2 = self.run_round(st, {"A館": [a]})
+        self.assertEqual(D.state_content_key(st), D.state_content_key(st2))
+        self.assertFalse(D.state_content_key(st) != D.state_content_key(st2))
+
+
+class IdStabilityTest(VolatilityHelpers, unittest.TestCase):
+    """IDの安定性：名称変更、同一URLの複数展覧会、旧形式の状態JSON"""
+
+    def test_rename_of_single_url_item_is_changed_not_new(self):
+        a = self.ti("展1", "https://a/1")
+        _, _, st = self.run_round(None, {"A館": [a]})
+        renamed = self.ti("展1（改題）", "https://a/1")
+        _, diff, _ = self.run_round(st, {"A館": [renamed]})
+        self.assertEqual(diff["counts"]["新着"], 0)
+        self.assertEqual(diff["counts"]["消失"], 0)
+        self.assertEqual(diff["counts"]["変更なし"], 1)
+
+    def test_same_url_two_exhibitions_are_both_kept_when_unchanged(self):
+        x = self.ti("展X", "https://a/same")
+        y = self.ti("展Y", "https://a/same")
+        _, _, st = self.run_round(None, {"A館": [x, y]})
+        active, diff, _ = self.run_round(st, {"A館": [x, y]})
+        self.assertEqual(len(active), 2)
+        self.assertEqual(diff["counts"]["変更なし"], 2)
+
+    def test_rename_when_url_is_shared_is_known_limitation(self):
+        # 同一URLを複数の展覧会が共有する場合、名称が変わるとIDも変わる（既知の制約）。
+        # 旧IDは「掲載確認できず」として残り、消失にはならない（誤った消失は起きない）。
+        x = self.ti("展X", "https://a/same")
+        y = self.ti("展Y", "https://a/same")
+        _, _, st = self.run_round(None, {"A館": [x, y]})
+        renamed = self.ti("展X改", "https://a/same")
+        active, diff, _ = self.run_round(st, {"A館": [renamed, y]})
+        self.assertEqual(diff["counts"]["新着"], 1)
+        self.assertEqual(diff["counts"]["消失"], 0)
+        self.assertEqual(len(active), 3)
+
+    def test_old_format_state_is_rekeyed_without_new(self):
+        a = self.ti("展1", "https://a/1")
+        old_key = "A館|展1|https://a/1"
+        st = {"version": 1, "venue_counts": {"A館": 1},
+              "items": {old_key: dict(a, judgment={})}}
+        _, diff, _ = self.run_round(st, {"A館": [a]})
+        self.assertEqual(diff["counts"]["新着"], 0)
+        self.assertEqual(diff["counts"]["消失"], 0)
 
 
 if __name__ == "__main__":

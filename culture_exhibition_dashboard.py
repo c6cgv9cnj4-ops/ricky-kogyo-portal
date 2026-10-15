@@ -1902,11 +1902,23 @@ LAST_DIFF = {}             # 直近の差分判定の結果（ログ・状態保
 
 
 def item_id(item):
-    """イベントID：施設名＋展覧会名＋URL（#以降を除く）。URLだけでは同じ施設の別展覧会が衝突するため展覧会名も含める。
-    URLの末尾の#は、取得経路の違いで付いたり消えたりする（同じ展覧会の別IDになるのを防ぐ）。"""
-    title = re.sub(r"\s+", " ", str(item.get("title", "")))
+    """イベントIDの基本形：施設名＋URL（#以降を除く）。掲載の入れ替わりで変わる展覧会名は含めない。"""
     link = urllib.parse.urldefrag(str(item.get("link", "")))[0]
-    return "|".join([str(item.get("venue", "")), title.strip(), link])
+    return f"{item.get('venue', '')}|{link}"
+
+
+def keyed(items):
+    """項目をIDで索引化する。同じ施設・同じURLが複数ある場合だけ、展覧会名を加えて区別する。"""
+    groups = {}
+    for it in items:
+        groups.setdefault(item_id(it), []).append(it)
+    out = {}
+    for it in items:
+        key = item_id(it)
+        if len(groups[key]) > 1:
+            key += "|" + re.sub(r"\s+", " ", str(it.get("title", ""))).strip()
+        out[key] = it
+    return out
 
 
 def item_fingerprint(item):
@@ -1929,14 +1941,34 @@ def load_state(path=None):
     return data
 
 
+def state_content_key(state):
+    """状態の内容だけを比べるための文字列。更新時刻（updated_at）と、判定の確認日は含めない
+    （確認日は日付が変わるたびに変わるため、差分の原因にしない）。キー順序は固定する。"""
+    items = {}
+    for key, value in ((state or {}).get("items") or {}).items():
+        d = dict(value)
+        judgment = dict(d.get("judgment") or {})
+        judgment.pop("確認日", None)
+        if judgment:
+            d["judgment"] = judgment
+        items[key] = d
+    return json.dumps({"items": items, "venue_counts": (state or {}).get("venue_counts") or {}},
+                      ensure_ascii=False, sort_keys=True, default=str)
+
+
 def save_state(state, path=None):
-    """状態JSONを一時ファイル経由で保存する（書き込み途中の破損を防ぐ）。"""
+    """状態JSONを保存する。内容（state_content_key）が前回と同じなら書き込まず False を返す（Git差分を作らない）。
+    書き込みは一時ファイル経由で、キー順序を固定する。updated_at は「内容が最後に変わった時刻」を表す。"""
     path = path or STATE_JSON
+    old = load_state(path)
+    if old is not None and state_content_key(old) == state_content_key(state):
+        return False
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     tmp = path + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(state, f, ensure_ascii=False, indent=1, default=str)
+        json.dump(state, f, ensure_ascii=False, indent=1, sort_keys=True, default=str)
     os.replace(tmp, path)
+    return True
 
 
 def venue_drop_failures(prev_counts, new_counts):
@@ -1967,37 +1999,55 @@ def initial_run_blockers(diff, page_venues):
     return set(diff.get("failed", [])) & set(page_venues)
 
 
+MISS_LIMIT = 3                # 連続してこの回数、掲載を確認できなかったら「掲載確認できず（限定）」を超える扱い
+FULL_LISTING_VENUES = set()   # 掲載一覧が全件を網羅すると確認できた施設だけを登録する。登録がない施設は消失を確定しない（安全側）
+
+
 def classify_and_merge(prev_state, fresh_items, failed_venues, today):
-    """P1・P2：正常に取得できた今回分（fresh_items）と、失敗施設の前回値を合わせ、新着・変更・消失・終了を判定する。
-    戻り値: (merged, labels)。prev_state が None（初回）のときは、新着・変更の判定を行わない（labels は終了のみ）。"""
-    # 保存済みの値は、現在のIDの規則で付け直す（ID規則の変更で前回値が消えないようにする）
-    prev = {item_id(v): v for v in ((prev_state or {}).get("items", {})).values()}
-    merged = {}
-    for item in fresh_items:
-        merged[item_id(item)] = item
-    carried = set()
+    """P1・P2・掲載変動の抑制：今回の正常取得分と、前回値を合わせ、新着・復帰・変更・掲載確認できず・消失・終了を判定する。
+    - 掲載が1〜2回確認できなくても、消失にしない（掲載確認できず）。
+    - 取得失敗・件数急減の施設は、前回値を保持し、連続未確認の回数を増やさない。
+    - 過去に記録した展覧会が再掲載された場合は「復帰」とし、新着にしない。
+    - 消失は、掲載一覧が網羅的と確認された施設（FULL_LISTING_VENUES）で、連続 MISS_LIMIT 回未確認の場合だけ。
+    - 会期終了（公式の日付）は、掲載の有無とは別に「終了」として判定する。
+    戻り値: (merged, labels)。prev_state が None（初回）のときは、新着・変更の判定を行わない。"""
+    prev = keyed(list(((prev_state or {}).get("items") or {}).values()))
+    fresh = keyed(fresh_items)
+    merged, labels = {}, {}
+    for key, item in fresh.items():
+        old = prev.get(key)
+        rec = dict(item)
+        rec["missed"] = 0
+        merged[key] = rec
+        if prev_state is None:
+            continue
+        if old is None:
+            labels[key] = "新着"
+        elif int(old.get("missed", 0)) > 0:
+            labels[key] = "復帰"
+        elif item_fingerprint(item) != item_fingerprint(old):
+            labels[key] = "変更"
+        else:
+            labels[key] = "変更なし"
     for key, old in prev.items():
-        if key not in merged and old.get("venue") in failed_venues:
-            merged[key] = old           # 失敗施設の前回値を保持（削除しない）
-            carried.add(key)
-    labels = {}
-    if prev_state is not None:
-        for key, item in merged.items():
-            if key in carried:
-                labels[key] = "保持（取得失敗）"
-            elif key not in prev:
-                labels[key] = "新着"
-            elif item_fingerprint(item) != item_fingerprint(prev[key]):
-                labels[key] = "変更"
-            else:
-                labels[key] = "変更なし"
-        for key in prev:
-            if key not in merged:
-                labels[key] = "消失"    # 正常に取得した施設から消えた（表示からは外すが、記録に残す）
+        if key in fresh:
+            continue
+        venue = old.get("venue", "")
+        if venue in failed_venues:
+            merged[key] = old                       # 取得失敗：前回値を保持し、未確認の回数は増やさない
+            labels[key] = "保持（取得失敗）"
+            continue
+        missed = int(old.get("missed", 0)) + 1
+        if venue in FULL_LISTING_VENUES and missed >= MISS_LIMIT:
+            labels[key] = "消失"                    # 網羅的な掲載一覧で、連続して確認できなかった（表示から外す）
+            continue
+        rec = dict(old, missed=missed)
+        merged[key] = rec
+        labels[key] = "掲載確認できず" if missed < MISS_LIMIT else "掲載確認できず（限定掲載・3回以上）"
     for key, item in merged.items():
         end_date = parse_end_date(item.get("period", ""))
         if end_date is not None and end_date < today:
-            labels[key] = "終了"
+            labels[key] = "終了"                    # 会期終了は、掲載の有無とは別に判定する
     return merged, labels
 
 
@@ -2058,15 +2108,15 @@ def build_dataset(today=None, state=None):
     LAST_DIFF.update({
         "baseline": prev_state is None,
         "labels": labels,
-        "counts": {name: sum(1 for v in labels.values() if v == name)
-                   for name in ["新着", "変更", "変更なし", "消失", "保持（取得失敗）", "終了"]},
+        "counts": {name: sum(1 for v in labels.values() if v == name or v.startswith(name + "（"))
+                   for name in ["新着", "復帰", "変更", "変更なし", "掲載確認できず", "消失", "保持（取得失敗）", "終了"]},
         "failed": sorted(failed),
         "guard_dropped": sorted(drops),
         "unmapped_empty": unmapped_empty,
         "merged": merged,
         "venue_counts": venue_counts,
-        "titles": {**{item_id(v): v.get("venue", "") + "｜" + v.get("title", "")
-                      for v in (prev_state or {}).get("items", {}).values()},
+        "titles": {**{k: v.get("venue", "") + "｜" + v.get("title", "")
+                      for k, v in keyed(list(((prev_state or {}).get("items") or {}).values())).items()},
                    **{k: v.get("venue", "") + "｜" + v.get("title", "") for k, v in merged.items()}},
     })
     return active_items, ended_count, open_count
@@ -2379,10 +2429,12 @@ def main():
     # 状態の保存（P1）：公開ページの書き込みと検証に成功した後だけ、次回の前回値として保存する
     diff = LAST_DIFF
     try:
-        save_state({"version": 1,
-                    "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
-                    "venue_counts": diff["venue_counts"], "items": diff["merged"]})
-        print(f"💾 状態JSON保存: {STATE_JSON}")
+        # 最終正常取得時刻は、公開ページの「最終生成」（この処理が成功したときだけ書き込まれる）で示す。
+        # 状態JSONには別の時刻を持たせない（内容が同じ日は書き込まれず、時刻だけ古くなる誤表示を防ぐため）。
+        now_utc = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
+        changed = save_state({"version": 1, "updated_at": now_utc,
+                              "venue_counts": diff["venue_counts"], "items": diff["merged"]})
+        print(f"💾 状態JSON保存: {STATE_JSON}" if changed else "💾 状態JSON: 内容に変更なし（書き込みなし）")
     except OSError as e:
         print(f"⚠️ 状態JSONの保存に失敗（公開ページは更新済み）: {e}")
     if diff["baseline"]:
