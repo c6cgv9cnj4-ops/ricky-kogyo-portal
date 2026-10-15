@@ -1,5 +1,6 @@
 import os
 import re
+import json
 import time
 import html as html_lib
 import datetime
@@ -1781,6 +1782,14 @@ def parse_end_date(period_str):
                 return datetime.date(year, m, d)
             except ValueError:
                 return None
+        # 「2026年10月20日（火）まで」のように、年表記の1日だけで終了日を示す表記。
+        # 「まで」「終了」が後ろに続く場合だけ、その日付を終了日として扱う（P0）。
+        if re.search(r"まで|迄|終了", after_text):
+            y, m, d = start.groups()
+            try:
+                return datetime.date(int(y), int(m), int(d))
+            except ValueError:
+                return None
         # 終了日を示す短縮形が見つからない＝開始日しか分からない場合は、
         # 誤って終了扱いにしないよう None を返す。
         return None
@@ -1880,12 +1889,143 @@ def dedupe_items(items):
     return out
 
 
-def build_dataset():
-    all_items = []
+# ------------------------------------------------------------
+# 状態管理（P1〜P3）
+# 前回の正常データを状態JSONに保存し、施設単位の取得失敗・異常な件数減少のときは前回値を保持する。
+# 初回（状態JSONなし）は基準の記録のみで、新着扱いにしない。
+# ------------------------------------------------------------
+STATE_JSON = os.path.join("data", "culture_state.json")
+STATE_MIN_COUNT = 3        # 前回件数がこれ未満の施設は、件数減少の判定をしない（P3）
+STATE_DROP_RATIO = 0.5     # 施設の件数が前回のこの割合未満なら、その施設は失敗として扱う（P3）
+FAILURE_MARKERS = ("取得エラー", "見つかりませんでした", "HTTP ")
+LAST_DIFF = {}             # 直近の差分判定の結果（ログ・状態保存用）
+
+
+def item_id(item):
+    """イベントID：施設名＋展覧会名＋URL（#以降を除く）。URLだけでは同じ施設の別展覧会が衝突するため展覧会名も含める。
+    URLの末尾の#は、取得経路の違いで付いたり消えたりする（同じ展覧会の別IDになるのを防ぐ）。"""
+    title = re.sub(r"\s+", " ", str(item.get("title", "")))
+    link = urllib.parse.urldefrag(str(item.get("link", "")))[0]
+    return "|".join([str(item.get("venue", "")), title.strip(), link])
+
+
+def item_fingerprint(item):
+    """新着・変更の判定に使う値。取得日時のように毎回変わる項目は含めない。"""
+    judgment = item.get("judgment") or {}
+    return [item.get("period", ""), item.get("status", ""), str(item.get("general_price", "")),
+            str(item.get("discount", "")), bool(judgment.get("無料表示")), bool(judgment.get("割引表示")),
+            str(judgment.get("手帳本人", ""))]
+
+
+def load_state(path=None):
+    """状態JSONを読む。存在しない・壊れている場合は None（初回扱い）。"""
+    try:
+        with open(path or STATE_JSON, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, ValueError):
+        return None
+    if not isinstance(data, dict) or not isinstance(data.get("items"), dict):
+        return None
+    return data
+
+
+def save_state(state, path=None):
+    """状態JSONを一時ファイル経由で保存する（書き込み途中の破損を防ぐ）。"""
+    path = path or STATE_JSON
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(state, f, ensure_ascii=False, indent=1, default=str)
+    os.replace(tmp, path)
+
+
+def venue_drop_failures(prev_counts, new_counts):
+    """P3：前回件数が STATE_MIN_COUNT 以上の施設で、今回件数が前回の STATE_DROP_RATIO 未満なら、
+    失敗扱いの施設名の集合を返す（施設が今回の結果に一件も無い場合も含む）。"""
+    failed = set()
+    for venue, prev in (prev_counts or {}).items():
+        if prev >= STATE_MIN_COUNT and new_counts.get(venue, 0) < prev * STATE_DROP_RATIO:
+            failed.add(venue)
+    return failed
+
+
+def published_venues(path=None):
+    """既存の公開ページにカードがある施設名の集合。読めない・存在しない場合は空集合。"""
+    try:
+        with open(path or OUTPUT_HTML, encoding="utf-8") as f:
+            text = f.read()
+    except OSError:
+        return set()
+    return {html_lib.unescape(v) for v in re.findall(r'data-venue="([^"]*)"', text)}
+
+
+def initial_run_blockers(diff, page_venues):
+    """状態JSONがない初回実行で、取得に失敗した施設に既存の公開展示がある場合、その施設名の集合を返す。
+    前回値がないため保持できず、展示が消えてしまうので、この場合はその回の書き込みを止める。"""
+    if not diff.get("baseline"):
+        return set()
+    return set(diff.get("failed", [])) & set(page_venues)
+
+
+def classify_and_merge(prev_state, fresh_items, failed_venues, today):
+    """P1・P2：正常に取得できた今回分（fresh_items）と、失敗施設の前回値を合わせ、新着・変更・消失・終了を判定する。
+    戻り値: (merged, labels)。prev_state が None（初回）のときは、新着・変更の判定を行わない（labels は終了のみ）。"""
+    # 保存済みの値は、現在のIDの規則で付け直す（ID規則の変更で前回値が消えないようにする）
+    prev = {item_id(v): v for v in ((prev_state or {}).get("items", {})).values()}
+    merged = {}
+    for item in fresh_items:
+        merged[item_id(item)] = item
+    carried = set()
+    for key, old in prev.items():
+        if key not in merged and old.get("venue") in failed_venues:
+            merged[key] = old           # 失敗施設の前回値を保持（削除しない）
+            carried.add(key)
+    labels = {}
+    if prev_state is not None:
+        for key, item in merged.items():
+            if key in carried:
+                labels[key] = "保持（取得失敗）"
+            elif key not in prev:
+                labels[key] = "新着"
+            elif item_fingerprint(item) != item_fingerprint(prev[key]):
+                labels[key] = "変更"
+            else:
+                labels[key] = "変更なし"
+        for key in prev:
+            if key not in merged:
+                labels[key] = "消失"    # 正常に取得した施設から消えた（表示からは外すが、記録に残す）
+    for key, item in merged.items():
+        end_date = parse_end_date(item.get("period", ""))
+        if end_date is not None and end_date < today:
+            labels[key] = "終了"
+    return merged, labels
+
+
+def build_dataset(today=None, state=None):
+    today = today or datetime.date.today()
+    prev_state = state if state is not None else load_state()
+    raw_by_venue = {}          # 施設名 -> 取得した生データ（処理前）
+    failed = set()             # 取得失敗の施設（P2）
+    unmapped_empty = []        # 0件で、失敗の記録もない取得関数（施設名を特定できない）
     for fetcher in FETCHERS:
-        all_items.extend(fetcher())
-    all_items = dedupe_items(all_items)
-    for item in all_items:
+        before = len(skip_log)
+        got = fetcher()
+        fail_sources = {entry.split(": ", 1)[0] for entry in skip_log[before:]
+                        if any(marker in entry for marker in FAILURE_MARKERS)}
+        failed |= fail_sources
+        if not got and not fail_sources:
+            unmapped_empty.append(fetcher.__name__)
+        for item in got:
+            raw_by_venue.setdefault(item["venue"], []).append(item)
+    new_counts = {venue: len(items) for venue, items in raw_by_venue.items()}
+    drops = venue_drop_failures((prev_state or {}).get("venue_counts"), new_counts)
+    failed |= drops
+    fresh = []
+    for venue, items in raw_by_venue.items():
+        if venue not in failed:          # 失敗した施設の生データは使わない（部分的な取得を公開しない）
+            fresh.extend(items)
+    fresh = dedupe_items(fresh)
+    for item in fresh:
         cat, cat_name = classify_category(item["title"])
         item["category"] = cat
         item["category_name"] = cat_name
@@ -1900,10 +2040,10 @@ def build_dataset():
         # 手書き情報を消さずに、個別ページの結果と並べて判定する（施設規定・本人・介護者を分離）
         process_discount(item, ticket_discount, page_checked)
 
-    today = datetime.date.today()
+    merged, labels = classify_and_merge(prev_state, fresh, failed, today)
     ended_count = 0
     active_items = []
-    for item in all_items:
+    for item in merged.values():
         end_date = parse_end_date(item.get("period", ""))
         if end_date is not None and end_date < today:
             ended_count += 1
@@ -1912,6 +2052,23 @@ def build_dataset():
 
     active_items.sort(key=lambda i: status_priority(i["status"]))
     open_count = sum(1 for i in active_items if status_priority(i["status"]) == 0)
+    venue_counts = dict((prev_state or {}).get("venue_counts") or {})
+    venue_counts.update({venue: n for venue, n in new_counts.items() if venue not in failed})
+    LAST_DIFF.clear()
+    LAST_DIFF.update({
+        "baseline": prev_state is None,
+        "labels": labels,
+        "counts": {name: sum(1 for v in labels.values() if v == name)
+                   for name in ["新着", "変更", "変更なし", "消失", "保持（取得失敗）", "終了"]},
+        "failed": sorted(failed),
+        "guard_dropped": sorted(drops),
+        "unmapped_empty": unmapped_empty,
+        "merged": merged,
+        "venue_counts": venue_counts,
+        "titles": {**{item_id(v): v.get("venue", "") + "｜" + v.get("title", "")
+                      for v in (prev_state or {}).get("items", {}).values()},
+                   **{k: v.get("venue", "") + "｜" + v.get("title", "") for k, v in merged.items()}},
+    })
     return active_items, ended_count, open_count
 
 
@@ -2159,6 +2316,13 @@ def main():
         print("❌ 自己検証NG: 本番ファイルは書き換えずに終了します")
         raise SystemExit(1)
 
+    # 初回移行の保護：状態JSONがない初回で、取得失敗の施設に既存の公開展示がある場合は、書き込みも状態保存もせず停止する
+    blockers = initial_run_blockers(LAST_DIFF, published_venues())
+    if blockers:
+        print("❌ 初回実行（状態JSONなし）で、取得に失敗した施設に公開中の展示があるため停止します: " + ", ".join(sorted(blockers)))
+        print("   公開ページ・状態JSONは変更していません。次回の実行で再試行します。")
+        raise SystemExit(1)
+
     # 件数急減ガード: 取得失敗で一部の施設しか残らなかった場合に、既存の公開ページを部分的な内容で上書きしない
     previous, previous_free = existing_page_counts()
     # 強制は「ワークフローの手動実行で強制を選び、理由を入力した」場合だけ有効（CULTURE_FORCE_REASON が空なら無効）
@@ -2211,6 +2375,29 @@ def main():
                 f.write(old_html)
             os.replace(temp_file, OUTPUT_HTML)
         raise SystemExit(1)
+
+    # 状態の保存（P1）：公開ページの書き込みと検証に成功した後だけ、次回の前回値として保存する
+    diff = LAST_DIFF
+    try:
+        save_state({"version": 1,
+                    "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+                    "venue_counts": diff["venue_counts"], "items": diff["merged"]})
+        print(f"💾 状態JSON保存: {STATE_JSON}")
+    except OSError as e:
+        print(f"⚠️ 状態JSONの保存に失敗（公開ページは更新済み）: {e}")
+    if diff["baseline"]:
+        print("🔎 差分判定: 初回（基準データを記録。新着扱いはしません）")
+    else:
+        print("🔎 差分判定: " + " / ".join(f"{k} {v}件" for k, v in diff["counts"].items()))
+    if not diff["baseline"]:
+        for label in ["新着", "変更", "消失"]:
+            names = [diff["titles"].get(k, k) for k, v in diff["labels"].items() if v == label]
+            if names:
+                print(f"   {label}（{len(names)}件）: " + " / ".join(n[:50] for n in names[:10]))
+    if diff["failed"]:
+        print("⚠️ 取得失敗・件数急減の施設（前回値を保持）: " + ", ".join(diff["failed"]))
+    if diff["unmapped_empty"]:
+        print("⚠️ 0件で施設を特定できない取得関数: " + ", ".join(diff["unmapped_empty"]))
 
     by_venue = {}
     for i in items:

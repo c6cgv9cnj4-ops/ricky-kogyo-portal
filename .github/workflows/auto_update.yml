@@ -94,6 +94,8 @@ jobs:
           git config user.name "ricky-kogyo-portal-bot"
           git config user.email "actions@users.noreply.github.com"
           git add docs/
+          # 文化の状態JSON（前回値の保持に使う）。失敗時は保存されないため存在しないこともある
+          if [ -f data/culture_state.json ]; then git add data/culture_state.json; fi
           git diff --cached --quiet && echo "No changes" || (git commit -m "auto: update all-deliverables portal $(date -u +'%Y-%m-%d %H:%M UTC')" && git push)
 
       # 最後のゲート: カルチャーが失敗していた場合のみジョブを失敗させる（他ページのコミット後に実行）
