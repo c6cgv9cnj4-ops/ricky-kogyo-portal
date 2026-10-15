@@ -2076,6 +2076,18 @@ def render_html(items):
 """
 
 
+def guard_decision(n_new, previous, previous_free, new_free, force):
+    """件数・無料の急減ガードの判定。戻り値: (通過するか, 理由)。
+    下限（既存の50%未満）は force でも解除しない。80%の件数減・無料の急減は、確認済みの強制（force=True）のときだけ通す。"""
+    if previous and n_new < previous * 0.5:
+        return False, f"下限ガード: 既存{previous}件 → 今回{n_new}件（50%未満）。FORCEでも解除しません。本番ファイルは書き換えずに終了します"
+    if not force and previous and n_new < previous * 0.8:
+        return False, f"件数急減ガード: 既存{previous}件 → 今回{n_new}件（80%未満）。取得失敗の可能性があるため本番ファイルは書き換えずに終了します"
+    if not force and previous_free >= 5 and new_free < previous_free * 0.8:
+        return False, f"無料急減ガード: 既存の確認済み無料{previous_free}件 → 今回{new_free}件（80%未満）。詳細ページの取得失敗の可能性があるため本番ファイルは書き換えずに終了します"
+    return True, ""
+
+
 def self_test(items):
     failures = []
     if not items:
@@ -2149,22 +2161,18 @@ def main():
 
     # 件数急減ガード: 取得失敗で一部の施設しか残らなかった場合に、既存の公開ページを部分的な内容で上書きしない
     previous, previous_free = existing_page_counts()
-    # 運用上の逃げ道: 恒久的な件数減少（サイト改修など）で更新が止まり続けた場合に、担当者が意図的に上書きする
-    force = os.environ.get("CULTURE_FORCE_UPDATE") == "1"
-    # 下限（FORCEでも解除しない）: 既存の50%未満への急減は全件失敗・大量失敗とみなして止める
-    if previous and len(items) < previous * 0.5:
-        print(f"❌ 下限ガード: 既存{previous}件 → 今回{len(items)}件（50%未満）。FORCEでも解除しません。本番ファイルは書き換えずに終了します")
-        raise SystemExit(1)
-    if force and (len(items) < previous * 0.8 or previous_free >= 5):
-        print("⚠️ CULTURE_FORCE_UPDATE=1: 件数（50%以上）・無料の急減ガードを無効化して上書きします（担当者の確認済みであること）")
-    if not force and previous and len(items) < previous * 0.8:
-        print(f"❌ 件数急減ガード: 既存{previous}件 → 今回{len(items)}件（80%未満）。取得失敗の可能性があるため本番ファイルは書き換えずに終了します")
-        raise SystemExit(1)
-    # 確認済み無料の急減ガード: 詳細ページの取得失敗で、確認済みの無料表示だけが消えるのを防ぐ（件数は残るため件数ガードでは拾えない）
+    # 強制は「ワークフローの手動実行で強制を選び、理由を入力した」場合だけ有効（CULTURE_FORCE_REASON が空なら無効）
+    reason = os.environ.get("CULTURE_FORCE_REASON", "").strip()
+    force = os.environ.get("CULTURE_FORCE_UPDATE") == "1" and bool(reason)
+    if os.environ.get("CULTURE_FORCE_UPDATE") == "1" and not reason:
+        print("⚠️ CULTURE_FORCE_UPDATE=1 ですが理由（CULTURE_FORCE_REASON）が空のため、強制は適用しません")
     new_free = sum(1 for i in items if (i.get("judgment") or {}).get("無料表示"))
-    if not force and previous_free >= 5 and new_free < previous_free * 0.8:
-        print(f"❌ 無料急減ガード: 既存の確認済み無料{previous_free}件 → 今回{new_free}件（80%未満）。詳細ページの取得失敗の可能性があるため本番ファイルは書き換えずに終了します")
+    ok, message = guard_decision(len(items), previous, previous_free, new_free, force)
+    if not ok:
+        print(f"❌ {message}")
         raise SystemExit(1)
+    if force:
+        print(f"⚠️ 強制実行（理由: {reason}）: 件数・無料の急減ガードを今回のみ無効化（下限50%は有効）")
 
     html = render_html(items)
 
@@ -2177,6 +2185,11 @@ def main():
         raise SystemExit(1)
     print(f"✅ 検品OK: カード{len(items)}件の状態・フラグ・根拠の整合性を確認しました")
 
+    # 旧ファイルは書き換え前にメモリへ退避する（書き換え後の検証に失敗したら復元する）
+    old_html = None
+    if os.path.exists(OUTPUT_HTML):
+        with open(OUTPUT_HTML, encoding="utf-8") as f:
+            old_html = f.read()
     temp_file = OUTPUT_HTML + ".tmp"
     try:
         with open(temp_file, "w", encoding="utf-8") as f:
@@ -2188,6 +2201,16 @@ def main():
         if os.path.exists(temp_file):
             os.remove(temp_file)
         raise SystemExit(1)  # 保存失敗を成功扱いにしない
+    # 書き込み後の検証: 読み直した内容が生成内容と一致し、検品を通ること。失敗時は旧ファイルへ戻して終了する
+    with open(OUTPUT_HTML, encoding="utf-8") as f:
+        written = f.read()
+    if written != html or quality_check(written, items):
+        print("❌ 書き込み後の検証に失敗。旧ファイルを復元して終了します")
+        if old_html is not None:
+            with open(temp_file, "w", encoding="utf-8") as f:
+                f.write(old_html)
+            os.replace(temp_file, OUTPUT_HTML)
+        raise SystemExit(1)
 
     by_venue = {}
     for i in items:
