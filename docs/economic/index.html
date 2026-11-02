@@ -92,7 +92,7 @@
 <div class="page">
   <header class="top">
     <h1>経済ポータルダッシュボード</h1>
-    <div class="meta">最終生成: 2026-11-01 09:01:02 JST</div>
+    <div class="meta">最終生成: 2026-11-02 09:31:28 JST</div>
   </header>
 
   <section>
@@ -100,51 +100,51 @@
     <div class="market-grid">
     <div class="mcard">
       <div class="mlabel">日経平均株価（現物）</div>
-      <div class="mvalue mono">63290.11</div>
-      <div class="mchange mono down">-1369.36 (-2.12%)</div>
-      <div class="mtime">更新日時: 2026-11-01 09:00:56 JST</div>
+      <div class="mvalue mono">62983.21</div>
+      <div class="mchange mono down">-306.9 (-0.48%)</div>
+      <div class="mtime">更新日時: 2026-11-02 09:31:20 JST</div>
     </div>
     <div class="mcard">
       <div class="mlabel">S&P 500</div>
       <div class="mvalue mono">7580.07</div>
       <div class="mchange mono down">-140.32 (-1.82%)</div>
-      <div class="mtime">更新日時: 2026-11-01 09:00:56 JST</div>
+      <div class="mtime">更新日時: 2026-11-02 09:31:21 JST</div>
     </div>
     <div class="mcard">
       <div class="mlabel">ドル/円</div>
-      <div class="mvalue mono">157.8</div>
-      <div class="mchange mono down">-0.03 (-0.02%)</div>
-      <div class="mtime">更新日時: 2026-11-01 09:00:56 JST</div>
+      <div class="mvalue mono">157.74</div>
+      <div class="mchange mono down">-0.07 (-0.04%)</div>
+      <div class="mtime">更新日時: 2026-11-02 09:31:21 JST</div>
     </div>
     <div class="mcard">
       <div class="mlabel">米10年債利回り</div>
       <div class="mvalue mono">4.93</div>
       <div class="mchange mono down">-0.06 (-1.2%)</div>
-      <div class="mtime">更新日時: 2026-11-01 09:00:56 JST</div>
+      <div class="mtime">更新日時: 2026-11-02 09:31:21 JST</div>
     </div>
     <div class="mcard">
       <div class="mlabel">SOX指数（半導体株）</div>
       <div class="mvalue mono">10688.8</div>
       <div class="mchange mono down">-829.4 (-7.2%)</div>
-      <div class="mtime">更新日時: 2026-11-01 09:00:56 JST</div>
+      <div class="mtime">更新日時: 2026-11-02 09:31:21 JST</div>
     </div>
     <div class="mcard">
       <div class="mlabel">WTI原油先物</div>
-      <div class="mvalue mono">104.12</div>
-      <div class="mchange mono up">+2.12 (+2.08%)</div>
-      <div class="mtime">更新日時: 2026-11-01 09:00:57 JST</div>
+      <div class="mvalue mono">102.5</div>
+      <div class="mchange mono down">-1.62 (-1.56%)</div>
+      <div class="mtime">更新日時: 2026-11-02 09:31:21 JST</div>
     </div>
     <div class="mcard">
       <div class="mlabel">VIX指数（恐怖指数）</div>
       <div class="mvalue mono">19.42</div>
       <div class="mchange mono up">+2.22 (+12.91%)</div>
-      <div class="mtime">更新日時: 2026-11-01 09:00:57 JST</div>
+      <div class="mtime">更新日時: 2026-11-02 09:31:21 JST</div>
     </div>
         <div class="mcard">
           <div class="mlabel">CME日経225先物（円建）（CME￥ 26年12月限）</div>
-          <div class="mvalue mono">62,600</div>
-          <div class="mchange mono">変化 -2,300 ／ 高値64,130 安値61,845</div>
-          <div class="mtime">サイト掲載時刻: 10/30（取得: 2026-11-01 09:00:58 JST）</div>
+          <div class="mvalue mono">62,995</div>
+          <div class="mchange mono">変化 +395 ／ 高値63,100 安値62,480</div>
+          <div class="mtime">サイト掲載時刻: 09:21（取得: 2026-11-02 09:31:23 JST）</div>
         </div></div>
   </section>
 
@@ -164,8 +164,9 @@ YouTube is blocking requests from your IP. This usually is due to one of the fol
 - You have done too many requests and your IP has been blocked by YouTube
 - You are doing requests from an IP belonging to a cloud provider (like AWS, Google Cloud Platform, Azure, etc.). Unfortunately, most IPs from cloud providers are blocked by YouTube.
 
-Ways to work around this are explained in the "Working around IP bans" section of the README (https://github.com/jdepoix/youtube-transcript-api?tab=readme-ov-file#working-around-ip-bans-requestblocked-or-ipblocked-exception).
-
+There are two things you can do to work around this:
+1. Use proxies to hide your IP address, as explained in the "Working around IP bans" section of the README (https://github.com/jdepoix/youtube-transcript-api?tab=readme-ov-file#working-around-ip-bans-requestblocked-or-ipblocked-exception).
+2. (NOT RECOMMENDED) If you authenticate your requests using cookies, you will be able to continue doing requests for a while. However, YouTube will eventually permanently ban the account that you have used to authenticate with! So only do this if you don't mind your account being banned!
 
 If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!）。動画リンクのみ提示します。</div>
     </div>
@@ -182,8 +183,9 @@ YouTube is blocking requests from your IP. This usually is due to one of the fol
 - You have done too many requests and your IP has been blocked by YouTube
 - You are doing requests from an IP belonging to a cloud provider (like AWS, Google Cloud Platform, Azure, etc.). Unfortunately, most IPs from cloud providers are blocked by YouTube.
 
-Ways to work around this are explained in the "Working around IP bans" section of the README (https://github.com/jdepoix/youtube-transcript-api?tab=readme-ov-file#working-around-ip-bans-requestblocked-or-ipblocked-exception).
-
+There are two things you can do to work around this:
+1. Use proxies to hide your IP address, as explained in the "Working around IP bans" section of the README (https://github.com/jdepoix/youtube-transcript-api?tab=readme-ov-file#working-around-ip-bans-requestblocked-or-ipblocked-exception).
+2. (NOT RECOMMENDED) If you authenticate your requests using cookies, you will be able to continue doing requests for a while. However, YouTube will eventually permanently ban the account that you have used to authenticate with! So only do this if you don't mind your account being banned!
 
 If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!）。動画リンクのみ提示します。</div>
     </div>
@@ -200,8 +202,9 @@ YouTube is blocking requests from your IP. This usually is due to one of the fol
 - You have done too many requests and your IP has been blocked by YouTube
 - You are doing requests from an IP belonging to a cloud provider (like AWS, Google Cloud Platform, Azure, etc.). Unfortunately, most IPs from cloud providers are blocked by YouTube.
 
-Ways to work around this are explained in the "Working around IP bans" section of the README (https://github.com/jdepoix/youtube-transcript-api?tab=readme-ov-file#working-around-ip-bans-requestblocked-or-ipblocked-exception).
-
+There are two things you can do to work around this:
+1. Use proxies to hide your IP address, as explained in the "Working around IP bans" section of the README (https://github.com/jdepoix/youtube-transcript-api?tab=readme-ov-file#working-around-ip-bans-requestblocked-or-ipblocked-exception).
+2. (NOT RECOMMENDED) If you authenticate your requests using cookies, you will be able to continue doing requests for a while. However, YouTube will eventually permanently ban the account that you have used to authenticate with! So only do this if you don't mind your account being banned!
 
 If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!）。動画リンクのみ提示します。</div>
     </div>
@@ -212,25 +215,25 @@ If you are sure that the described cause is not responsible for this error and t
     <div class="np-grid">
     <div class="np-col">
       <h3>日経新聞<span class="np-count">6件</span></h3>
-      <a class='np-item' href='https://www.nikkei.com/article/DGXZQOUA0100F0R01C26A1000000/' target='_blank' rel='noopener'><span class='np-time mono'>06:45</span><span class='np-title'>日本・サウジアラビア外相が会談　中東の安定へ連携確認</span></a><a class='np-item' href='https://www.nikkei.com/article/DGXZQOGN28CJK0Y6A021C2000000/' target='_blank' rel='noopener'><span class='np-time mono'>05:00</span><span class='np-title'>ブルーカラー票争奪、赤いラストベルト州が試金石　28年大統領選巡り</span></a><a class='np-item' href='https://www.nikkei.com/article/DGXZQOUB29BV20Z21C26A0000000/' target='_blank' rel='noopener'><span class='np-time mono'>05:00</span><span class='np-title'>金利低下でも沈むゴールド　1年ぶり安値、米中間選挙後の原油高に警鐘</span></a><a class='np-item' href='https://www.nikkei.com/article/DGXZQOUC30BCV0Q6A930C2000000/' target='_blank' rel='noopener'><span class='np-time mono'>05:00</span><span class='np-title'>2ナノ回路は存在しない？　半導体性能を示す「業界用語」が独り歩き</span></a><a class='np-item' href='https://www.nikkei.com/article/DGXZQOUC27BFQ0X21C26A0000000/' target='_blank' rel='noopener'><span class='np-time mono'>05:00</span><span class='np-title'>伊藤忠、訪日客購買データに照準　免税新制度向けシステム会社に出資</span></a><a class='np-item' href='https://www.nikkei.com/article/DGXZQOUC21B2H0R21C26A0000000/' target='_blank' rel='noopener'><span class='np-time mono'>05:00</span><span class='np-title'>長雨で野菜不作、外食で食材変更相次ぐ　ロイホはレタス→キャベツに</span></a>
+      <a class='np-item' href='https://www.nikkei.com/article/DGXZQOKC020FL0S6A101C2000000/' target='_blank' rel='noopener'><span class='np-time mono'>09:08</span><span class='np-title'>堂安律フル出場、南野拓実・久保建英は途中出場　海外サッカー</span></a><a class='np-item' href='https://www.nikkei.com/article/DGXZQOFL020EH0S6A101C2000000/' target='_blank' rel='noopener'><span class='np-time mono'>09:08</span><span class='np-title'>日経平均、続落で始まる　半導体株に売り先行</span></a><a class='np-item' href='https://www.nikkei.com/article/DGXZQOKC020EX0S6A101C2000000/' target='_blank' rel='noopener'><span class='np-time mono'>09:07</span><span class='np-title'>中村敬斗がアシスト、チーム快勝　フランス1部</span></a><a class='np-item' href='https://www.nikkei.com/article/DGXZQOFL020500S6A101C2000000/' target='_blank' rel='noopener'><span class='np-time mono'>09:01</span><span class='np-title'>外為8時30分　円相場、横ばい圏　157円台半ば　対ユーロは上昇</span></a><a class='np-item' href='https://www.nikkei.com/article/DGXZQOKC020E00S6A101C2000000/' target='_blank' rel='noopener'><span class='np-time mono'>08:56</span><span class='np-title'>阪神・佐藤輝明ら交渉へ　大リーグ移籍へポスティング公示</span></a><a class='np-item' href='https://www.nikkei.com/article/DGXZQOUF020JR0S6A101C2000000/' target='_blank' rel='noopener'><span class='np-time mono'>08:56</span><span class='np-title'>滋賀・甲賀で住宅火災、3人死亡　高齢夫婦と息子か</span></a>
     </div>
     <div class="np-col">
       <h3>読売新聞<span class="np-count">6件</span></h3>
-      <a class='np-item' href='https://news.yahoo.co.jp/articles/879390c5bb8343a20d00be4945e7218b0a1a30ca' target='_blank' rel='noopener'><span class='np-time mono'>8:01</span><span class='np-title'>テーオーエルビスが日本調教馬で初の米ＢＣスプリント制覇、クラシック連覇目指したフォーエバーヤングは５着</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/0a51adf26fd2a3a794b591869685b11f3cea0c27' target='_blank' rel='noopener'><span class='np-time mono'>7:55</span><span class='np-title'>全日本大学駅伝当日変更のメンバー発表…早稲田大は新妻遼己３区で前半にルーキートリオそろい踏み、国学院大は３人替え</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/d425bbb78b663ef66416966b40293a2a801b1824' target='_blank' rel='noopener'><span class='np-time mono'>7:30</span><span class='np-title'>全日本大学駅伝の出場校はどう決まる？…箱根シード１０校の中で城西大が出場できない理由は</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/4d759e9672c86177906a07063cda78e40f4dc3a5' target='_blank' rel='noopener'><span class='np-time mono'>7:00</span><span class='np-title'>広島のリーグ３連覇に貢献・田中広輔氏が内野守備・走塁コーチに就任へ…「選手が困った時しっかりとした答えを出せるように」</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/85765acabc769459318ba56129281e494f62f0f7' target='_blank' rel='noopener'><span class='np-time mono'>7:00</span><span class='np-title'>広島の秋山翔吾が海外ＦＡ権行使せず残留「また１年カープで、ＤＨ制でも守備につけるように頑張りたい」</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/4b132120bf7e2bf1460da6717e49426d676ee81c' target='_blank' rel='noopener'><span class='np-time mono'>7:00</span><span class='np-title'>千葉県マスコット「チーバくん」、当初は右向き案もあった…誕生２０年で生みの親が明かす</span></a>
+      <a class='np-item' href='https://news.yahoo.co.jp/articles/df8d626ee7caa1aa6ea57c1513783663eea98756' target='_blank' rel='noopener'><span class='np-time mono'>9:24</span><span class='np-title'>南西諸島へ迅速に展開可能な装輪戦闘車両、那覇駐屯地に搬入へ…敵部隊の上陸や侵攻の阻止を想定</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/aebbc8883445d8a0c261619282646abc734c1924' target='_blank' rel='noopener'><span class='np-time mono'>9:21</span><span class='np-title'>大学野球・神戸医療未来大が関西学院大を破り大阪商業大と決勝へ…天理大は敗者復活準決勝へ</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/97cb01488f0ef70ff0cd91da28bc1eac9dbaa9cd' target='_blank' rel='noopener'><span class='np-time mono'>9:18</span><span class='np-title'>「やっと勝てたので、泣いちゃった」関西学院大が初勝利…関西大学ラグビー</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/7347d0e66845fa0e18ea8a375e0b64bc63dc03ed' target='_blank' rel='noopener'><span class='np-time mono'>9:10</span><span class='np-title'>滋賀県甲賀市で住宅火災、焼け跡から性別不明の３遺体見つかる</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/c792d65ed86c75b2f9ddbc9668999f635f760b6c' target='_blank' rel='noopener'><span class='np-time mono'>8:50</span><span class='np-title'>「日本のガウディ」建築家・梵寿綱、「無駄なものこそ美しい」世界観…亡くなる直前まで住んだ集合住宅で追悼展</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/beac3bbe9308af4ce193728d6c14b7a18481a098' target='_blank' rel='noopener'><span class='np-time mono'>8:32</span><span class='np-title'>紫綬褒章・奈良美智さん「少し世の中とずれたところで自分の絵を描いていきたい」…秋の褒章７３６人２５団体</span></a>
     </div>
     <div class="np-col">
       <h3>朝日新聞<span class="np-count">6件</span></h3>
-      <a class='np-item' href='https://news.yahoo.co.jp/articles/dd2b1b0aae9a1706c26d96a4ee4bf8631473160d' target='_blank' rel='noopener'><span class='np-time mono'>8:00</span><span class='np-title'>非課税だけじゃない、NISAで社会保険料を抑制　シニア期の活用策</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/3e7200ddc37b683d2374b40e6450e4aa18d070a8' target='_blank' rel='noopener'><span class='np-time mono'>8:00</span><span class='np-title'>イヌと暮らす高齢者増えると公的支出1500億減　国立環境研など</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/7150a022b1ed7c70ed30d1e31f6068bb095c812a' target='_blank' rel='noopener'><span class='np-time mono'>8:00</span><span class='np-title'>仰げば千紫万紅　若冲最晩年の天井画　京都非公開文化財特別公開</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/0760410fe93ad1144dca9a1e3fccd89b3754fcd2' target='_blank' rel='noopener'><span class='np-time mono'>8:00</span><span class='np-title'>冥王星の先に新たな準惑星か　米天文台が発見「信じられなかった」</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/e1702b981b798e760ec29b803c3c8f813dfe3b4f' target='_blank' rel='noopener'><span class='np-time mono'>8:00</span><span class='np-title'>智弁学園の四番・太田蓮選手、逆転3ラン 選抜出場濃厚に</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/bae27e2e0709347e0c23ee81a3ca67cafb2ad499' target='_blank' rel='noopener'><span class='np-time mono'>7:34</span><span class='np-title'>早稲田大2冠なるか、全日本大学駅伝スタート　8区間106.8キロ</span></a>
+      <a class='np-item' href='https://news.yahoo.co.jp/articles/2c8bfa62fc44dc9d25f61c8c0bc35a1a6769d1ad' target='_blank' rel='noopener'><span class='np-time mono'>9:00</span><span class='np-title'>国内最大ウォーキング大会、スリーデーマーチ開幕　熊本地震の支援も</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/b13932fb0a75bd6d71b808af929ebe1fe7c54987' target='_blank' rel='noopener'><span class='np-time mono'>9:00</span><span class='np-title'>デーブ・スペクターさんが語る米国の「悪夢」　日本から見る中間選挙</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/1bec2037543069877812576384f4552b23aacae2' target='_blank' rel='noopener'><span class='np-time mono'>8:53</span><span class='np-title'>覆面パトカーが交差点で軽乗用車と衝突、女性がけが　滋賀・東近江</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/bdb41e5b11385d8cc43d77d30811789abdb4bb99' target='_blank' rel='noopener'><span class='np-time mono'>8:19</span><span class='np-title'>島田麻央、日本女子4人目のGP初出場優勝　「笑顔で滑りきれた」</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/35ba6f0a0591f34b993e37f378ac61245640be4e' target='_blank' rel='noopener'><span class='np-time mono'>8:00</span><span class='np-title'>智弁学園・大場、自己最速143キロ 秋季近畿大会で初先発</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/6c0d35077790dd94887138f12d668c3518b0d736' target='_blank' rel='noopener'><span class='np-time mono'>7:14</span><span class='np-title'>滋賀・甲賀市の民家で火災　3人の遺体発見、住人と連絡取れず</span></a>
     </div>
     <div class="np-col">
       <h3>毎日新聞<span class="np-count">6件</span></h3>
-      <a class='np-item' href='https://news.yahoo.co.jp/articles/206e82074536f8073a4d55cc672282ba9bf5d3ab' target='_blank' rel='noopener'><span class='np-time mono'>8:59</span><span class='np-title'>イラン外相、米側の和平交渉再開要請を評価　「前向きな一歩」</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/bb281354396adc3d5fb164a26ae3a7021138cb29' target='_blank' rel='noopener'><span class='np-time mono'>8:15</span><span class='np-title'>かむほど甘み「幻キャベツ」生む嬬恋村　ぐんまパスポートで巡る</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/578fc421be8a72fcfe0bdb95d84973938df4bbb8' target='_blank' rel='noopener'><span class='np-time mono'>8:00</span><span class='np-title'>ポニーリーグ　那須専務理事　7回制「育成の青写真見えない」</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/f01538ab00112cee9ab1261c021c772b0384bab9' target='_blank' rel='noopener'><span class='np-time mono'>7:45</span><span class='np-title'>警察犬が違法薬物発見　ジーナとメイにご褒美「ちゅ～る」　千葉</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/056f22e0b18539b46090123e2246fd1bdf45f85f' target='_blank' rel='noopener'><span class='np-time mono'>7:15</span><span class='np-title'>「この席で結婚指輪を…」　尾道の純喫茶で昭和にタイムリープ</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/4a416903bbd64552be55f44b7da9d0958cd2ee26' target='_blank' rel='noopener'><span class='np-time mono'>6:22</span><span class='np-title'>島田麻央が首位発進、三宅咲綺は4位　スケートカナダ女子SP</span></a>
+      <a class='np-item' href='https://news.yahoo.co.jp/articles/dffb058743a4d2cb3875bac2313628bf745d9772' target='_blank' rel='noopener'><span class='np-time mono'>8:15</span><span class='np-title'>千葉スカイセイラーズ、独立リーグ初参加のシーズンを地元で報告</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/e96a748100f2732272ffdf225fb0a70a957a95b6' target='_blank' rel='noopener'><span class='np-time mono'>7:46</span><span class='np-title'>大エジプト博物館1年で500万人　日本が支援、中東緊迫も好調</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/61a4cc89ec4b7ac3323db2bea2d72fde2af6e3c4' target='_blank' rel='noopener'><span class='np-time mono'>7:45</span><span class='np-title'>「ロス五輪に向け頑張る」　競泳・鈴木聡美選手、故郷に表敬訪問</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/84c6e7ee0818b20613d9cbfae1908d2501d6ee5a' target='_blank' rel='noopener'><span class='np-time mono'>7:31</span><span class='np-title'>「名ばかりの法支配」官邸襲撃の被告が手紙　黙秘の中、支援者に</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/950a03e2062e9412dd788dbf1f2812ca1bf501a5' target='_blank' rel='noopener'><span class='np-time mono'>7:15</span><span class='np-title'>島田麻央がGP初出場優勝　三宅咲綺は4位　スケートカナダ</span></a><a class='np-item' href='https://news.yahoo.co.jp/articles/300bea307df536bddba7b7383fa19aa4df9eca42' target='_blank' rel='noopener'><span class='np-time mono'>7:11</span><span class='np-title'>島田麻央がGPデビュー戦優勝　日本女子4人目　スケートカナダ</span></a>
     </div></div>
   </section>
 
   <section>
     <h2>④ 本日の注目ポイント</h2>
-    <ul class="watch-list"><li>日経平均は前営業日比下落（-2.12%、2026-11-01 09:00:56 JST時点）。</li><li>ドル/円は157.8円（2026-11-01 09:00:56 JST時点）。急変動時は介入観測にも留意。</li><li>本日は主要4紙合計24件の同日記事を確認（詳細はセクション③参照）。</li><li>※本セクションは取得情報の要点整理であり、個別の投資判断・売買を推奨するものではありません。</li></ul>
+    <ul class="watch-list"><li>日経平均は前営業日比下落（-0.48%、2026-11-02 09:31:20 JST時点）。</li><li>ドル/円は157.74円（2026-11-02 09:31:21 JST時点）。急変動時は介入観測にも留意。</li><li>本日は主要4紙合計24件の同日記事を確認（詳細はセクション③参照）。</li><li>※本セクションは取得情報の要点整理であり、個別の投資判断・売買を推奨するものではありません。</li></ul>
   </section>
 
   <footer>
@@ -242,8 +245,9 @@ YouTube is blocking requests from your IP. This usually is due to one of the fol
 - You have done too many requests and your IP has been blocked by YouTube
 - You are doing requests from an IP belonging to a cloud provider (like AWS, Google Cloud Platform, Azure, etc.). Unfortunately, most IPs from cloud providers are blocked by YouTube.
 
-Ways to work around this are explained in the "Working around IP bans" section of the README (https://github.com/jdepoix/youtube-transcript-api?tab=readme-ov-file#working-around-ip-bans-requestblocked-or-ipblocked-exception).
-
+There are two things you can do to work around this:
+1. Use proxies to hide your IP address, as explained in the "Working around IP bans" section of the README (https://github.com/jdepoix/youtube-transcript-api?tab=readme-ov-file#working-around-ip-bans-requestblocked-or-ipblocked-exception).
+2. (NOT RECOMMENDED) If you authenticate your requests using cookies, you will be able to continue doing requests for a while. However, YouTube will eventually permanently ban the account that you have used to authenticate with! So only do this if you don't mind your account being banned!
 
 If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!)</li><li>日経CNBC動画(jVvE8t_vcZU): 字幕取得エラー (
 Could not retrieve a transcript for the video https://www.youtube.com/watch?v=jVvE8t_vcZU! This is most likely caused by:
@@ -252,8 +256,9 @@ YouTube is blocking requests from your IP. This usually is due to one of the fol
 - You have done too many requests and your IP has been blocked by YouTube
 - You are doing requests from an IP belonging to a cloud provider (like AWS, Google Cloud Platform, Azure, etc.). Unfortunately, most IPs from cloud providers are blocked by YouTube.
 
-Ways to work around this are explained in the "Working around IP bans" section of the README (https://github.com/jdepoix/youtube-transcript-api?tab=readme-ov-file#working-around-ip-bans-requestblocked-or-ipblocked-exception).
-
+There are two things you can do to work around this:
+1. Use proxies to hide your IP address, as explained in the "Working around IP bans" section of the README (https://github.com/jdepoix/youtube-transcript-api?tab=readme-ov-file#working-around-ip-bans-requestblocked-or-ipblocked-exception).
+2. (NOT RECOMMENDED) If you authenticate your requests using cookies, you will be able to continue doing requests for a while. However, YouTube will eventually permanently ban the account that you have used to authenticate with! So only do this if you don't mind your account being banned!
 
 If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!)</li><li>日経CNBC動画(1RpLK0USTT4): 字幕取得エラー (
 Could not retrieve a transcript for the video https://www.youtube.com/watch?v=1RpLK0USTT4! This is most likely caused by:
@@ -262,8 +267,9 @@ YouTube is blocking requests from your IP. This usually is due to one of the fol
 - You have done too many requests and your IP has been blocked by YouTube
 - You are doing requests from an IP belonging to a cloud provider (like AWS, Google Cloud Platform, Azure, etc.). Unfortunately, most IPs from cloud providers are blocked by YouTube.
 
-Ways to work around this are explained in the "Working around IP bans" section of the README (https://github.com/jdepoix/youtube-transcript-api?tab=readme-ov-file#working-around-ip-bans-requestblocked-or-ipblocked-exception).
-
+There are two things you can do to work around this:
+1. Use proxies to hide your IP address, as explained in the "Working around IP bans" section of the README (https://github.com/jdepoix/youtube-transcript-api?tab=readme-ov-file#working-around-ip-bans-requestblocked-or-ipblocked-exception).
+2. (NOT RECOMMENDED) If you authenticate your requests using cookies, you will be able to continue doing requests for a while. However, YouTube will eventually permanently ban the account that you have used to authenticate with! So only do this if you don't mind your account being banned!
 
 If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!)</li></ul>
   </footer>
