@@ -1,0 +1,21 @@
+{
+  "artists": [
+    {
+      "name": "架空アーティストA（サンプル）",
+      "official_url": "https://example.invalid/sample-a"
+    },
+    {
+      "name": "架空アーティストB（サンプル）",
+      "official_url": "https://example.invalid/sample-b"
+    }
+  ],
+  "sources": [
+    {
+      "id": "src_manual",
+      "name": "手動入力（架空の設定例）",
+      "url": "https://example.invalid/manual",
+      "kind": "その他",
+      "terms_status": "未確認"
+    }
+  ]
+}

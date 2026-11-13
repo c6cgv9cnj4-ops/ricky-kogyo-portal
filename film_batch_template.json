@@ -1,0 +1,23 @@
+{
+  "people": [
+    {"ref": "p_director", "name": "（監督名）", "disambiguator": "（生年など。同名の人がいれば必須）", "source_url": "（出典URL https://）", "checked_on": "（確認日 YYYY-MM-DD）"}
+  ],
+  "works": [
+    {
+      "ref": "w_film",
+      "title": "（作品名）",
+      "source_url": "（作品の公式ページ URL https://）",
+      "checked_on": "（確認日 YYYY-MM-DD）",
+      "release": {"status": "（公開日確定／未発表／未確認）", "date": "（公開日確定のときだけ YYYY-MM-DD）", "source_url": "（出典URL https://）", "checked_on": "（確認日 YYYY-MM-DD）"},
+      "sales": [
+        {"kind": "（先行／一般）", "status": "（発売前／発売中／販売終了／未確認）", "starts_at": "（発売前は必須。YYYY-MM-DDTHH:MM:SS+09:00）", "url": "（公式販売URL https://）", "source_url": "（出典URL https://）", "checked_on": "（確認日 YYYY-MM-DD）"}
+      ],
+      "staff": [
+        {"name": "（関係者名）", "role": "（監督／脚本／出演／原作／プロデュース）", "disambiguator": "（区別情報。任意）", "source_url": "（出典URL https://）", "checked_on": "（確認日 YYYY-MM-DD）"}
+      ]
+    }
+  ],
+  "credits": [
+    {"work": "w_film", "person": "p_director", "role": "監督", "source_url": "（出典URL https://）", "checked_on": "（確認日 YYYY-MM-DD）"}
+  ]
+}

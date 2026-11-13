@@ -1,0 +1,23 @@
+{
+ "work|title|ゴジラ-10": {
+  "checked_on": "",
+  "credits": [
+   {
+    "person_id": "p_cd66525f",
+    "role": "監督"
+   }
+  ],
+  "data_kind": "実データ",
+  "id": "work|title|ゴジラ-10",
+  "registered_at": "2026-10-21T08:04:33+09:00",
+  "release": {
+   "checked_on": "",
+   "date": "2023-11-03",
+   "precision": "day",
+   "source_url": "https://godzilla-movie2023.toho.co.jp/news/10qu3to-8-7/",
+   "status": "公開日確定"
+  },
+  "source_url": "https://godzilla-movie2023.toho.co.jp/news/oxb3-_pekb/",
+  "title": "ゴジラ-1.0"
+ }
+}

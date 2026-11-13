@@ -42,6 +42,12 @@ def datetime_date(value, timezone, source_url=""):
     return {"value": str(value), "precision": "datetime", "timezone": timezone, "source_url": source_url or ""}
 
 
+SALE_KINDS = ("先行受付", "一般発売")
+SALE_PRECISIONS = ("datetime", "unknown")
+SALE_YEAR_SOURCES = ("明記", "曜日で推定", "未確定")
+SALES_STATUSES = ("取得・解析済み（発売あり）", "ページ確認済み（発売欄なし）", "未確認")
+
+
 def validate_record(rec):
     """共通契約の検証。問題の一覧を返す（空なら合格）。"""
     errors = []
@@ -65,6 +71,23 @@ def validate_record(rec):
             errors.append(f"{key}: 不明な日付に値が入っています")
         if d.get("precision") == "datetime" and not d.get("timezone"):
             errors.append(f"{key}: 時刻付きなのに timezone がありません")
+    # 任意キー（旧データには無い。無くても合格）
+    if "sales" in rec:
+        if not isinstance(rec["sales"], list):
+            errors.append("sales は配列である必要があります")
+        for item in rec.get("sales") or []:
+            if item.get("kind") not in SALE_KINDS:
+                errors.append(f"sales の kind が不正です: {item.get('kind')}")
+            if item.get("precision") not in SALE_PRECISIONS:
+                errors.append("sales の precision が不正です")
+            if item.get("precision") == "unknown" and item.get("start") is not None:
+                errors.append("sales: 不明な発売日時に値が入っています")
+            if item.get("precision") == "datetime" and (not item.get("start") or not item.get("timezone")):
+                errors.append("sales: 時刻付きなのに start / timezone がありません")
+            if item.get("year_source") not in SALE_YEAR_SOURCES:
+                errors.append(f"sales の year_source が不正です: {item.get('year_source')}")
+    if "sales_status" in rec and rec["sales_status"] not in SALES_STATUSES:
+        errors.append(f"sales_status が不正です: {rec['sales_status']}")
     return errors
 
 
@@ -92,6 +115,19 @@ def upcoming_deadlines(records, today, days=14):
             delta = (day - today).days
             if 0 <= delta <= days:
                 rows.append((day, key, rec))
+        singles = {(k, (rec.get("dates") or {}).get(f, {}).get("value")) for k, f in
+                   (("先行受付", "ticket_sale_start"), ("一般発売", "general_sale_start"))}
+        seen = set()
+        for item in rec.get("sales") or []:
+            if item.get("precision") != "datetime" or not item.get("start"):
+                continue   # 日時不明・年不明は期限候補にしない
+            day = datetime.date.fromisoformat(item["start"][:10])
+            delta = (day - today).days
+            key_pair = (item["kind"], item["start"])
+            if not (0 <= delta <= days) or key_pair in singles or key_pair in seen:
+                continue
+            seen.add(key_pair)
+            rows.append((day, item["kind"], rec))
     rows.sort(key=lambda r: (r[0], r[2]["id"]))
     return [{"date": day.isoformat(), "kind": key, "record": rec} for day, key, rec in rows]
 
@@ -137,6 +173,73 @@ def content_key(rec):
     """記録の内容を比べるための文字列（最終確認時刻は含めない）。"""
     body = {k: v for k, v in rec.items() if k != "last_checked_at"}
     return json.dumps(body, ensure_ascii=False, sort_keys=True, default=str)
+
+
+def schedule_rows(records, limit=30):
+    """開催日の近い順の一覧（状態に関わらず、開始日が判明している記録）。日付が不明な記録は含めない。"""
+    rows = []
+    for rec in records:
+        start = ((rec.get("dates") or {}).get("event_start") or {})
+        if start.get("precision") == "day" and start.get("value"):
+            rows.append((str(start["value"]), rec.get("title", ""), rec))
+    rows.sort(key=lambda r: (r[0], r[1]))
+    return [r[2] for r in rows[:limit]]
+
+
+def render_schedule_html(records, limit=30):
+    """公式情報の開催日一覧（公演・イベント）。締切・発売日は、判明している場合だけ表示する。"""
+    rows = schedule_rows(records, limit)
+    if not rows:
+        return "<p class='news-empty'>開催日が判明している公演はありません。</p>"
+    items = []
+    for rec in rows:
+        dates = rec.get("dates") or {}
+        start = (dates.get("event_start") or {}).get("value") or ""
+        end = (dates.get("event_end") or {}).get("value") or ""
+        dl = (dates.get("application_deadline") or {}).get("value") or "未確認"
+        items_sales = rec.get("sales") or []
+        if items_sales:
+            sale_text = " ／ ".join(f"{it['kind']} {it['start'] or '日付未確定'}" for it in items_sales)
+        else:
+            sale_text = {"ページ確認済み（発売欄なし）": "ページに発売の記載なし"}.get(rec.get("sales_status"), "未確認")
+        url = rec["source_url"] if str(rec["source_url"]).startswith(("http://", "https://")) else "#"
+        items.append(
+            "<li class='news-row'>"
+            f"<span class='news-period'>{_esc(start)} 〜 {_esc(end or '未確認')}</span>"
+            f"<span class='news-genre'>{_esc(rec.get('genre', ''))}</span>"
+            f"<a href='{_esc(url)}' target='_blank' rel='noopener'>{_esc(rec.get('title', ''))}</a>"
+            f"<span class='news-venue'>{_esc(rec.get('venue', ''))}</span>"
+            f"<span class='news-deadline'>応募締切：{_esc(dl)}</span>"
+            f"<span class='news-sale'>発売：{_esc(sale_text)}</span>"
+            f"<span class='news-confidence'>確度：{_esc(rec.get('confidence', ''))}</span>"
+            "</li>"
+        )
+    return "<ul class='news-list'>" + "".join(items) + "</ul>"
+
+
+DEADLINE_KIND_LABELS = {"ticket_sale_start": "先行受付", "general_sale_start": "一般発売",
+                        "application_deadline": "応募締切", "先行受付": "先行受付", "一般発売": "一般発売"}
+
+
+def render_deadline_html(rows, empty_text="今後14日以内の発売・締切はありません。"):
+    """upcoming_deadlines の結果を、日付順の一覧にする。区分（先行受付・一般発売・応募締切）を保持する。"""
+    if not rows:
+        return f"<p class='news-empty'>{_esc(empty_text)}</p>"
+    items = []
+    for row in rows:
+        rec = row["record"]
+        kind = DEADLINE_KIND_LABELS.get(row["kind"], row["kind"])
+        url = rec["source_url"] if str(rec.get("source_url", "")).startswith(("http://", "https://")) else "#"
+        items.append(
+            "<li class='news-row'>"
+            f"<span class='news-deadline'>{_esc(row['date'])}</span>"
+            f"<span class='news-sale-kind'>{_esc(kind)}</span>"
+            f"<a href='{_esc(url)}' target='_blank' rel='noopener'>{_esc(rec.get('title', ''))}</a>"
+            f"<span class='news-venue'>{_esc(rec.get('venue', ''))}</span>"
+            f"<span class='news-confidence'>確度：{_esc(rec.get('confidence', ''))}</span>"
+            "</li>"
+        )
+    return "<ul class='news-list'>" + "".join(items) + "</ul>"
 
 
 def write_json_atomic(path, payload):

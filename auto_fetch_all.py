@@ -124,6 +124,44 @@ def check_internal(path):
 CULTURE_EVENTS_JSON = os.path.join(OUTPUT_DIR, "culture-exhibition", "events.json")
 
 
+# 文化機能の一時停止（2026-10-21）：True の間は、ホームの文化カードと文化の共通データを使わない
+# 再開は False に戻す（取得の停止は auto_update.yml の culture ステップ側で別途行う）
+CULTURE_PAUSED = True
+CULTURE_CARD_PATH = "culture-exhibition/"
+
+MUSIC_EVENTS_JSON = os.path.join(OUTPUT_DIR, "music", "events.json")
+EVENT_JSON_FILES = [MUSIC_EVENTS_JSON] if CULTURE_PAUSED else [CULTURE_EVENTS_JSON, MUSIC_EVENTS_JSON]
+
+
+def visible_artifacts(items):
+    """ホームに出すカードの一覧。文化の一時停止中は文化カードを除く（他のカードはそのまま）。"""
+    return [item for item in items if not (CULTURE_PAUSED and item.get("path") == CULTURE_CARD_PATH)]
+
+
+def _read_event_file(path):
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, ValueError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def load_all_event_records():
+    """全ジャンルの共通データを連結する（読めないファイルは空として扱う）。"""
+    records = []
+    for path in EVENT_JSON_FILES:
+        records.extend(_read_event_file(path).get("records", []))
+    return records
+
+
+def load_all_failed_venues():
+    failed = []
+    for path in EVENT_JSON_FILES:
+        failed.extend(_read_event_file(path).get("failed_venues", []))
+    return failed
+
+
 def load_culture_events():
     """美術展の共通データ（events.json）を読む。無い・壊れている場合は空（ホームは取得済みの情報だけを示す）。"""
     try:
@@ -150,7 +188,7 @@ def load_culture_failed_venues():
     return data.get("failed_venues", []) if isinstance(data, dict) else []
 
 
-def news_section_html(records, failed_venues=()):
+def news_section_html(records, failed_venues=(), today=None):
     """ホームの「新着・変更・取得状況」欄。初回の基準データは新着として出さない（状態が 新着 の記録だけを出す）。"""
     rows = ER.news_rows(records)
     body = ER.render_news_html(rows, "新着・変更・取得状況の掲載はありません（差分なし、または初回の基準データ）。")
@@ -158,7 +196,20 @@ def news_section_html(records, failed_venues=()):
     if failed_venues:
         names = "、".join(H_esc(v) for v in failed_venues)
         failed_line = f"<p class='note'>今回取得できなかった施設（前回の正常データを表示、またはデータなし）：{names}</p>"
+    schedule = ER.render_schedule_html(records)
+    today = today or datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).date()
+    deadlines = ER.render_deadline_html(ER.upcoming_deadlines(records, today, days=14))
     return f"""
+<section class="deadlines">
+  <h2>今後14日以内の発売・締切</h2>
+  <p class="note">日付が確定しているものだけを表示します。年や時刻が不明なものと、過去の日付は含みません。</p>
+  {deadlines}
+</section>
+<section class="schedule">
+  <h2>開催日一覧（美術展・公演・イベント）</h2>
+  <p class="note">開催日は公式ページ・展示ページの記載に基づきます。一般発売日・先行受付・公式発表日は情報源に記載がないものは「未確認」です。</p>
+  {schedule}
+</section>
 <section class="news">
   <h2>新着・変更・取得状況（{len(rows)}件）</h2>
   {failed_line}
@@ -185,7 +236,7 @@ def main():
     now_str = now.strftime("%Y-%m-%d %H:%M JST")
 
     results = []
-    for item in ARTIFACTS:
+    for item in visible_artifacts(ARTIFACTS):
         key = item.get("url") or item.get("path")
         if item["type"] == "external":
             status_code, ok = check_external(item["url"])
@@ -310,7 +361,7 @@ def main():
   <div class="summary">✅ {ok_count} / {total} 件 生存確認OK ｜ 最終更新: {now_str}</div>
 </header>
 <main>
-{news_section_html(load_culture_events(), load_culture_failed_venues())}
+{news_section_html(load_all_event_records(), load_all_failed_venues())}
 {sections_html}
 </main>
 <footer>

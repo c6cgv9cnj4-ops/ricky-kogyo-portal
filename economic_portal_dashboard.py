@@ -21,6 +21,7 @@ from youtube_transcript_api import YouTubeTranscriptApi
 
 OUTPUT_DIR = "docs/economic"
 OUTPUT_HTML = os.path.join(OUTPUT_DIR, "index.html")
+JST = datetime.timezone(datetime.timedelta(hours=9))
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
@@ -180,7 +181,8 @@ def log_skip(source, reason):
 
 
 def now_jst():
-    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S JST")
+    # 実行環境のローカル時刻（GitHub Actions は UTC）ではなく JST で表示・判定する
+    return datetime.datetime.now(JST).strftime("%Y-%m-%d %H:%M:%S JST")
 
 
 # ------------------------------------------------------------
@@ -351,7 +353,8 @@ def fetch_nikkei_today(limit=6):
         if status is not None and status >= 400:
             log_skip(label, f"HTTP {status}")
             return items
-        today = datetime.datetime.now().date()
+        # RSSの日付は +09:00。実行環境の日付（UTC）と比べると、08:00〜09:00 JST に当日記事が全て落ちる
+        today = datetime.datetime.now(JST).date()
         for e in feed.entries:
             date_str = e.get("date") or e.get("published") or e.get("updated")
             if not date_str:
@@ -379,7 +382,7 @@ def fetch_yahoo_media_today(name, media_code, limit=6):
         r = requests.get(f"https://news.yahoo.co.jp/media/{media_code}", headers=HEADERS, timeout=10)
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
-        today = datetime.datetime.now()
+        today = datetime.datetime.now(JST)
         today_md = f"{today.month}/{today.day}"
         pattern = re.compile(r"^(.*?)\s*(\d{1,2}/\d{1,2})\(.\)\s*(\d{1,2}:\d{2})$")
         links = soup.select("a[href*='/articles/']")

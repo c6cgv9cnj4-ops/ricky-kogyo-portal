@@ -10,6 +10,7 @@ import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import culture_exhibition_dashboard as D  # noqa: E402
+import fetch_meta as FM  # noqa: E402
 
 TODAY = datetime.date(2026, 10, 15)
 
@@ -233,15 +234,16 @@ class MainHarness(unittest.TestCase):
         self.dir = tempfile.mkdtemp()
         self.page = os.path.join(self.dir, "docs", "culture-exhibition", "index.html")
         self.state = os.path.join(self.dir, "data", "culture_state.json")
-        self.saved = (D.OUTPUT_DIR, D.OUTPUT_HTML, D.STATE_JSON, D.FETCHERS, D.fetch_ticket_info)
+        self.saved = (D.OUTPUT_DIR, D.OUTPUT_HTML, D.STATE_JSON, D.FETCHERS, D.fetch_ticket_info, FM.META_PATH)
         D.OUTPUT_DIR = os.path.join(self.dir, "docs", "culture-exhibition")
         D.OUTPUT_HTML = self.page
         D.STATE_JSON = self.state
+        FM.META_PATH = os.path.join(self.dir, "data", "culture_fetch_meta.json")   # 実データの取得時刻を書かない
         D.fetch_ticket_info = lambda url: ("", "", "", False)
         self.venues = {}
 
     def tearDown(self):
-        D.OUTPUT_DIR, D.OUTPUT_HTML, D.STATE_JSON, D.FETCHERS, D.fetch_ticket_info = self.saved
+        D.OUTPUT_DIR, D.OUTPUT_HTML, D.STATE_JSON, D.FETCHERS, D.fetch_ticket_info, FM.META_PATH = self.saved
         shutil.rmtree(self.dir, ignore_errors=True)
 
     def _fetcher(self, name):

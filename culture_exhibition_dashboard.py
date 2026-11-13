@@ -4,6 +4,8 @@ import json
 import time
 import html as html_lib
 import datetime
+import concurrent.futures
+import threading
 import urllib.parse
 import requests
 import feedparser
@@ -11,6 +13,7 @@ import sys as _sys
 import os as _os
 _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))  # 共通データ契約（同じフォルダ）を、-I などの実行方法に関わらず読めるようにする
 import event_records as ER
+import fetch_meta as FM
 from bs4 import BeautifulSoup
 
 # ============================================================
@@ -1814,6 +1817,33 @@ PERIOD_PATTERNS = [
 ]
 
 
+TICKET_WORKERS = 4    # 詳細ページの同時取得数の全体上限（1にすると従来どおり直列）
+TICKET_PER_HOST = 2   # 同一ホストへの同時取得数の上限（取得元への集中を防ぐ）。利用条件・レート制限は未確認
+
+
+def prefetch_ticket_info(links, workers=None, per_host=None):
+    """詳細ページを並列に取得し、URLごとの結果を返す。同じURLは1回だけ取得する。
+    全体の同時数は workers 以下、同一ホストへの同時数は per_host 以下に抑える。
+    fetch_ticket_info は共有の状態を書き換えないため、並列でも結果は直列と同じになる。
+    呼び出し側は元の順序で結果を使うので、出力の順序も変わらない。"""
+    unique = list(dict.fromkeys(links))
+    workers = TICKET_WORKERS if workers is None else workers
+    per_host = TICKET_PER_HOST if per_host is None else per_host
+    if workers <= 1 or len(unique) <= 1:
+        return {url: fetch_ticket_info(url) for url in unique}
+    # ホストごとのセマフォは、取得の前に全部作っておく（並列中に作ると二重に作られる恐れがあるため）
+    slots = {}
+    for url in unique:
+        slots.setdefault(urllib.parse.urlsplit(url).netloc, threading.Semaphore(per_host))
+
+    def fetch_limited(url):
+        with slots[urllib.parse.urlsplit(url).netloc]:
+            return fetch_ticket_info(url)
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as pool:
+        return dict(zip(unique, pool.map(fetch_limited, unique)))
+
+
 def fetch_ticket_info(url):
     """展覧会の個別ページから会期・一般観覧料・障害者手帳の割引条件を実際に取得する。
     取得できない場合は正直に None を返す（推測で埋めない）。
@@ -2079,13 +2109,14 @@ def build_dataset(today=None, state=None):
         if venue not in failed:          # 失敗した施設の生データは使わない（部分的な取得を公開しない）
             fresh.extend(items)
     fresh = dedupe_items(fresh)
+    ticket_pages = prefetch_ticket_info([item["link"] for item in fresh])
     for item in fresh:
         cat, cat_name = classify_category(item["title"])
         item["category"] = cat
         item["category_name"] = cat_name
         item["access"] = ACCESS_INFO.get(item["venue"], "")
 
-        price, ticket_discount, ticket_period, page_checked = fetch_ticket_info(item["link"])
+        price, ticket_discount, ticket_period, page_checked = ticket_pages[item["link"]]
         item["general_price"] = price if price else "料金情報取得中"
         if not item.get("period") and ticket_period:
             # 一覧ページに会期がなかった場合のみ、詳細ページから取得した会期で補完する
@@ -2589,7 +2620,19 @@ def main():
     elapsed = time.time() - start_time
     print(f"⏱️ トータル処理時間: {int(elapsed // 60)}分 {elapsed % 60:.2f}秒")
     print(f"🔎 自己検証結果: {'PASS' if passed else 'FAIL'}")
+    # 取得時刻は、全施設の取得が成功したときだけ更新する。一部の施設が失敗・件数急減・特定不能なら、
+    # 前回値で補った部分失敗なので、最終成功時刻は前回のまま残す
+    FM.record_outcome(list(diff["failed"]) + list(diff["unmapped_empty"]), FM.META_PATH)
 
 
 if __name__ == "__main__":
-    main()
+    # 失敗・異常終了は取得時刻メタデータに記録する（最終成功時刻は前回の値のまま残す）
+    try:
+        main()
+    except SystemExit as e:
+        if e.code not in (0, None):
+            FM.record_failure(f"終了コード {e.code}", FM.META_PATH)
+        raise
+    except Exception as e:
+        FM.record_failure(f"{type(e).__name__}: {e}", FM.META_PATH)
+        raise

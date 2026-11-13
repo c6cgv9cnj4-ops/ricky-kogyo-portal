@@ -1,0 +1,4 @@
+artist_name,venue,name,event_date,status,evidence_url,source_performance_id,sale_type,sale_start,sale_end
+架空アーティストA（サンプル）,架空ホールA（サンプル）,サンプル・ツアー 2027,2027-03-01,公演発表,https://example.invalid/sample-a,SAMPLE-A-001,先行受付,2026-11-10T10:00:00+09:00,2026-11-11T23:59:00+09:00
+架空アーティストA（サンプル）,架空ホールB（サンプル）,サンプル・ツアー 2027,2027-03-08,公演発表,https://example.invalid/sample-a,SAMPLE-A-002,一般発売,2026-11-12T10:00:00+09:00,2026-11-13T23:59:00+09:00
+架空アーティストB（サンプル）,架空ホールC（サンプル）,サンプル・ジャパン公演,,延期,https://example.invalid/sample-b,SAMPLE-B-001,,,
